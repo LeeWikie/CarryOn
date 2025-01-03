@@ -38,7 +38,7 @@ public class CarryConfig
 		)
 		public Settings settings = new Settings();
 
-		@Category("settings")
+		@Category(value="settings", translation = "carryon.category.settings")
 		public static class Settings
 		{
 			@Property(
@@ -171,7 +171,8 @@ public class CarryConfig
 
 			@Property(
 					type = PropertyType.STRING_ARRAY,
-					description = "Usually all the block state information is retained when placing a block that was picked up. But some information is changed to a modified property, like rotation or orientation. In this list, add additional properties that should NOT be saved and instead be updated when placed. Format: modid:block[propertyname]. Note: You don't need to add an entry for every subtype of a same block. For example, we only add an entry for one type of slab, but the change is applied to all slabs."
+					description = "Usually all the block state information is retained when placing a block that was picked up. But some information is changed to a modified property, like rotation or orientation. In this list, add additional properties that should NOT be saved and instead be updated when placed. Format: modid:block[propertyname]. Note: You don't need to add an entry for every subtype of a same block. For example, we only add an entry for one type of slab, but the change is applied to all slabs.",
+					validationRegex = "([a-zA-Z0-9_]+:[a-zA-Z0-9_]+)\\[([a-zA-Z0-9_,]+)\\]"
 			)
 			public String[] placementStateExceptions = {
 					"minecraft:chest[type]",
@@ -204,24 +205,27 @@ public class CarryConfig
 		//Whitelist
 		public Whitelist whitelist = new Whitelist();
 
-		@Category("whitelist")
+		@Category(value="whitelist", translation = "carryon.category.whitelist")
 		public static class Whitelist
 		{
 			@Property(
 					type = PropertyType.STRING_ARRAY,
-					description = "Entities that CAN be picked up (useWhitelistEntities must be true)"
+					description = "Entities that CAN be picked up (useWhitelistEntities must be true)",
+					validationRegex = "(#?[a-zA-Z0-9_*]+:[a-zA-Z0-9_*]*(?:\\*|[a-zA-Z0-9_]*)(?:\\*|[a-zA-Z0-9_]*)?)"
 			)
 			public String[] allowedEntities = {};
 
 			@Property(
 					type = PropertyType.STRING_ARRAY,
-					description = "Blocks that CAN be picked up (useWhitelistBlocks must be true)"
+					description = "Blocks that CAN be picked up (useWhitelistBlocks must be true)",
+					validationRegex = "(#?[a-zA-Z0-9_*]+:[a-zA-Z0-9_*]*(?:\\*|[a-zA-Z0-9_]*)(?:\\*|[a-zA-Z0-9_]*)?)"
 			)
 			public String[] allowedBlocks = {};
 
 			@Property(
 					type = PropertyType.STRING_ARRAY,
-					description = "Entities that CAN have other entities stacked on top of them (useWhitelistStacking must be true)"
+					description = "Entities that CAN have other entities stacked on top of them (useWhitelistStacking must be true)",
+					validationRegex = "(#?[a-zA-Z0-9_*]+:[a-zA-Z0-9_*]*(?:\\*|[a-zA-Z0-9_]*)(?:\\*|[a-zA-Z0-9_]*)?)"
 			)
 			public String[] allowedStacking = {};
 		}
@@ -233,12 +237,13 @@ public class CarryConfig
 		)
 		public Blacklist blacklist = new Blacklist();
 
-		@Category("blacklist")
+		@Category(value="blacklist", translation = "carryon.category.blacklist")
 		public static class Blacklist
 		{
 			@Property(
 					type = PropertyType.STRING_ARRAY,
-					description = "Blocks that cannot be picked up"
+					description = "Blocks that cannot be picked up",
+					validationRegex = "(#?[a-zA-Z0-9_*]+:[a-zA-Z0-9_*]*(?:\\*|[a-zA-Z0-9_]*)(?:\\*|[a-zA-Z0-9_]*)?)"
 			)
 			public String[] forbiddenTiles = {
 					"#forge:immovable", "#forge:relocation_not_supported", "#neoforge:immovable", "#neoforge:relocation_not_supported", "minecraft:end_portal", "minecraft:piston_head",
@@ -283,7 +288,8 @@ public class CarryConfig
 
 			@Property(
 					type = PropertyType.STRING_ARRAY,
-					description = "Entities that cannot be picked up"
+					description = "Entities that cannot be picked up",
+					validationRegex = "(#?[a-zA-Z0-9_*]+:[a-zA-Z0-9_*]*(?:\\*|[a-zA-Z0-9_]*)(?:\\*|[a-zA-Z0-9_]*)?)"
 			)
 			public String[] forbiddenEntities = {
 					"#c:capturing_not_supported", "#c:teleporting_not_supported",
@@ -298,7 +304,8 @@ public class CarryConfig
 
 			@Property(
 					type = PropertyType.STRING_ARRAY,
-					description = "Entities that cannot have other entities stacked on top of them"
+					description = "Entities that cannot have other entities stacked on top of them",
+					validationRegex = "(#?[a-zA-Z0-9_*]+:[a-zA-Z0-9_*]*(?:\\*|[a-zA-Z0-9_]*)(?:\\*|[a-zA-Z0-9_]*)?)"
 			)
 			public String[] forbiddenStacking = {
 					"minecraft:horse"
@@ -312,18 +319,20 @@ public class CarryConfig
 		)
 		public CustomPickupConditions customPickupConditions = new CustomPickupConditions();
 
-		@Category("customPickupConditions")
+		@Category(value="customPickupConditions", translation = "carryon.category.custompickupconditions")
 		public static class CustomPickupConditions
 		{
 			@Property(
 					type = PropertyType.STRING_ARRAY,
-					description = "Custom Pickup Conditions for Blocks"
+					description = "Custom Pickup Conditions for Blocks",
+					validationRegex = "([a-zA-Z0-9_*\\-:]+(?:\\[[^\\]]*\\])?)\\(([\\w_]+)\\)"
 			)
 			public String[] customPickupConditionsBlocks = {};
 
 			@Property(
 					type = PropertyType.STRING_ARRAY,
-					description = "Custom Pickup Conditions for Entities"
+					description = "Custom Pickup Conditions for Entities",
+					validationRegex = "([a-zA-Z0-9_*\\-:]+(?:\\[[^\\]]*\\])?)\\(([\\w_]+)\\)"
 			)
 			public String[] customPickupConditionsEntities = {};
 		}
@@ -347,7 +356,8 @@ public class CarryConfig
 
 		@Property(
 				type = PropertyType.STRING_ARRAY,
-				description = "Model Overrides based on NBT or Meta. Advanced users only! Read about the format here: https://github.com/Tschipp/CarryOn/wiki/Model-Override-Config"
+				description = "Model Overrides based on NBT or Meta. Advanced users only! Read about the format here: https://github.com/Tschipp/CarryOn/wiki/Model-Override-Config",
+				validationRegex = "([a-zA-Z0-9_]+:[a-zA-Z0-9_]+(?:\\[[^\\]]*\\])?(?:\\{[^}]*\\})?)(?:;(\\d+))?->(?:\\((item|block)\\))?([a-zA-Z0-9_]+:[a-zA-Z0-9_]+(?:\\[[^\\]]*\\])?(?:\\{[^}]*\\})?)(?:;(\\d+))?"
 		)
 		public String[] modelOverrides = {
 				"minecraft:redstone_wire->(item)minecraft:redstone",

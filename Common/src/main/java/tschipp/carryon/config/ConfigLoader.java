@@ -66,7 +66,7 @@ public class ConfigLoader {
         if (configClass.isAnnotationPresent(Config.class)) {
             category = new BuiltConfig(configClass.getAnnotation(Config.class).value());
         } else if (configClass.isAnnotationPresent(Category.class)) {
-            category = new BuiltCategory(categoryDesc, configClass.getAnnotation(Category.class).value());
+            category = new BuiltCategory(categoryDesc, configClass.getAnnotation(Category.class).value(), configClass.getAnnotation(Category.class).translation());
         } else {
             throw new IllegalStateException("Config does not contain any @Config annotation or @Category");
         }
@@ -77,7 +77,7 @@ public class ConfigLoader {
                 if (type.equals(PropertyType.CATEGORY)) {
                     category.categories.add(buildCategory(field.getAnnotation(Property.class).description(), field.get(object)));
                 } else {
-                    category.properties.add(new PropertyData(object, field, AnnotationData.getData(field)));
+                    category.properties.add(new PropertyData(object, field, AnnotationData.getData(field), field.get(object)));
                 }
             }
         }

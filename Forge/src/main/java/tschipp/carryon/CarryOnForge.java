@@ -45,7 +45,7 @@ public class CarryOnForge {
 
         context.getModEventBus().addListener(this::setup);
 
-        ConfigLoaderImpl.initialize();
+        ConfigLoaderImpl.initialize(context);
     }
 
     private void setup(final FMLCommonSetupEvent event)

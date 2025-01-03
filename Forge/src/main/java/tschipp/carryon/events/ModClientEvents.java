@@ -22,12 +22,19 @@ package tschipp.carryon.events;
 
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.ConfigScreenHandler;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import tschipp.carryon.Constants;
 import tschipp.carryon.client.keybinds.CarryOnKeybinds;
+import tschipp.carryon.compat.ClothConfigCompatForge;
+import tschipp.carryon.config.BuiltConfig;
+import tschipp.carryon.config.forge.ConfigLoaderImpl;
+import tschipp.carryon.platform.Services;
 
 @Mod.EventBusSubscriber(bus = Bus.MOD, modid = Constants.MOD_ID)
 public class ModClientEvents
@@ -36,5 +43,15 @@ public class ModClientEvents
 	public static void registerKeybinds(RegisterKeyMappingsEvent event)
 	{
 		CarryOnKeybinds.registerKeybinds(event::register);
+	}
+
+	@SubscribeEvent
+	public static void clientSetup(FMLClientSetupEvent event)
+	{
+		if(Services.PLATFORM.isModLoaded("cloth_config")) {
+
+			BuiltConfig[] configs = ConfigLoaderImpl.CONFIGS.values().toArray(new BuiltConfig[0]);
+			ModLoadingContext.get().registerExtensionPoint(ConfigScreenHandler.ConfigScreenFactory.class, () -> new ConfigScreenHandler.ConfigScreenFactory((mc, prevScreen) -> ClothConfigCompatForge.createScreen(configs[1], configs[0], prevScreen)));
+		}
 	}
 }

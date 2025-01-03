@@ -23,6 +23,9 @@
       ],
       "client": [
         "tschipp.carryon.CarryOnFabricClientMod"
+      ],
+      "modmenu" : [
+        "tschipp.carryon.compat.ModMenuCompat"
       ]
     },
     "mixins": [

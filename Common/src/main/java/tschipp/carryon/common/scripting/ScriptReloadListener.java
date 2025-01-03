@@ -29,11 +29,13 @@ import com.mojang.serialization.JsonOps;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
+import net.minecraft.resources.FileToIdConverter;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
+import org.jetbrains.annotations.NotNull;
 import tschipp.carryon.Constants;
 import tschipp.carryon.common.carry.CarryOnData;
 import tschipp.carryon.networking.clientbound.ClientboundSyncScriptsPacket;
@@ -46,11 +48,11 @@ public class ScriptReloadListener extends SimpleJsonResourceReloadListener<Carry
 {
 	public ScriptReloadListener()
 	{
-		super(CarryOnScript.CODEC, "carryon/scripts");
+		super(CarryOnScript.CODEC, FileToIdConverter.json("carryon/scripts"));
 	}
 
 	@Override
-	protected void apply(Map<ResourceLocation, CarryOnScript> scripts, ResourceManager resourceManager, ProfilerFiller profilerFiller)
+	protected void apply(Map<ResourceLocation, CarryOnScript> scripts, @NotNull ResourceManager resourceManager, @NotNull ProfilerFiller profilerFiller)
 	{
 		ScriptManager.SCRIPTS.clear();
 
@@ -59,7 +61,7 @@ public class ScriptReloadListener extends SimpleJsonResourceReloadListener<Carry
 				ScriptManager.SCRIPTS.add(script);
 		});
 
-		Collections.sort(ScriptManager.SCRIPTS, (s1, s2) -> Long.compare(s2.priority(), s1.priority()));
+		ScriptManager.SCRIPTS.sort((s1, s2) -> Long.compare(s2.priority(), s1.priority()));
 	}
 
 

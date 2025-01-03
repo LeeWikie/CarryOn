@@ -29,17 +29,14 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ConfigLoaderImpl {
 
     private static final Gson GSON = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
 
     //Default JSON and config data.
-    public static final Map<JsonObject, BuiltConfig> CONFIGS = new HashMap<>();
+    public static final Map<JsonObject, BuiltConfig> CONFIGS = new LinkedHashMap<>();
 
     public static void initialize() throws IOException {
         Path cfgPath = FabricLoader.getInstance().getConfigDir();
@@ -68,11 +65,11 @@ public class ConfigLoaderImpl {
                 JsonElement value = entry.getValue();
                 if (value instanceof JsonPrimitive configValue) {
                     category.getProperty(id).ifPresent(data -> {
-                        if (configValue.isBoolean() && data.data().type().equals(PropertyType.BOOLEAN))
+                        if (configValue.isBoolean() && data.getData().type().equals(PropertyType.BOOLEAN))
                             data.setBoolean(configValue.getAsBoolean());
-                        if (configValue.isNumber() && data.data().type().equals(PropertyType.INT)) {
+                        if (configValue.isNumber() && data.getData().type().equals(PropertyType.INT)) {
                             int configInt = configValue.getAsInt();
-                            if (configInt > data.data().max() || configInt < data.data().min()) {
+                            if (configInt > data.getData().max() || configInt < data.getData().min()) {
                                 try {
                                     config.addProperty(id, data.getInt());
                                 } catch (IllegalAccessException ignored) {
@@ -81,9 +78,9 @@ public class ConfigLoaderImpl {
                                 data.setInt(configInt);
                             }
                         }
-                        if (configValue.isNumber() && data.data().type().equals(PropertyType.DOUBLE)) {
+                        if (configValue.isNumber() && data.getData().type().equals(PropertyType.DOUBLE)) {
                             double configDouble = configValue.getAsDouble();
-                            if (configDouble > data.data().maxD() || configDouble < data.data().minD()) {
+                            if (configDouble > data.getData().maxD() || configDouble < data.getData().minD()) {
                                 try {
                                     config.addProperty(id, data.getDouble());
                                 } catch (IllegalAccessException ignored) {
@@ -97,7 +94,7 @@ public class ConfigLoaderImpl {
                     category.getCategory(id).ifPresent(cat -> loadConfig(cat, subConfig));
                 } else if (value instanceof JsonArray list) {
                     category.getProperty(id).ifPresent(data -> {
-                        if(data.data().type() == PropertyType.STRING_ARRAY)
+                        if(data.getData().type() == PropertyType.STRING_ARRAY)
                         {
                             List<String> ls = new ArrayList<>();
                             for(JsonElement arrEle : list)
@@ -114,6 +111,19 @@ public class ConfigLoaderImpl {
             }
         });
         return config;
+    }
+
+    public static void saveConfigs() {
+        try {
+            Path cfgPath = FabricLoader.getInstance().getConfigDir();
+            for (Map.Entry<JsonObject, BuiltConfig> entry : CONFIGS.entrySet()) {
+                File cfgFile = new File(cfgPath.toFile(), entry.getValue().fileName+".json");
+                cfgPath.toFile().mkdirs();
+                FileUtils.write(cfgFile, GSON.toJson(entry.getKey()), StandardCharsets.UTF_8);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static void registerConfig(BuiltConfig config) {
@@ -136,20 +146,37 @@ public class ConfigLoaderImpl {
     }
 
     private static void buildProperty(JsonObject builder, PropertyData data) throws IllegalAccessException {
-        AnnotationData annotationData = data.data();
+        AnnotationData annotationData = data.getData();
         builder.addProperty("//"+data.getId(), annotationData.description());
 
         switch (annotationData.type()) {
-            case BOOLEAN -> builder.addProperty(data.getId(), data.getBoolean());
-            case INT -> builder.addProperty(data.getId(), data.getInt());
-            case DOUBLE -> builder.addProperty(data.getId(), data.getDouble());
-            case STRING_ARRAY -> {
+            case BOOLEAN:
+                builder.addProperty(data.getId(), data.getBoolean());
+                data.setSetter((b) -> {builder.addProperty(data.getId(), (boolean)b); data.setBoolean((boolean)b);});
+                break;
+            case INT:
+                builder.addProperty(data.getId(), data.getInt());
+                data.setSetter((b) -> {builder.addProperty(data.getId(), (int)b); data.setInt((int)b);});
+                break;
+            case DOUBLE:
+                builder.addProperty(data.getId(), data.getDouble());
+                data.setSetter((b) -> {builder.addProperty(data.getId(), (double)b); data.setDouble((double)b);});
+                break;
+            case STRING_ARRAY:
                 JsonArray arr = new JsonArray();
                 for(String s : data.getStringArray())
                     arr.add(s);
                 builder.add(data.getId(), arr);
-            }
-            default -> throw new IllegalAccessException("Unknown property type.");
+                data.setSetter(list -> {
+                    JsonArray overwrite = new JsonArray();
+                    for(String s : (List<String>)list)
+                        overwrite.add(s);
+                    builder.add(data.getId(), overwrite);
+                    data.setStringArray(((List<?>) list).toArray(new String[0]));
+                });
+                break;
+            default:
+                throw new IllegalAccessException("Unknown property type.");
         }
     }
 }

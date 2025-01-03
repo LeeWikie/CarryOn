@@ -50,6 +50,11 @@ subprojects {
             name = 'BlameJared Maven (CrT / Bookshelf)'
             url = 'https://maven.blamejared.com'
         }
+
+        maven {
+            name = "Shedaniel"
+            url "https://maven.shedaniel.me/"
+        }
     }
 
     tasks.withType(JavaCompile).configureEach {
@@ -92,5 +97,12 @@ subprojects {
     tasks.withType(GenerateModuleMetadata) {
 
         enabled = false
+    }
+
+    idea {
+        module {
+            downloadSources = true
+            downloadJavadoc = true
+        }
     }
 }

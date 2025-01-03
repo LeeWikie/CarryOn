@@ -56,13 +56,14 @@ runs {
         systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
     }
 
+    /*
     data {
         // example of overriding the workingDirectory set in configureEach above, uncomment if you want to use it
         // workingDirectory project.file('run-data')
 
         // Specify the modid for data generation, where to output the resulting resource, and where to look for existing resources.
         programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
-    }
+    }*/
 }
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
@@ -79,6 +80,8 @@ tasks.named("test").configure {
 dependencies {
     implementation "net.neoforged:neoforge:${neoforge_version}"
     compileOnly project(":Common")
+
+    api "me.shedaniel.cloth:cloth-config-neoforge:${cloth_config_version}"
     //implementation fg.deobf("net.darkhax.gamestages:GameStages-Forge-1.19.2:11.0.2")
     //implementation fg.deobf("net.darkhax.bookshelf:Bookshelf-Forge-1.19.3:17.0.2")
 }
@@ -113,12 +116,5 @@ publishing {
         maven {
             url "file://" + System.getenv("local_maven")
         }
-    }
-}
-
-idea {
-    module {
-        downloadSources = true
-        downloadJavadoc = true
     }
 }

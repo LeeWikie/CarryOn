@@ -21,15 +21,49 @@
 package tschipp.carryon.config;
 
 import java.lang.reflect.Field;
+import java.util.function.Consumer;
 
-public record PropertyData(Object fieldClass, Field field, AnnotationData data) {
+public class PropertyData {
+
+    Object fieldClass;
+    Field field;
+    AnnotationData data;
+    Object defaultValue;
+    Consumer<?> setter;
+
+    public PropertyData(Object fieldClass, Field field, AnnotationData data, Object defaultValue) {
+        this.fieldClass = fieldClass;
+        this.field = field;
+        this.data = data;
+        this.defaultValue = defaultValue;
+    }
+
+    public Consumer<?> getSetter() {
+        return setter;
+    }
+
+    public void setSetter(Consumer<?> setter) {
+        this.setter = setter;
+    }
+
+    public AnnotationData getData() {
+        return data;
+    }
+
+    public Field getField() {
+        return field;
+    }
+
+    public Object getFieldClass() {
+        return fieldClass;
+    }
 
     public String getId() {
-        return field().getName();
+        return field.getName();
     }
 
     public boolean getBoolean() throws IllegalAccessException {
-        return field().getBoolean(fieldClass());
+        return field.getBoolean(fieldClass);
     }
 
     public void setBoolean(boolean _boolean) {
@@ -40,8 +74,12 @@ public record PropertyData(Object fieldClass, Field field, AnnotationData data) 
         }
     }
 
+    public boolean getDefaultBoolean() {
+        return (boolean)defaultValue;
+    }
+
     public int getInt() throws IllegalAccessException {
-        return field().getInt(fieldClass());
+        return field.getInt(fieldClass);
     }
 
     public void setInt(int _int) {
@@ -52,8 +90,12 @@ public record PropertyData(Object fieldClass, Field field, AnnotationData data) 
         }
     }
 
+    public int getDefaultInt() {
+        return (int)defaultValue;
+    }
+
     public double getDouble() throws IllegalAccessException {
-        return field().getDouble(fieldClass());
+        return field.getDouble(fieldClass);
     }
 
     public void setDouble(double _double) {
@@ -64,8 +106,12 @@ public record PropertyData(Object fieldClass, Field field, AnnotationData data) 
         }
     }
 
+    public double getDefaultDouble() {
+        return (double)defaultValue;
+    }
+
     public String[] getStringArray() throws  IllegalAccessException {
-        return (String[])field().get(fieldClass());
+        return (String[])field.get(fieldClass);
     }
 
     public void setStringArray(String[] arr)
@@ -75,5 +121,9 @@ public record PropertyData(Object fieldClass, Field field, AnnotationData data) 
         } catch (Exception e) {
             //Ignore
         }
+    }
+
+    public String[] getDefaultStringArray() {
+        return (String[])defaultValue;
     }
 }

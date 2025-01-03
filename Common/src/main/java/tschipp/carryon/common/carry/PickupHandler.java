@@ -237,7 +237,7 @@ public class PickupHandler {
         entity.ejectPassengers();
         entity.stopRiding();
         if (entity instanceof Animal animal) {
-            animal.dropLeash(true, true);
+            animal.dropLeash();
         }
 
         if(result.isPresent())

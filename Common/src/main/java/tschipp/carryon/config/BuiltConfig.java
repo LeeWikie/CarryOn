@@ -25,7 +25,7 @@ public class BuiltConfig extends BuiltCategory {
     public final String fileName;
 
     public BuiltConfig(String fileName) {
-        super(null, fileName);
+        super(null, fileName, "key.carry.category");
         this.fileName = fileName;
     }
 }

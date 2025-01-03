@@ -31,6 +31,8 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
+import net.minecraft.client.renderer.item.ItemStackRenderState;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.world.entity.Entity;
@@ -38,6 +40,7 @@ import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -106,6 +109,7 @@ public class CarriedObjectRender
 		RenderSystem.disableCull();
 
 		CarryOnData carry = CarryOnDataManager.getCarryData(player);
+		ItemStackRenderState renderState = new ItemStackRenderState();
 
 		if (Constants.CLIENT_CONFIG.facePlayer != CarryRenderHelper.isChest(state.getBlock())) {
 			matrix.mulPose(Axis.YP.rotationDegrees(180));
@@ -117,11 +121,13 @@ public class CarriedObjectRender
 		if(carry.getActiveScript().isPresent())
 			CarryRenderHelper.performScriptTransformation(matrix, carry.getActiveScript().get());
 
-		RenderSystem.setShaderTexture(0, InventoryMenu.BLOCK_ATLAS);
+		RenderSystem.setShaderTexture(0, TextureAtlas.LOCATION_BLOCKS);
 
-		ItemStack stack = new ItemStack(state.getBlock().asItem());
-		BakedModel model = CarryRenderHelper.getRenderBlock(player);
-		CarryRenderHelper.renderBakedModel(stack, matrix, buffer, light, model);
+		ItemStack renderStack = CarryRenderHelper.getRenderItemStack(player);
+		Minecraft.getInstance().getItemModelResolver().updateForTopItem(renderState, renderStack, ItemDisplayContext.NONE, false, player.level(), null, 0);
+		renderState.render(matrix, buffer, light, OverlayTexture.NO_OVERLAY);
+
+
 
 		RenderSystem.enableCull();
 		RenderSystem.disableBlend();
@@ -196,6 +202,7 @@ public class CarriedObjectRender
 		RenderSystem.disableDepthTest();
 
 		BufferSource buffer = MultiBufferSource.immediateWithBuffers(builders, builders.get(RenderType.glint()));
+		ItemStackRenderState renderState = new ItemStackRenderState();
 
 		for (Player player : level.players())
 		{
@@ -213,18 +220,17 @@ public class CarriedObjectRender
 
 					CarryRenderHelper.applyBlockTransformations(player, partialticks, matrix, state.getBlock());
 
-					ItemStack tileItem = new ItemStack(state.getBlock().asItem());
-					BakedModel model = CarryRenderHelper.getRenderBlock(player);
+					ItemStack renderItemStack = CarryRenderHelper.getRenderItemStack(player);
 
-					//ModelOverridesHandler.hasCustomOverrideModel(state, tag) ? ModelOverridesHandler.getCustomOverrideModel(state, tag, level, player) : tileItem.isEmpty() ? mc.getBlockRenderer().getBlockModel(state) : mc.getItemRenderer().getModel(tileItem, level, player, 0);
-//
+					mc.getItemModelResolver().updateForTopItem(renderState, renderItemStack, ItemDisplayContext.NONE, false, level, null, 0);
+
 					Optional<CarryOnScript> res = carry.getActiveScript();
 					if (res.isPresent()) {
 						CarryOnScript script = res.get();
 						CarryRenderHelper.performScriptTransformation(matrix, script);
 					}
 
-					RenderSystem.setShaderTexture(0, InventoryMenu.BLOCK_ATLAS);
+					RenderSystem.setShaderTexture(0, TextureAtlas.LOCATION_BLOCKS);
 					RenderSystem.enableCull();
 
 					PoseStack.Pose p = matrix.last();
@@ -234,7 +240,7 @@ public class CarriedObjectRender
 
 					RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 
-					CarryRenderHelper.renderBakedModel(tileItem, copy, buffer, light, model);
+					renderState.render(copy, buffer, light, OverlayTexture.NO_OVERLAY);
 
 					matrix.popPose();
 				} else if (carry.isCarrying(CarryType.ENTITY)) {

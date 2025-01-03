@@ -29,7 +29,8 @@ public record AnnotationData(
         PropertyType type,
         String description,
         int min, int max,
-        double minD, double maxD
+        double minD, double maxD,
+        String validationRegex
 ) {
 
     public static AnnotationData getData(Field field) {
@@ -38,7 +39,8 @@ public record AnnotationData(
                 annotation.type(),
                 annotation.description(),
                 annotation.min(), annotation.max(),
-                annotation.minD(), annotation.maxD()
+                annotation.minD(), annotation.maxD(),
+                annotation.validationRegex()
         );
     }
 }

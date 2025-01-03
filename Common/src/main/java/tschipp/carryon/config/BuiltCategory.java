@@ -32,9 +32,12 @@ public class BuiltCategory {
     public final String categoryDesc;
     public final String category;
 
-    public BuiltCategory(String categoryDesc, String category) {
+    public final String translation;
+
+    public BuiltCategory(String categoryDesc, String category, String translation) {
         this.categoryDesc = categoryDesc;
         this.category = category;
+        this.translation = translation;
     }
 
     public Optional<PropertyData> getProperty(String id) {

@@ -45,42 +45,25 @@ public class ConfigLoaderImpl {
 
     public static final Map<ForgeConfigSpec, BuiltConfig> CONFIGS = new HashMap<>();
 
-    public static void initialize() {
-        IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
+    public static void initialize(FMLJavaModLoadingContext context) {
+        IEventBus bus = context.getModEventBus();
         bus.addListener(ConfigLoaderImpl::onConfigLoad);
         bus.addListener(ConfigLoaderImpl::onConfigReload);
 
         ConfigLoaderImpl.CONFIGS.forEach((spec, config) -> {
             if(config.fileName.contains("client"))
-                ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, spec, config.fileName+".toml");
+                context.registerConfig(ModConfig.Type.CLIENT, spec, config.fileName+".toml");
             else
-                ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, spec, config.fileName+".toml");
+                context.registerConfig(ModConfig.Type.COMMON, spec, config.fileName+".toml");
         });
     }
 
     public static void onConfigLoad(ModConfigEvent.Loading loading) {
         loadConfig(loading.getConfig().getSpec());
-
-//
-//        DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> () -> {
-//            ConfigLoader.onConfigLoaded(Minecraft.getInstance().level.registryAccess());
-//        });
-//
-//        DistExecutor.safeRunWhenOn(Dist.DEDICATED_SERVER, () -> () -> {
-//            ConfigLoader.onConfigLoaded(ServerLifecycleHooks.getCurrentServer().registryAccess());
-//        });
     }
 
     public static void onConfigReload(ModConfigEvent.Reloading loading) {
         loadConfig(loading.getConfig().getSpec());
-//
-//        DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> () -> {
-//            ConfigLoader.onConfigLoaded(Minecraft.getInstance().level.registryAccess());
-//        });
-//
-//        DistExecutor.safeRunWhenOn(Dist.DEDICATED_SERVER, () -> () -> {
-//            ConfigLoader.onConfigLoaded(ServerLifecycleHooks.getCurrentServer().registryAccess());
-//        });
     }
 
     private static void loadConfig(IConfigSpec<ForgeConfigSpec> spec) {
@@ -108,6 +91,15 @@ public class ConfigLoaderImpl {
         });
     }
 
+    public static void saveConfig(BuiltConfig cfg) {
+        for (Map.Entry<ForgeConfigSpec, BuiltConfig> entry : CONFIGS.entrySet()) {
+            if(entry.getValue() == cfg) {
+                ForgeConfigSpec spec = entry.getKey();
+                spec.save();
+            }
+        }
+    }
+
     public static void registerConfig(BuiltConfig config) {
         try {
             ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
@@ -128,10 +120,10 @@ public class ConfigLoaderImpl {
     }
 
     private static void buildProperty(ForgeConfigSpec.Builder builder, PropertyData data) throws IllegalAccessException {
-        AnnotationData annotationData = data.data();
+        AnnotationData annotationData = data.getData();
         builder.comment(annotationData.description());
 
-        switch (annotationData.type()) {
+        ForgeConfigSpec.ConfigValue val = switch (annotationData.type()) {
             case BOOLEAN -> builder.define(data.getId(), data.getBoolean());
             case INT -> builder.defineInRange(data.getId(), data.getInt(), annotationData.min(), annotationData.max());
             case DOUBLE -> builder.defineInRange(data.getId(), data.getDouble(), annotationData.minD(), annotationData.maxD());
@@ -144,6 +136,8 @@ public class ConfigLoaderImpl {
                 return new ArrayList<>();
             }, obj -> obj instanceof String);
             default -> throw new IllegalAccessException("Unknown property type.");
-        }
+        };
+
+        data.setSetter(val::set);
     }
 }

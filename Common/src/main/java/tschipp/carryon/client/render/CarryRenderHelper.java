@@ -24,7 +24,9 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.ItemRenderer;
+import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -249,17 +251,63 @@ public class CarryRenderHelper
 		matrix.scale((float) scale.x, (float) scale.y, (float) scale.z);
 	}
 
-
-
+	/*
+	@Deprecated
 	public static void renderBakedModel(ItemStack stack, PoseStack matrix, MultiBufferSource buffer, int light, BakedModel model)
 	{
+		ItemStackRenderState state = new ItemStackRenderState();
+
 		try {
+
+
+			ItemStackRenderState.LayerRenderState layer = state.newLayer();
+			if(stack.hasFoil())
+				layer.setFoilType(ItemStackRenderState.FoilType.STANDARD);
+			layer.setupBlockModel(model, RenderType.translucent());
+
+			state.render(matrix, buffer, light, OverlayTexture.NO_OVERLAY);
+
+
 			ItemRenderer renderer = Minecraft.getInstance().getItemRenderer();
+			renderer.renderStatic(stack, ItemDisplayContext.NONE, light, OverlayTexture.NO_OVERLAY, matrix, buffer, null, model, 0);
 			renderer.render(stack, ItemDisplayContext.NONE, false, matrix, buffer, light, OverlayTexture.NO_OVERLAY, model);
+
 		}
 		catch (Exception e)
 		{
 		}
+	}
+	*/
+
+	public static ItemStack getRenderItemStack(Player player)
+	{
+		CarryOnData carry = CarryOnDataManager.getCarryData(player);
+		BlockState state = carry.getBlock().getBlock().defaultBlockState();
+		if(carry.getActiveScript().isPresent())
+		{
+			ScriptRender render = carry.getActiveScript().get().scriptRender();
+			if(render.renderNameBlock().isPresent())
+			{
+				state = BuiltInRegistries.BLOCK.get(render.renderNameBlock().get()).get().value().defaultBlockState();
+			}
+		}
+
+		ItemStack renderStack = ItemStack.EMPTY;
+
+		Optional<ModelOverride> ov = ModelOverrideHandler.getModelOverride(state, carry.getContentNbt());
+		if(ov.isPresent())
+		{
+			var renderObj = ov.get().getRenderObject();
+			if(renderObj.right().isPresent())
+				state = renderObj.right().get();
+			else if (renderObj.left().isPresent())
+				renderStack = renderObj.left().get();
+		}
+
+		if(renderStack.isEmpty())
+			renderStack = new ItemStack(state.getBlock());
+
+		return renderStack;
 	}
 
 	public static BlockState getRenderState(Player player)
@@ -286,10 +334,14 @@ public class CarryRenderHelper
 		return state;
 	}
 
+
+	/*
+	@Deprecated
 	public static BakedModel getRenderBlock(Player player)
 	{
 		CarryOnData carry = CarryOnDataManager.getCarryData(player);
 		ItemRenderer renderer = Minecraft.getInstance().getItemRenderer();
+		Minecraft.getInstance().getModelManager().specialBlockModelRenderer().get().
 		BlockState state = getRenderState(player);
 		BakedModel model = Minecraft.getInstance().getBlockRenderer().getBlockModel(state);
 
@@ -308,6 +360,7 @@ public class CarryRenderHelper
 
 		return model;
 	}
+	 */
 
 	public static Entity getRenderEntity(Player player)
 	{
@@ -319,7 +372,7 @@ public class CarryRenderHelper
 			CarryOnScript script = carry.getActiveScript().get();
 			ScriptRender render = script.scriptRender();
 			if(render.renderNameEntity().isPresent())
-				entity = BuiltInRegistries.ENTITY_TYPE.get(render.renderNameEntity().get()).get().value().create(player.level(), EntitySpawnReason.BUCKET);
+				entity = BuiltInRegistries.ENTITY_TYPE.get(render.renderNameEntity().get()).get().value().create(player.level(), EntitySpawnReason.EVENT);
 
 			if(render.renderNBT().isPresent())
 				entity.load(render.renderNBT().get());

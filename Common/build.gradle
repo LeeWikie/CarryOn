@@ -26,6 +26,8 @@ dependencies {
     implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
     implementation("io.github.llamalad7:mixinextras-common:${mixinextras_version}")
     annotationProcessor("io.github.llamalad7:mixinextras-common:${mixinextras_version}")
+
+    compileOnly("me.shedaniel.cloth:cloth-config-neoforge:${cloth_config_version}")
 }
 
 processResources {

@@ -29,4 +29,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Category {
     String value();
+    String translation() default "";
 }

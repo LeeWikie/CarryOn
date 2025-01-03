@@ -32,7 +32,6 @@ import java.lang.annotation.Target;
 public @interface Property {
 
 
-
     PropertyType type();
     String description();
 
@@ -41,4 +40,6 @@ public @interface Property {
 
     double minD() default Double.MIN_VALUE;
     double maxD() default Double.MAX_VALUE;
+
+    String validationRegex() default ".*";
 }

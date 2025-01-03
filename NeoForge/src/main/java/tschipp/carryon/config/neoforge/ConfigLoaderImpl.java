@@ -40,11 +40,12 @@ import tschipp.carryon.Constants;
 import tschipp.carryon.config.*;
 
 import java.util.*;
+import java.util.function.Consumer;
 
 @EventBusSubscriber(modid = Constants.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
 public class ConfigLoaderImpl {
 
-    public static final Map<ModConfigSpec, BuiltConfig> CONFIGS = new HashMap<>();
+    public static final Map<ModConfigSpec, BuiltConfig> CONFIGS = new LinkedHashMap<>();
 
     public static void initialize(ModContainer container) {
 
@@ -60,25 +61,10 @@ public class ConfigLoaderImpl {
     @SubscribeEvent
     public static void onConfigLoad(ModConfigEvent.Loading loading) {
         loadConfig((ModConfigSpec) loading.getConfig().getSpec());
-
-//        DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> () -> {
-//            ConfigLoader.onConfigLoaded(Minecraft.getInstance().level.registryAccess());
-//        });
-//
-//        DistExecutor.safeRunWhenOn(Dist.DEDICATED_SERVER, () -> () -> {
-//            ConfigLoader.onConfigLoaded(ServerLifecycleHooks.getCurrentServer().registryAccess());
-//        });
     }
     @SubscribeEvent
     public static void onConfigReload(ModConfigEvent.Reloading loading) {
-          loadConfig((ModConfigSpec) loading.getConfig().getSpec());
-//        DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> () -> {
-//            ConfigLoader.onConfigLoaded(Minecraft.getInstance().level.registryAccess());
-//        });
-//
-//        DistExecutor.safeRunWhenOn(Dist.DEDICATED_SERVER, () -> () -> {
-//            ConfigLoader.onConfigLoaded(ServerLifecycleHooks.getCurrentServer().registryAccess());
-//        });
+        loadConfig((ModConfigSpec) loading.getConfig().getSpec());
     }
 
     private static void loadConfig(ModConfigSpec spec) {
@@ -106,6 +92,15 @@ public class ConfigLoaderImpl {
         });
     }
 
+    public static void saveConfig(BuiltConfig cfg) {
+        for (Map.Entry<ModConfigSpec, BuiltConfig> entry : CONFIGS.entrySet()) {
+            if(entry.getValue() == cfg) {
+                ModConfigSpec spec = entry.getKey();
+                spec.save();
+            }
+        }
+    }
+
     public static void registerConfig(BuiltConfig config) {
         try {
             ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
@@ -126,10 +121,11 @@ public class ConfigLoaderImpl {
     }
 
     private static void buildProperty(ModConfigSpec.Builder builder, PropertyData data) throws IllegalAccessException {
-        AnnotationData annotationData = data.data();
+        AnnotationData annotationData = data.getData();
         builder.comment(annotationData.description());
 
-        switch (annotationData.type()) {
+
+        ModConfigSpec.ConfigValue val = switch (annotationData.type()) {
             case BOOLEAN -> builder.define(data.getId(), data.getBoolean());
             case INT -> builder.defineInRange(data.getId(), data.getInt(), annotationData.min(), annotationData.max());
             case DOUBLE -> builder.defineInRange(data.getId(), data.getDouble(), annotationData.minD(), annotationData.maxD());
@@ -142,6 +138,8 @@ public class ConfigLoaderImpl {
                 return new ArrayList<>();
             }, obj -> obj instanceof String);
             default -> throw new IllegalAccessException("Unknown property type.");
-        }
+        };
+
+        data.setSetter(val::set);
     }
 }

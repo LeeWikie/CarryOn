@@ -24,6 +24,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Camera;
 import net.minecraft.client.particle.ParticleEngine;
 import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.culling.Frustum;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -36,10 +37,10 @@ public class ParticleEngineMixin
 {
 	//I am injecting into a lambda, lord help me
 
-	@Inject(method = "Lnet/minecraft/client/particle/ParticleEngine;render(Lnet/minecraft/client/renderer/LightTexture;Lnet/minecraft/client/Camera;FLnet/minecraft/client/renderer/culling/Frustum;)V",
-		   at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/LightTexture;turnOffLightLayer()V",
+	@Inject(method = "render(Lnet/minecraft/client/Camera;FLnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/renderer/culling/Frustum;)V",
+		   at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;endBatch()V",
 		   shift = At.Shift.AFTER))
-	private void onRenderLevel(LightTexture p_107339_, Camera p_107340_, float partialTick, Frustum frustum, CallbackInfo ci)
+	private void onRenderLevel(Camera p_107340_, float partialTick, MultiBufferSource.BufferSource p_377798_, Frustum frustum, CallbackInfo ci)
 	{
 		CarriedObjectRender.drawThirdPerson(partialTick, new PoseStack().last().pose());
 	}

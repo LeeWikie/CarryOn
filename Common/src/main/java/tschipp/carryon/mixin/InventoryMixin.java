@@ -62,7 +62,7 @@ public class InventoryMixin
 			return original.call(instance, slot);
 	}
 
-	@Inject(method = "setPickedItem(Lnet/minecraft/world/item/ItemStack;)V", at = @At("HEAD"), cancellable = true)
+	@Inject(method = "addAndPickItem(Lnet/minecraft/world/item/ItemStack;)V", at = @At("HEAD"), cancellable = true)
 	private void onPickBlock(CallbackInfo info)
 	{
 		if(CarryOnDataManager.getCarryData(player).isCarrying())
