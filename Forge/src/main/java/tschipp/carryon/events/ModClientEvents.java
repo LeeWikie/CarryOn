@@ -36,7 +36,7 @@ import tschipp.carryon.config.BuiltConfig;
 import tschipp.carryon.config.forge.ConfigLoaderImpl;
 import tschipp.carryon.platform.Services;
 
-@Mod.EventBusSubscriber(bus = Bus.MOD, modid = Constants.MOD_ID)
+@Mod.EventBusSubscriber(bus = Bus.MOD, modid = Constants.MOD_ID, value=Dist.CLIENT)
 public class ModClientEvents
 {
 	@SubscribeEvent
@@ -44,6 +44,7 @@ public class ModClientEvents
 	{
 		CarryOnKeybinds.registerKeybinds(event::register);
 	}
+
 
 	@SubscribeEvent
 	public static void clientSetup(FMLClientSetupEvent event)
