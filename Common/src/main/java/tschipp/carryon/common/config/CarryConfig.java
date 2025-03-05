@@ -279,6 +279,7 @@ public class CarryConfig
 					"modern_industrialization:*_item_pipe",
 					"modern_industrialization:fluid_pipe",
 					"modern_industrialization:*_fluid_pipe",
+					"snowrealmagic:*"
 			};
 
 			@Property(
