@@ -136,7 +136,7 @@ public class PickupHandler {
                 player.getServer().getCommands().performPrefixedCommand(player.getServer().createCommandSourceStack(), "/execute as " + player.getGameProfile().getName() + " run " + cmd);
         }
 
-        carry.setBlock(state, blockEntity);
+        carry.setBlock(state, blockEntity, player, pos);
 
         level.removeBlockEntity(pos);
         level.removeBlock(pos, false);

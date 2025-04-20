@@ -21,6 +21,7 @@
 package tschipp.carryon.events;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
@@ -147,9 +148,9 @@ public class CommonEvents
 	}
 
 	@SubscribeEvent
-	public static void onDatapackRegister(AddReloadListenerEvent event)
+	public static void onDatapackRegister(AddServerReloadListenersEvent event)
 	{
-		event.addListener(new ScriptReloadListener());
+		event.addListener(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "scripts"), new ScriptReloadListener());
 	}
 
 	@SubscribeEvent
