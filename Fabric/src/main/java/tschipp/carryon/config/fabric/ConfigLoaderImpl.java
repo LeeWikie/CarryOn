@@ -23,6 +23,9 @@ package tschipp.carryon.config.fabric;
 import com.google.gson.*;
 import net.fabricmc.loader.api.FabricLoader;
 import org.apache.commons.io.FileUtils;
+import tschipp.carryon.Constants;
+import tschipp.carryon.common.config.CarryConfig;
+import tschipp.carryon.common.config.ListHandler;
 import tschipp.carryon.config.*;
 
 import java.io.File;
@@ -121,6 +124,7 @@ public class ConfigLoaderImpl {
                 cfgPath.toFile().mkdirs();
                 FileUtils.write(cfgFile, GSON.toJson(entry.getKey()), StandardCharsets.UTF_8);
             }
+            ListHandler.initConfigLists();
         } catch (Exception e) {
             e.printStackTrace();
         }

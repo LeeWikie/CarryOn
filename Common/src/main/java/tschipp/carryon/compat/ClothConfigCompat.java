@@ -80,8 +80,9 @@ public record ClothConfigCompat(BuiltConfig client, BuiltConfig common, Runnable
                                             .setSaveConsumer((Consumer<Double>) propertyData.getSetter())
                                             .build();
                             case STRING_ARRAY ->
-                                    entryBuilder.startStrList(Component.literal(propertyData.getField().getName()), List.of(propertyData.getDefaultStringArray()))
+                                    entryBuilder.startStrList(Component.literal(propertyData.getField().getName()), List.of(propertyData.getStringArray()))
                                             .setTooltip(Component.literal(data.description()))
+                                            .setInsertInFront(true)
                                             .setDefaultValue(List.of(propertyData.getDefaultStringArray()))
                                             .setCellErrorSupplier(str -> str.matches(data.validationRegex()) ? Optional.empty() : Optional.of(Component.literal("Invalid Format")))
                                             .setSaveConsumer((Consumer<List<String>>) propertyData.getSetter())
