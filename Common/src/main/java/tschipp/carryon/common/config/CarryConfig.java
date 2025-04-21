@@ -285,7 +285,7 @@ public class CarryConfig
 					"modern_industrialization:fluid_pipe",
 					"modern_industrialization:*_fluid_pipe",
 					"yigd:*", "domum_ornamentum:*", "connectiblechains:*",
-					"cobblemon:*"
+					"cobblemon:*", "snowrealmagic:*"
 			};
 
 			@Property(
