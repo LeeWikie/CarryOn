@@ -283,7 +283,7 @@ public class PlacementHandler
 		if (((ServerLevel) oldPlayer.level()).getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY) || !died) {
 			if (!carry.isCarrying(CarryType.PLAYER)) {
 				CarryOnDataManager.setCarryData(newPlayer, carry);
-				newPlayer.getInventory().selected = oldPlayer.getInventory().selected;
+				newPlayer.getInventory().setSelectedSlot(oldPlayer.getInventory().getSelectedSlot());
 				return;
 			}
 		}

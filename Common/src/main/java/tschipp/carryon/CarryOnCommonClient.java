@@ -59,7 +59,7 @@ public class CarryOnCommonClient
 			CarryOnData carry = CarryOnDataManager.getCarryData(player);
 			if(carry.isCarrying())
 			{
-				player.getInventory().selected = carry.getSelected();
+				player.getInventory().setSelectedSlot(carry.getSelected());
 			}
 		}
 	}

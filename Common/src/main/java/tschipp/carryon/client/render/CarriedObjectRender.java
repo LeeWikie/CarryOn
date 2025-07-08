@@ -20,21 +20,23 @@
 
 package tschipp.carryon.client.render;
 
+import com.mojang.blaze3d.pipeline.BlendFunction;
+import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.blaze3d.pipeline.RenderTarget;
+import com.mojang.blaze3d.platform.DepthTestFunction;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.ByteBufferBuilder;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.blaze3d.textures.GpuTexture;
+import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.ShaderDefines;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlas;
-import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.LivingEntity;
@@ -45,6 +47,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
 import tschipp.carryon.Constants;
 import tschipp.carryon.common.carry.CarryOnData;
@@ -54,21 +57,19 @@ import tschipp.carryon.common.scripting.CarryOnScript;
 import tschipp.carryon.common.scripting.CarryOnScript.ScriptRender;
 import tschipp.carryon.platform.Services;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.SequencedMap;
+import java.util.*;
 
 public class CarriedObjectRender
 {
 
-	private static SequencedMap<RenderType, ByteBufferBuilder> builders = new LinkedHashMap<>(Map.of(
-			RenderType.glint(), new ByteBufferBuilder(RenderType.glint().bufferSize()),
-			RenderType.armorEntityGlint(), new ByteBufferBuilder(RenderType.armorEntityGlint().bufferSize()),
-			RenderType.glintTranslucent(), new ByteBufferBuilder(RenderType.glintTranslucent().bufferSize()),
-			RenderType.entityGlint(), new ByteBufferBuilder(RenderType.entityGlint().bufferSize())
+	private static final SequencedMap<RenderType, ByteBufferBuilder> builders = new LinkedHashMap<>(Map.of(
+			RenderType.glint(), new ByteBufferBuilder(CarryOnRenderType.remap(RenderType.glint()).bufferSize()),
+			RenderType.armorEntityGlint(), new ByteBufferBuilder(CarryOnRenderType.remap(RenderType.armorEntityGlint()).bufferSize()),
+			RenderType.glintTranslucent(), new ByteBufferBuilder(CarryOnRenderType.remap(RenderType.glintTranslucent()).bufferSize()),
+			RenderType.entityGlint(), new ByteBufferBuilder(CarryOnRenderType.remap(RenderType.entityGlint()).bufferSize())
 			//RenderType.entityGlintDirect(), new ByteBufferBuilder(RenderType.entityGlintDirect().bufferSize())
 	));
+
 
 	public static boolean drawFirstPerson(Player player, MultiBufferSource buffer, PoseStack matrix, int light, float partialTicks)
 	{
@@ -105,11 +106,13 @@ public class CarriedObjectRender
 		matrix.pushPose();
 		matrix.scale(2.5f, 2.5f, 2.5f);
 		matrix.translate(0, -0.5, -1);
-		RenderSystem.enableBlend();
-		RenderSystem.disableCull();
+		//RenderSystem.enableBlend();
+		//RenderSystem.disableCull();
 
 		CarryOnData carry = CarryOnDataManager.getCarryData(player);
 		ItemStackRenderState renderState = new ItemStackRenderState();
+		var layer = renderState.newLayer();
+		layer.setRenderType(CarryOnRenderType.remap(RenderType.glint()));
 
 		if (Constants.CLIENT_CONFIG.facePlayer != CarryRenderHelper.isChest(state.getBlock())) {
 			matrix.mulPose(Axis.YP.rotationDegrees(180));
@@ -121,16 +124,16 @@ public class CarriedObjectRender
 		if(carry.getActiveScript().isPresent())
 			CarryRenderHelper.performScriptTransformation(matrix, carry.getActiveScript().get());
 
-		RenderSystem.setShaderTexture(0, TextureAtlas.LOCATION_BLOCKS);
+		//RenderSystem.setShaderTexture(0, GpuTexture);
 
 		ItemStack renderStack = CarryRenderHelper.getRenderItemStack(player);
-		Minecraft.getInstance().getItemModelResolver().updateForTopItem(renderState, renderStack, ItemDisplayContext.NONE, false, player.level(), null, 0);
+		Minecraft.getInstance().getItemModelResolver().updateForTopItem(renderState, renderStack, ItemDisplayContext.NONE, player.level(), null, 0);
 		renderState.render(matrix, buffer, light, OverlayTexture.NO_OVERLAY);
 
 
 
-		RenderSystem.enableCull();
-		RenderSystem.disableBlend();
+		//RenderSystem.enableCull();
+		//RenderSystem.disableBlend();
 		matrix.popPose();
 	}
 
@@ -197,12 +200,14 @@ public class CarriedObjectRender
 		PoseStack matrix = new PoseStack();
 		matrix.mulPose(mat);
 
-		RenderSystem.enableBlend();
-		RenderSystem.disableCull();
-		RenderSystem.disableDepthTest();
+		//RenderSystem.enableBlend();
+		//RenderSystem.disableCull();
+		//RenderSystem.disableDepthTest();
 
 		BufferSource buffer = MultiBufferSource.immediateWithBuffers(builders, builders.get(RenderType.glint()));
 		ItemStackRenderState renderState = new ItemStackRenderState();
+		var layer = renderState.newLayer();
+		layer.setRenderType(RenderType.glint());
 
 		for (Player player : level.players())
 		{
@@ -222,16 +227,13 @@ public class CarriedObjectRender
 
 					ItemStack renderItemStack = CarryRenderHelper.getRenderItemStack(player);
 
-					mc.getItemModelResolver().updateForTopItem(renderState, renderItemStack, ItemDisplayContext.NONE, false, level, null, 0);
+					mc.getItemModelResolver().updateForTopItem(renderState, renderItemStack, ItemDisplayContext.NONE, level, null, 0);
 
 					Optional<CarryOnScript> res = carry.getActiveScript();
-					if (res.isPresent()) {
-						CarryOnScript script = res.get();
-						CarryRenderHelper.performScriptTransformation(matrix, script);
-					}
+                    res.ifPresent(script -> CarryRenderHelper.performScriptTransformation(matrix, script));
 
-					RenderSystem.setShaderTexture(0, TextureAtlas.LOCATION_BLOCKS);
-					RenderSystem.enableCull();
+					//RenderSystem.setShaderTexture(0, TextureAtlas.LOCATION_BLOCKS);
+					//RenderSystem.enableCull();
 
 					PoseStack.Pose p = matrix.last();
 					PoseStack copy = new PoseStack();
@@ -252,10 +254,7 @@ public class CarriedObjectRender
 						manager.setRenderShadow(false);
 
 						Optional<CarryOnScript> res = carry.getActiveScript();
-						if (res.isPresent()) {
-							CarryOnScript script = res.get();
-							CarryRenderHelper.performScriptTransformation(matrix, script);
-						}
+                        res.ifPresent(script -> CarryRenderHelper.performScriptTransformation(matrix, script));
 
 						if (entity instanceof LivingEntity le)
 							le.hurtTime = 0;
@@ -283,9 +282,9 @@ public class CarriedObjectRender
 		buffer.endBatch(RenderType.entityCutoutNoCull(TextureAtlas.LOCATION_BLOCKS));
 		buffer.endBatch(RenderType.entitySmoothCutout(TextureAtlas.LOCATION_BLOCKS));
 
-		RenderSystem.enableDepthTest();
-		RenderSystem.enableCull();
-		RenderSystem.disableBlend();
+		//RenderSystem.enableDepthTest();
+		//RenderSystem.enableCull();
+		//RenderSystem.disableBlend();
 	}
 
 }

@@ -31,7 +31,7 @@ import tschipp.carryon.common.carry.CarryOnDataManager;
 @Mixin(Minecraft.class)
 public class MinecraftMixin
 {
-	@WrapWithCondition(method = "handleKeybinds()V", at = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/player/Inventory;selected:I", ordinal = 0, opcode = 181)) //Opcode for PUTFIELD
+	@WrapWithCondition(method = "handleKeybinds()V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Inventory;setSelectedSlot(I)V", ordinal = 0))
 	private boolean allowSlotSelection(Inventory inv,int slot)
 	{
 		return !CarryOnDataManager.getCarryData(inv.player).isCarrying();
