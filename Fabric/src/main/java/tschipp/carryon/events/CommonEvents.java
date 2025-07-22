@@ -26,6 +26,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.CommonLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.*;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -154,6 +155,10 @@ public class CommonEvents {
                 return InteractionResult.SUCCESS;
             return InteractionResult.PASS;
         }));
+
+        ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> {
+            CarryOnCommon.onRiderDisconnected(handler.getPlayer());
+        });
 
         //TODO: drop carried when attacked
     }

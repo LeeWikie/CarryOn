@@ -40,6 +40,7 @@ import tschipp.carryon.common.carry.CarryOnDataManager;
 import tschipp.carryon.common.carry.PlacementHandler;
 import tschipp.carryon.common.command.CommandCarryOn;
 import tschipp.carryon.config.ConfigLoader;
+import tschipp.carryon.networking.clientbound.ClientboundStartRidingOtherPlayerPacket;
 import tschipp.carryon.networking.clientbound.ClientboundStartRidingPacket;
 import tschipp.carryon.networking.clientbound.ClientboundSyncScriptsPacket;
 import tschipp.carryon.networking.serverbound.ServerboundCarryKeyPressedPacket;
@@ -81,6 +82,14 @@ public class CarryOnCommon
 				ClientboundSyncScriptsPacket.class,
 				ClientboundSyncScriptsPacket.CODEC,
 				ClientboundSyncScriptsPacket::handle,
+				args
+		);
+
+		Services.PLATFORM.registerClientboundPacket(
+				ClientboundStartRidingOtherPlayerPacket.TYPE,
+				ClientboundStartRidingOtherPlayerPacket.class,
+				ClientboundStartRidingOtherPlayerPacket.CODEC,
+				ClientboundStartRidingOtherPlayerPacket::handle,
 				args
 		);
 	}
@@ -157,6 +166,16 @@ public class CarryOnCommon
 				PlacementHandler.placeCarried((ServerPlayer) player);
 			}
 
+		}
+	}
+
+	public static void onRiderDisconnected(Player rider)
+	{
+		if(rider.getVehicle() instanceof ServerPlayer vehicle) {
+			CarryOnData data = CarryOnDataManager.getCarryData(vehicle);
+			if(data.isCarrying(CarryType.PLAYER)) {
+				PlacementHandler.placeCarried(vehicle);
+			}
 		}
 	}
 

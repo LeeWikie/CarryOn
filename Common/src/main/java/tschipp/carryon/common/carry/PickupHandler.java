@@ -22,6 +22,7 @@ package tschipp.carryon.common.carry;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -47,6 +48,7 @@ import tschipp.carryon.common.pickupcondition.PickupCondition;
 import tschipp.carryon.common.pickupcondition.PickupConditionHandler;
 import tschipp.carryon.common.scripting.CarryOnScript;
 import tschipp.carryon.common.scripting.ScriptManager;
+import tschipp.carryon.networking.clientbound.ClientboundStartRidingOtherPlayerPacket;
 import tschipp.carryon.networking.clientbound.ClientboundStartRidingPacket;
 import tschipp.carryon.platform.Services;
 
@@ -230,7 +232,7 @@ public class PickupHandler {
             }
 
             otherPlayer.startRiding(player, true);
-            Services.PLATFORM.sendPacketToAllPlayers(Constants.PACKET_ID_START_RIDING_OTHER, new ClientboundStartRidingOtherPlayerPacket(player.getId(), otherPlayer.getId(), true), player.level());
+            Services.PLATFORM.sendPacketToAllPlayers(Constants.PACKET_ID_START_RIDING_OTHER, new ClientboundStartRidingOtherPlayerPacket(player.getId(), otherPlayer.getId(), true), (ServerLevel) player.level());
             carry.setCarryingPlayer();
             player.swing(InteractionHand.MAIN_HAND, true);
             player.level().playSound(null, player.getOnPos(), SoundEvents.ARMOR_EQUIP_GENERIC.value(), SoundSource.AMBIENT, 1.0f, 0.5f);
