@@ -40,6 +40,7 @@ import net.minecraftforge.event.TickEvent.ServerTickEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.MobSpawnEvent.FinalizeSpawn;
 import net.minecraftforge.event.entity.player.AttackEntityEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.BreakSpeed;
 import net.minecraftforge.event.entity.player.PlayerEvent.Clone;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
@@ -216,6 +217,12 @@ public class CommonEvents
 	{
 		if(event.getEntity() instanceof Player player)
 			CarryOnCommon.onPlayerAttacked(player);
+	}
+
+	@SubscribeEvent
+	public static void onPlayerLoggedOut(PlayerEvent.PlayerLoggedOutEvent event) {
+		if(event.getEntity() instanceof ServerPlayer player)
+			CarryOnCommon.onRiderDisconnected(player);
 	}
 
 }

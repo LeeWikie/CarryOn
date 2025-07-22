@@ -46,6 +46,8 @@ import tschipp.carryon.Constants;
 import tschipp.carryon.common.carry.CarryOnData.CarryType;
 import tschipp.carryon.common.config.ListHandler;
 import tschipp.carryon.common.scripting.CarryOnScript.ScriptEffects;
+import tschipp.carryon.networking.clientbound.ClientboundStartRidingOtherPlayerPacket;
+import tschipp.carryon.platform.Services;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -173,11 +175,10 @@ public class PlacementHandler
 		if (carry.isCarrying(CarryType.PLAYER)) {
 			Entity otherPlayer = player.getFirstPassenger();
 			player.ejectPassengers();
+			Services.PLATFORM.sendPacketToAllPlayers(Constants.PACKET_ID_START_RIDING_OTHER, new ClientboundStartRidingOtherPlayerPacket(player.getId(), otherPlayer.getId(), false), player.serverLevel());
 			carry.clear();
 			CarryOnDataManager.setCarryData(player, carry);
-			if (otherPlayer == null)
-				return true;
-			otherPlayer.teleportTo(placementPos.x, placementPos.y, placementPos.z);
+            otherPlayer.teleportTo(placementPos.x, placementPos.y, placementPos.z);
 			player.swing(InteractionHand.MAIN_HAND, true);
 			return true;
 		}
@@ -222,6 +223,8 @@ public class PlacementHandler
 		else
 			entityHeld = player.getFirstPassenger();
 
+		if(entityHeld == null)
+			return;
 
 		double sizeHeldEntity = entityHeld.getBbHeight() * entityHeld.getBbWidth();
 		double distance = entityClicked.blockPosition().distSqr(player.blockPosition());
