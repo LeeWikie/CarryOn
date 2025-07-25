@@ -27,6 +27,8 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.animal.horse.Horse;
@@ -42,6 +44,7 @@ import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
+import tschipp.carryon.CarryOnCommon;
 import tschipp.carryon.Constants;
 import tschipp.carryon.common.carry.CarryOnData.CarryType;
 import tschipp.carryon.common.config.ListHandler;
@@ -111,6 +114,7 @@ public class PlacementHandler
 		player.playSound(state.getSoundType().getPlaceSound(), 1.0f, 0.5f);
 		level.playSound(null, pos, state.getSoundType().getPlaceSound(), SoundSource.BLOCKS, 1.0f, 0.5f);
 		player.swing(InteractionHand.MAIN_HAND, true);
+		player.removeEffect(MobEffects.SLOWNESS);
 		return true;
 	}
 
@@ -180,6 +184,7 @@ public class PlacementHandler
 			CarryOnDataManager.setCarryData(player, carry);
             otherPlayer.teleportTo(placementPos.x, placementPos.y, placementPos.z);
 			player.swing(InteractionHand.MAIN_HAND, true);
+			player.removeEffect(MobEffects.SLOWNESS);
 			return true;
 		}
 
@@ -204,6 +209,7 @@ public class PlacementHandler
 		player.swing(InteractionHand.MAIN_HAND, true);
 		carry.clear();
 		CarryOnDataManager.setCarryData(player, carry);
+		player.removeEffect(MobEffects.SLOWNESS);
 		return true;
 	}
 
@@ -271,6 +277,7 @@ public class PlacementHandler
 					carry.clear();
 					CarryOnDataManager.setCarryData(player, carry);
 					level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.HORSE_SADDLE, SoundSource.PLAYERS, 0.5F, 1.5F);
+					player.removeEffect(MobEffects.SLOWNESS);
 				} else {
 					level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.LAVA_POP, SoundSource.PLAYERS, 0.5F, 0.5F);
 				}
@@ -314,6 +321,7 @@ public class PlacementHandler
 		}
 		carry.clear();
 		CarryOnDataManager.setCarryData(player, carry);
+		player.removeEffect(MobEffects.SLOWNESS);
 	}
 
 	private static BlockPos getDeathPlacementPos(BlockState state, ServerPlayer player)

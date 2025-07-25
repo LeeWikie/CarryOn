@@ -51,7 +51,7 @@ public class HumanoidModelMixin {
         if(state instanceof ICarryOnRenderState carryOnRenderState && Constants.CLIENT_CONFIG.renderArms)
         {
             CarryOnData carry = carryOnRenderState.getCarryOnData();
-            if(carry.isCarrying() && !state.isVisuallySwimming && !state.isFallFlying)
+            if(carry != null && carry.isCarrying() && !state.isVisuallySwimming && !state.isFallFlying)
             {
                 boolean sneaking = state.isCrouching;
 

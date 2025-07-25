@@ -118,11 +118,6 @@ public class CarryOnCommon
 	                player.getServer().getCommands().performPrefixedCommand(player.getServer().createCommandSourceStack(), "/execute as " + player.getGameProfile().getName() + " run " + cmd);
 	        }
 
-		    if (!Constants.COMMON_CONFIG.settings.slownessInCreative && player.isCreative())
-			    return;
-
-		    player.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 1, potionLevel(carry, player.level()), false, false));
-
 		    Inventory inv = player.getInventory();
 			inv.setSelectedSlot(carry.getSelected());
 	    }
@@ -180,7 +175,7 @@ public class CarryOnCommon
 	}
 
 
-	private static int potionLevel(CarryOnData carry, Level level)
+	public static int potionLevel(CarryOnData carry, Level level)
 	{
 		if(carry.isCarrying(CarryType.PLAYER))
 			return 1;
