@@ -7,14 +7,12 @@ import com.mojang.blaze3d.platform.DepthTestFunction;
 import com.mojang.blaze3d.vertex.MeshData;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.ShaderDefines;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.IdentityHashMap;
 import java.util.Map;
-import java.util.Optional;
 
-//Credit: klikli
+//Credit: klikli for the idea and code for this wrapper
 public class CarryOnRenderType extends RenderType {
 
     private static final Map<RenderType, RenderType> remappedTypes = new IdentityHashMap<>();
