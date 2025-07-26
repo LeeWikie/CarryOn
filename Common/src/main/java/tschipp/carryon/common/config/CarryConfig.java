@@ -285,7 +285,7 @@ public class CarryConfig
 					"modern_industrialization:fluid_pipe",
 					"modern_industrialization:*_fluid_pipe",
 					"yigd:*", "domum_ornamentum:*", "connectiblechains:*",
-					"cobblemon:*", "snowrealmagic:*", "forbidden_arcanus:black_hole", "domum_ornamentum:*", "sgjourney:*", "copycats:*"
+					"cobblemon:*", "snowrealmagic:*", "forbidden_arcanus:black_hole", "domum_ornamentum:*", "sgjourney:*", "copycats:*", "expandedstorage:*"
 			};
 
 			@Property(
