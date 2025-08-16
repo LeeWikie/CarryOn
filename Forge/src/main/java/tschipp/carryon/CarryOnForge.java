@@ -21,6 +21,7 @@
 package tschipp.carryon;
 
 import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.eventbus.api.listener.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -43,12 +44,11 @@ public class CarryOnForge {
         // Use Forge to bootstrap the Common mod.
         CarryOnCommon.registerConfig();
 
-        context.getModEventBus().addListener(this::setup);
-
         ConfigLoaderImpl.initialize(context);
     }
 
-    private void setup(final FMLCommonSetupEvent event)
+    @SubscribeEvent
+    public static void setup(final FMLCommonSetupEvent event)
     {
         network = ChannelBuilder.named(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "carryonpackets")).simpleChannel();
 

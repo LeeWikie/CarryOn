@@ -41,7 +41,7 @@ import tschipp.carryon.client.render.CarryRenderHelper;
 import tschipp.carryon.common.carry.CarryOnData;
 import tschipp.carryon.common.carry.CarryOnDataManager;
 
-@EventBusSubscriber(bus = EventBusSubscriber.Bus.GAME, modid = Constants.MOD_ID, value = Dist.CLIENT)
+@EventBusSubscriber(modid = Constants.MOD_ID, value = Dist.CLIENT)
 public class ClientEvents {
 
 	@OnlyIn(Dist.CLIENT)
@@ -60,10 +60,9 @@ public class ClientEvents {
 
 	@OnlyIn(Dist.CLIENT)
 	@SubscribeEvent
-	public static void onRenderLevel(RenderLevelStageEvent event)
+	public static void onRenderLevel(RenderLevelStageEvent.AfterParticles event)
 	{
-		if(event.getStage() == RenderLevelStageEvent.Stage.AFTER_PARTICLES)
-			CarriedObjectRender.drawThirdPerson(event.getPartialTick().getGameTimeDeltaPartialTick(true), event.getPoseStack().last().pose());
+		CarriedObjectRender.drawThirdPerson(event.getPartialTick().getGameTimeDeltaPartialTick(true), event.getPoseStack().last().pose());
 	}
 
 	@OnlyIn(Dist.CLIENT)

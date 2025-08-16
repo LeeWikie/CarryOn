@@ -29,7 +29,7 @@ import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import tschipp.carryon.Constants;
 import tschipp.carryon.client.keybinds.CarryOnKeybinds;
 
-@EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD, modid = Constants.MOD_ID, value = Dist.CLIENT)
+@EventBusSubscriber(modid = Constants.MOD_ID, value = Dist.CLIENT)
 public class ModClientEvents
 {
 	@OnlyIn(Dist.CLIENT)

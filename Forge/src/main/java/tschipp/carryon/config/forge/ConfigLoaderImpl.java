@@ -27,29 +27,27 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.util.LogicalSidedProvider;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.eventbus.api.listener.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.ModLoadingContext;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.IConfigSpec;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.config.ModConfigEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLServiceProvider;
 import net.minecraftforge.server.ServerLifecycleHooks;
+import tschipp.carryon.Constants;
 import tschipp.carryon.config.*;
 
 import java.util.*;
 
+@Mod.EventBusSubscriber(modid = Constants.MOD_ID)
 public class ConfigLoaderImpl {
 
     public static final Map<ForgeConfigSpec, BuiltConfig> CONFIGS = new HashMap<>();
 
     public static void initialize(FMLJavaModLoadingContext context) {
-        IEventBus bus = context.getModEventBus();
-        bus.addListener(ConfigLoaderImpl::onConfigLoad);
-        bus.addListener(ConfigLoaderImpl::onConfigReload);
-
         ConfigLoaderImpl.CONFIGS.forEach((spec, config) -> {
             if(config.fileName.contains("client"))
                 context.registerConfig(ModConfig.Type.CLIENT, spec, config.fileName+".toml");
@@ -58,10 +56,12 @@ public class ConfigLoaderImpl {
         });
     }
 
+    @SubscribeEvent
     public static void onConfigLoad(ModConfigEvent.Loading loading) {
         loadConfig(loading.getConfig().getSpec());
     }
 
+    @SubscribeEvent
     public static void onConfigReload(ModConfigEvent.Reloading loading) {
         loadConfig(loading.getConfig().getSpec());
     }

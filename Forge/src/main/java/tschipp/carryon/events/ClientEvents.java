@@ -31,7 +31,7 @@ import net.minecraftforge.client.event.RenderHandEvent;
 import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.event.TickEvent.ClientTickEvent;
 import net.minecraftforge.event.TickEvent.Phase;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.eventbus.api.listener.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import tschipp.carryon.CarryOnCommonClient;
 import tschipp.carryon.Constants;
@@ -44,7 +44,7 @@ import tschipp.carryon.common.carry.CarryOnDataManager;
 public class ClientEvents {
 
 	@SubscribeEvent
-	public static void renderHand(RenderHandEvent event)
+	public static boolean renderHand(RenderHandEvent event)
 	{
 		Player player = Minecraft.getInstance().player;
 		MultiBufferSource buffer = event.getMultiBufferSource();
@@ -52,9 +52,9 @@ public class ClientEvents {
 		int light = event.getPackedLight();
 		float partialTicks = event.getPartialTick();
 
-		if(CarriedObjectRender.drawFirstPerson(player, buffer, matrix, light, partialTicks) && CarryRenderHelper.getPerspective() == 0)
-			event.setCanceled(true);
-	}
+		//If true, cancels event
+        return CarriedObjectRender.drawFirstPerson(player, buffer, matrix, light, partialTicks) && CarryRenderHelper.getPerspective() == 0;
+    }
 
 	/*
 	@SubscribeEvent
@@ -66,27 +66,25 @@ public class ClientEvents {
 	 */
 
 	@SubscribeEvent
-	public static void onGuiInit(ScreenEvent.Init.Pre event)
+	public static boolean onGuiInit(ScreenEvent.Init.Pre event)
 	{
-		if (event.getScreen() != null)
-		{
-			boolean inventory = event.getScreen() instanceof AbstractContainerScreen;
-			Minecraft mc = Minecraft.getInstance();
-			Player player = mc.player;
+        boolean inventory = event.getScreen() instanceof AbstractContainerScreen;
+        Minecraft mc = Minecraft.getInstance();
+        Player player = mc.player;
 
-			if (player != null && inventory)
-			{
-				CarryOnData carry = CarryOnDataManager.getCarryData(player);
-				if (carry.isCarrying())
-				{
-					mc.player.closeContainer();
-					mc.screen = null;
-					mc.mouseHandler.grabMouse();
-					event.setCanceled(true);
-				}
-			}
-		}
-	}
+        if (player != null && inventory)
+        {
+            CarryOnData carry = CarryOnDataManager.getCarryData(player);
+            if (carry.isCarrying())
+            {
+                mc.player.closeContainer();
+                mc.screen = null;
+                mc.mouseHandler.grabMouse();
+                return true;
+            }
+        }
+		return false;
+    }
 
 	@SubscribeEvent
 	public static void onClientTick(ClientTickEvent.Post event)

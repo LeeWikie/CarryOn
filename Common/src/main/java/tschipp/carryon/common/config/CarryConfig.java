@@ -353,6 +353,12 @@ public class CarryConfig
 
 		@Property(
 				type = PropertyType.BOOLEAN,
+				description = "If Entities should be rotated sideways when carried"
+		)
+		public boolean rotateEntitiesSideways = false;
+
+		@Property(
+				type = PropertyType.BOOLEAN,
 				description = "Arms should render on sides when carrying. Set to false if you experience issues with mods that replace the player model (like MoBends, etc)"
 		)
 		public boolean renderArms = true;

@@ -23,11 +23,14 @@ package tschipp.carryon.common.scripting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.TagValueOutput;
 import tschipp.carryon.Constants;
 import tschipp.carryon.common.scripting.CarryOnScript.ScriptObject.ScriptObjectBlock;
 import tschipp.carryon.common.scripting.CarryOnScript.ScriptObject.ScriptObjectEntity;
@@ -67,8 +70,9 @@ public class ScriptManager
 		float height = entity.getBbHeight();
 		float width = entity.getBbWidth();
 		float health = entity instanceof LivingEntity ? ((LivingEntity) entity).getHealth() : 0.0f;
-		CompoundTag tag = new CompoundTag();
-		entity.save(tag);
+		TagValueOutput output = TagValueOutput.createWithContext(new ProblemReporter.ScopedCollector(Constants.LOG), entity.registryAccess());
+		entity.save(output);
+		CompoundTag tag = output.buildResult();
 
 		for (CarryOnScript script : SCRIPTS)
 		{

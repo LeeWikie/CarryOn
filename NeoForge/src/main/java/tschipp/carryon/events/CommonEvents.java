@@ -55,7 +55,7 @@ import tschipp.carryon.common.carry.PlacementHandler;
 import tschipp.carryon.common.scripting.ScriptReloadListener;
 import tschipp.carryon.config.ConfigLoader;
 
-@EventBusSubscriber(bus = EventBusSubscriber.Bus.GAME, modid = Constants.MOD_ID)
+@EventBusSubscriber(modid = Constants.MOD_ID)
 public class CommonEvents
 {
 	@SubscribeEvent(priority = EventPriority.HIGH)

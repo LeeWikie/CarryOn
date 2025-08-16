@@ -63,10 +63,10 @@ public class CarriedObjectRender
 {
 
 	private static final SequencedMap<RenderType, ByteBufferBuilder> builders = new LinkedHashMap<>(Map.of(
-			RenderType.glint(), new ByteBufferBuilder(CarryOnRenderType.remap(RenderType.glint()).bufferSize()),
-			RenderType.armorEntityGlint(), new ByteBufferBuilder(CarryOnRenderType.remap(RenderType.armorEntityGlint()).bufferSize()),
-			RenderType.glintTranslucent(), new ByteBufferBuilder(CarryOnRenderType.remap(RenderType.glintTranslucent()).bufferSize()),
-			RenderType.entityGlint(), new ByteBufferBuilder(CarryOnRenderType.remap(RenderType.entityGlint()).bufferSize())
+			RenderType.glint(), new ByteBufferBuilder(RenderType.glint().bufferSize()),
+			RenderType.armorEntityGlint(), new ByteBufferBuilder(RenderType.armorEntityGlint().bufferSize()),
+			RenderType.glintTranslucent(), new ByteBufferBuilder(RenderType.glintTranslucent().bufferSize()),
+			RenderType.entityGlint(), new ByteBufferBuilder(RenderType.entityGlint().bufferSize())
 			//RenderType.entityGlintDirect(), new ByteBufferBuilder(RenderType.entityGlintDirect().bufferSize())
 	));
 
@@ -112,7 +112,7 @@ public class CarriedObjectRender
 		CarryOnData carry = CarryOnDataManager.getCarryData(player);
 		ItemStackRenderState renderState = new ItemStackRenderState();
 		var layer = renderState.newLayer();
-		layer.setRenderType(CarryOnRenderType.remap(RenderType.glint()));
+		layer.setRenderType(RenderType.glint());
 
 		if (Constants.CLIENT_CONFIG.facePlayer != CarryRenderHelper.isChest(state.getBlock())) {
 			matrix.mulPose(Axis.YP.rotationDegrees(180));
@@ -157,7 +157,7 @@ public class CarriedObjectRender
 			matrix.pushPose();
 			matrix.scale(0.8f, 0.8f, 0.8f);
 			matrix.mulPose(Axis.YP.rotationDegrees(180));
-			matrix.translate(0.0, -height - .1, width + 0.1);
+			matrix.translate(0.0, -height - .2, width * 1.3 + 0.1);
 
 			manager.setRenderShadow(false);
 
@@ -167,6 +167,9 @@ public class CarriedObjectRender
 				CarryOnScript script = res.get();
 				CarryRenderHelper.performScriptTransformation(matrix, script);
 			}
+
+			if(Constants.CLIENT_CONFIG.rotateEntitiesSideways)
+				matrix.mulPose(Axis.YP.rotationDegrees(90));
 
 			if (entity instanceof LivingEntity)
 				((LivingEntity) entity).hurtTime = 0;
@@ -240,7 +243,7 @@ public class CarriedObjectRender
 					copy.mulPose(p.pose());
 					matrix.popPose();
 
-					RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+					//RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 
 					renderState.render(copy, buffer, light, OverlayTexture.NO_OVERLAY);
 
@@ -259,7 +262,7 @@ public class CarriedObjectRender
 						if (entity instanceof LivingEntity le)
 							le.hurtTime = 0;
 
-						RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+						//RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 
 						manager.render(entity, 0, 0, 0, 0f, matrix, buffer, light);
 						matrix.popPose();

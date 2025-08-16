@@ -1,25 +1,9 @@
 plugins {
-    id 'idea'
-    id 'java'
-    id 'maven-publish'
+    id 'multiloader-loader'
     id 'net.minecraftforge.gradle' version '[6.0.36,6.2)'
     id 'org.spongepowered.mixin' version '0.7-SNAPSHOT'
     id 'org.parchmentmc.librarian.forgegradle' version '1.+'
 }
-
-/*
-apply from: 'https://raw.githubusercontent.com/MinecraftModDevelopment/Gradle-Collection/22e7d543a18cd30675277fbfa3669e3d9e206010/generic/secrets.gradle'
-
-if (project.hasProperty('secretFile')) {
-    loadSecrets(new File((String) findProperty('secretFile')))
-}
-
- */
-if (System.getenv('BUILD_NUMBER') != null) {
-    version += "." + System.getenv('BUILD_NUMBER')
-}
-
-
 
 base {
     archivesName = "${mod_id}-forge-${minecraft_version}"
@@ -32,6 +16,14 @@ mixin {
     config "${mod_id}.forge.mixins.json"
 }
 
+tasks.named('jar', Jar).configure {
+    manifest {
+        attributes([
+                "MixinConfigs" : "${mod_id}.mixins.json,${mod_id}.forge.mixins.json"
+        ])
+    }
+}
+
 jarJar.enable()
 build.dependsOn tasks.jarJar
 
@@ -40,8 +32,9 @@ minecraft {
     copyIdeResources = true
     reobf = false
 
-    if (file('src/main/resources/META-INF/accesstransformer.cfg').exists()) {
-        accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+    def at = file('src/main/resources/META-INF/accesstransformer.cfg')
+    if (at.exists()) {
+        accessTransformer = at
     }
 
     runs {
@@ -51,6 +44,7 @@ minecraft {
             taskName 'Client'
             property 'mixin.env.remapRefMap', 'true'
             property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
+            property 'eventbus.api.strictRuntimeChecks', 'true'
             args "-mixin.config=${mod_id}.mixins.json", "-mixin.config=${mod_id}.forge.mixins.json"
             mods {
                 modClientRun {
@@ -66,6 +60,7 @@ minecraft {
             taskName 'Server'
             property 'mixin.env.remapRefMap', 'true'
             property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
+            property 'eventbus.api.strictRuntimeChecks', 'true'
             args "-mixin.config=${mod_id}.mixins.json", "-mixin.config=${mod_id}.forge.mixins.json"
             mods {
                 modServerRun {
@@ -82,6 +77,7 @@ minecraft {
             taskName 'Data'
             property 'mixin.env.remapRefMap', 'true'
             property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
+            property 'eventbus.api.strictRuntimeChecks', 'true'
             args "-mixin.config=${mod_id}.mixins.json", "-mixin.config=${mod_id}.forge.mixins.json"
             mods {
                 modDataRun {
@@ -96,17 +92,25 @@ minecraft {
 sourceSets.main.resources.srcDir 'src/generated/resources'
 
 repositories {
+    maven {
+        name = "Shedaniel"
+        url "https://maven.shedaniel.me/"
+    }
+
+    maven { url 'https://jitpack.io' }
+
     flatDir {
         dirs 'libs'
     }
-    maven { url 'https://jitpack.io' }
 
 }
+
 
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
     compileOnly project(":Common")
     annotationProcessor 'org.spongepowered:mixin:0.8.5-SNAPSHOT:processor'
+    annotationProcessor 'net.minecraftforge:eventbus-validator:7.0-beta.7'
 // Hack fix for now, force jopt-simple to be exactly 5.0.4 because Mojang ships that version, but some transitive dependencies request 6.0+
     implementation('net.sf.jopt-simple:jopt-simple:5.0.4') { version { strictly '5.0.4' } }
 
@@ -117,7 +121,7 @@ dependencies {
 
     //implementation fg.deobf("net.darkhax.gamestages:GameStages-Forge-1.19.2:11.0.2")
 
-    implementation(fg.deobf("me.shedaniel.cloth:cloth-config-forge:${cloth_config_version}"))
+    compileOnly(fg.deobf("me.shedaniel.cloth:cloth-config-neoforge:${cloth_config_version}"))
 
     fileTree("libs").matching {
         include "*.jar"
@@ -132,47 +136,14 @@ dependencies {
 
 }
 
-tasks.withType(JavaCompile).configureEach {
-    source(project(":Common").sourceSets.main.allSource)
-}
-tasks.withType(Javadoc).configureEach {
-    source(project(":Common").sourceSets.main.allJava)
-}
-tasks.named("sourcesJar", Jar) {
-    from(project(":Common").sourceSets.main.allSource)
-}
-
-processResources {
-    from project(":Common").sourceSets.main.resources
-}
-
-tasks.named('jar', Jar).configure {
-    manifest {
-        attributes([
-                "MixinConfigs" : "${mod_id}.mixins.json,${mod_id}.forge.mixins.json"
-        ])
-    }
-}
-
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            artifactId base.archivesName.get()
-            from components.java
             fg.component(it)
-        }
-    }
-    repositories {
-        maven {
-            url "file://" + System.getenv("local_maven")
         }
     }
 }
 
-// Merge the resources and classes into the same directory.
-// This is done because java expects modules to be in a single directory.
-// And if we have it in multiple we have to do performance intensive hacks like having the UnionFileSystem
-// This will eventually be migrated to ForgeGradle so modders don't need to manually do it. But that is later.
 sourceSets.each {
     def dir = layout.buildDirectory.dir("sourcesSets/$it.name")
     it.output.resourcesDir = dir

@@ -22,17 +22,11 @@ package tschipp.carryon.events;
 
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
-import net.minecraftforge.eventbus.api.Cancelable;
-import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
+import net.minecraftforge.eventbus.api.event.RecordEvent;
+import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 
-@Cancelable
-public class EntityPickupEvent extends Event {
+public record EntityPickupEvent(ServerPlayer player, Entity target) implements Cancellable, RecordEvent {
 
-    public final ServerPlayer player;
-    public final Entity target;
-
-    public EntityPickupEvent(ServerPlayer player, Entity target) {
-        this.player = player;
-        this.target = target;
-    }
+    public static final CancellableEventBus<EntityPickupEvent> BUS = CancellableEventBus.create(EntityPickupEvent.class);
 }

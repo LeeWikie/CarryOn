@@ -30,6 +30,8 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -38,6 +40,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import tschipp.carryon.common.carry.CarryOnData;
 import tschipp.carryon.common.carry.CarryOnDataManager;
+
+import java.util.Optional;
 
 @Mixin(Player.class)
 public abstract class PlayerMixin extends LivingEntity implements CarryOnDataManager.ICarrying {
@@ -76,20 +80,18 @@ public abstract class PlayerMixin extends LivingEntity implements CarryOnDataMan
     }
 
 
-    @Inject(method = "addAdditionalSaveData(Lnet/minecraft/nbt/CompoundTag;)V", at = @At("RETURN"))
-    private void onAddAdditionalSaveData(CompoundTag tag, CallbackInfo info)
+    @Inject(method = "addAdditionalSaveData(Lnet/minecraft/world/level/storage/ValueOutput;)V", at = @At("RETURN"))
+    private void onAddAdditionalSaveData(ValueOutput output, CallbackInfo ci)
     {
         CarryOnData carry = CarryOnDataManager.getCarryData((Player)(Object)this);
-        tag.put("CarryOnData", carry.getNbt());
+        output.store("CarryOnData", CarryOnData.CODEC, carry);
     }
 
-    @Inject(method = "readAdditionalSaveData(Lnet/minecraft/nbt/CompoundTag;)V", at = @At("RETURN"))
-    private void onReadAdditionalSaveData(CompoundTag tag, CallbackInfo info)
+    @Inject(method = "readAdditionalSaveData(Lnet/minecraft/world/level/storage/ValueInput;)V", at = @At("RETURN"))
+    private void onReadAdditionalSaveData(ValueInput input, CallbackInfo ci)
     {
-        if (tag.contains("CarryOnData")) {
-            CarryOnData data = new CarryOnData(tag.getCompoundOrEmpty("CarryOnData"));
-            setCarryOnData(data);
-        }
+        Optional<CarryOnData> res = input.read("CarryOnData", CarryOnData.CODEC);
+        res.ifPresent(this::setCarryOnData);
     }
 
 }

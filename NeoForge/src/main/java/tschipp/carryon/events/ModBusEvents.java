@@ -32,7 +32,7 @@ import tschipp.carryon.common.config.ListHandler;
 
 import java.util.stream.Stream;
 
-@EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD, modid = Constants.MOD_ID)
+@EventBusSubscriber(modid = Constants.MOD_ID)
 public class ModBusEvents {
 
 	@SubscribeEvent(priority = EventPriority.LOW)

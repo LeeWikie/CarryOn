@@ -20,7 +20,9 @@
 
 package tschipp.carryon.common.carry;
 
+import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -29,6 +31,7 @@ import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.entity.AreaEffectCloud;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySpawnReason;
@@ -37,6 +40,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.storage.TagValueInput;
+import net.minecraft.world.level.storage.TagValueOutput;
+import net.minecraft.world.level.storage.ValueInput;
 import tschipp.carryon.Constants;
 import tschipp.carryon.common.scripting.CarryOnScript;
 
@@ -50,6 +56,24 @@ public class CarryOnData {
     private boolean keyPressed = false;
     private CarryOnScript activeScript;
     private int selectedSlot = 0;
+    private static final ProblemReporter problemReporter = new ProblemReporter.ScopedCollector(Constants.LOG);
+
+    public static final Codec<CarryOnData> CODEC = CompoundTag.CODEC.flatXmap(
+            tag -> {
+                try {
+                    return DataResult.success(new CarryOnData(tag));
+                } catch (Exception e) {
+                    return DataResult.error(e::getMessage);
+                }
+            },
+            carry -> {
+                try {
+                    return DataResult.success(carry.getNbt());
+                } catch (Exception e) {
+                    return DataResult.error(e::getMessage);
+                }
+            }
+    );
 
     public CarryOnData(CompoundTag data)
     {
@@ -107,7 +131,9 @@ public class CarryOnData {
 
         if(tile != null)
         {
-            CompoundTag tileData = tile.saveWithId(tile.getLevel().registryAccess());
+            TagValueOutput output = TagValueOutput.createWithContext(problemReporter, player.registryAccess());
+            tile.saveWithId(output);
+            Tag tileData = output.buildResult();
             nbt.put("tile", tileData);
         }
     }
@@ -135,8 +161,9 @@ public class CarryOnData {
     public void setEntity(Entity entity)
     {
         this.type = CarryType.ENTITY;
-        CompoundTag entityData = new CompoundTag();
-        entity.save(entityData);
+        TagValueOutput output = TagValueOutput.createWithContext(new ProblemReporter.ScopedCollector(Constants.LOG), entity.registryAccess());
+        entity.save(output);
+        Tag entityData = output.buildResult();
         nbt.put("entity", entityData);
     }
 
@@ -145,7 +172,8 @@ public class CarryOnData {
         if(this.type != CarryType.ENTITY)
             throw new IllegalStateException("Called getEntity on data that contained " + this.type);
 
-        var optionalEntity = EntityType.create(nbt.getCompoundOrEmpty("entity"), level, EntitySpawnReason.BUCKET);
+        ValueInput in = TagValueInput.create(problemReporter, level.registryAccess(), nbt.getCompoundOrEmpty("entity"));
+        var optionalEntity = EntityType.create(in, level, EntitySpawnReason.BUCKET);
         if(optionalEntity.isPresent())
             return optionalEntity.get();
 

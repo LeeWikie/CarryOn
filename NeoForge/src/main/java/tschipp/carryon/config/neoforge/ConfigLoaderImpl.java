@@ -42,7 +42,7 @@ import tschipp.carryon.config.*;
 import java.util.*;
 import java.util.function.Consumer;
 
-@EventBusSubscriber(modid = Constants.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = Constants.MOD_ID)
 public class ConfigLoaderImpl {
 
     public static final Map<ModConfigSpec, BuiltConfig> CONFIGS = new LinkedHashMap<>();

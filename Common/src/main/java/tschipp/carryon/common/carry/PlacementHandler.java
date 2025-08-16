@@ -179,7 +179,7 @@ public class PlacementHandler
 		if (carry.isCarrying(CarryType.PLAYER)) {
 			Entity otherPlayer = player.getFirstPassenger();
 			player.ejectPassengers();
-			Services.PLATFORM.sendPacketToAllPlayers(Constants.PACKET_ID_START_RIDING_OTHER, new ClientboundStartRidingOtherPlayerPacket(player.getId(), otherPlayer.getId(), false), player.serverLevel());
+			Services.PLATFORM.sendPacketToAllPlayers(Constants.PACKET_ID_START_RIDING_OTHER, new ClientboundStartRidingOtherPlayerPacket(player.getId(), otherPlayer.getId(), false), player.level());
 			carry.clear();
 			CarryOnDataManager.setCarryData(player, carry);
             otherPlayer.teleportTo(placementPos.x, placementPos.y, placementPos.z);

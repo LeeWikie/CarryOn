@@ -19,9 +19,8 @@
  */
 
 package tschipp.carryon.events;
-
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.eventbus.api.listener.Priority;
+import net.minecraftforge.eventbus.api.listener.SubscribeEvent;
 import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.fml.InterModComms.IMCMessage;
 import net.minecraftforge.fml.common.Mod;
@@ -36,7 +35,7 @@ import java.util.stream.Stream;
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD, modid = Constants.MOD_ID)
 public class ModBusEvents {
 
-	@SubscribeEvent(priority = EventPriority.LOW)
+	@SubscribeEvent(priority = Priority.LOW)
 	public static void serverLoad(InterModProcessEvent event)
 	{
 		Stream<IMCMessage> messages = InterModComms.getMessages(Constants.MOD_ID);

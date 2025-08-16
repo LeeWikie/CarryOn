@@ -25,6 +25,7 @@ import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.util.Mth;
+import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.LivingEntity;
@@ -34,6 +35,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.TagValueInput;
+import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.joml.Quaternionf;
@@ -208,7 +211,7 @@ public class CarryRenderHelper
 			matrix.mulPose(Axis.YP.rotationDegrees(180));
 
 		matrix.scale((10 - multiplier) * 0.08f, (10 - multiplier) * 0.08f, (10 - multiplier) * 0.08f);
-		matrix.translate(0.0, height / 2 + -(height / 2) + 1, width - 0.1 < 0.7 ? width - 0.1 + (0.7 - (width - 0.1)) : width - 0.1);
+		matrix.translate(0.0, height / 2 + -(height / 4) + 1, width - 0.1 < 0.7 ? width - 0.1 + (0.7 - (width - 0.1)) : width - 0.1);
 
 		if (pose == Pose.SWIMMING || pose == Pose.FALL_FLYING)
 		{
@@ -218,6 +221,9 @@ public class CarryRenderHelper
 			if (pose == Pose.FALL_FLYING)
 				matrix.translate(0, 0, 0.2);
 		}
+
+		if(Constants.CLIENT_CONFIG.rotateEntitiesSideways)
+			matrix.mulPose(Axis.YP.rotationDegrees(90));
 
 	}
 
@@ -365,8 +371,10 @@ public class CarryRenderHelper
 			if(render.renderNameEntity().isPresent())
 				entity = BuiltInRegistries.ENTITY_TYPE.get(render.renderNameEntity().get()).get().value().create(player.level(), EntitySpawnReason.EVENT);
 
-			if(render.renderNBT().isPresent())
-				entity.load(render.renderNBT().get());
+			if(render.renderNBT().isPresent()) {
+				ValueInput input = TagValueInput.create(new ProblemReporter.ScopedCollector(Constants.LOG), player.registryAccess(), render.renderNBT().get());
+				entity.load(input);
+			}
 		}
 
 		return entity;
@@ -394,7 +402,10 @@ public class CarryRenderHelper
 		else if(carry.isCarrying(CarryType.ENTITY))
 		{
 			Entity entity = getRenderEntity(player);
-			return entity.getBbWidth();
+			float w =  entity.getBbWidth();
+			if (Constants.CLIENT_CONFIG.rotateEntitiesSideways)
+				return w - (w*w) * 0.35f;
+			return w * 0.9f;
 		}
 		else
 			return 1f;

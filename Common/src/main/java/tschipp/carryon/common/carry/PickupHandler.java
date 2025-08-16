@@ -25,6 +25,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -39,6 +40,7 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.TagValueOutput;
 import net.minecraft.world.phys.Vec3;
 import tschipp.carryon.CarryOnCommon;
 import tschipp.carryon.Constants;
@@ -96,8 +98,11 @@ public class PickupHandler {
         BlockEntity blockEntity = level.getBlockEntity(pos);
         BlockState state = level.getBlockState(pos);
         CompoundTag nbt = null;
-        if(blockEntity != null)
-            nbt = blockEntity.saveWithId(level.registryAccess());
+        if(blockEntity != null) {
+            TagValueOutput output = TagValueOutput.createWithContext(new ProblemReporter.ScopedCollector(Constants.LOG), level.registryAccess());
+            blockEntity.saveWithId(output);
+            nbt = output.buildResult();
+        }
 
         if(!ListHandler.isPermitted(state.getBlock()))
             return false;
@@ -231,7 +236,7 @@ public class PickupHandler {
             }
 
             otherPlayer.startRiding(player, true);
-            Services.PLATFORM.sendPacketToAllPlayers(Constants.PACKET_ID_START_RIDING_OTHER, new ClientboundStartRidingOtherPlayerPacket(player.getId(), otherPlayer.getId(), true), player.serverLevel());
+            Services.PLATFORM.sendPacketToAllPlayers(Constants.PACKET_ID_START_RIDING_OTHER, new ClientboundStartRidingOtherPlayerPacket(player.getId(), otherPlayer.getId(), true), player.level());
             carry.setCarryingPlayer();
             player.swing(InteractionHand.MAIN_HAND, true);
             player.level().playSound(null, player.getOnPos(), SoundEvents.ARMOR_EQUIP_GENERIC.value(), SoundSource.AMBIENT, 1.0f, 0.5f);
