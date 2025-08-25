@@ -20,7 +20,6 @@
 
 package tschipp.carryon.platform;
 
-import io.netty.buffer.ByteBuf;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
@@ -36,10 +35,10 @@ import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.handling.IPayloadHandler;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import tschipp.carryon.CarryOnCommonClient;
+import tschipp.carryon.CarryOnNeoForgeClient;
 import tschipp.carryon.config.BuiltConfig;
 import tschipp.carryon.config.neoforge.ConfigLoaderImpl;
 import tschipp.carryon.networking.PacketBase;
-import tschipp.carryon.networking.serverbound.ServerboundCarryKeyPressedPacket;
 import tschipp.carryon.platform.services.IPlatformHelper;
 
 import java.util.function.BiConsumer;
@@ -100,7 +99,7 @@ public class NeoForgePlatformHelper implements IPlatformHelper {
 
     @Override
     public void sendPacketToServer(ResourceLocation id, PacketBase packet) {
-        PacketDistributor.sendToServer(packet);
+        CarryOnNeoForgeClient.sendPacketToServer(packet);
     }
 
     @Override

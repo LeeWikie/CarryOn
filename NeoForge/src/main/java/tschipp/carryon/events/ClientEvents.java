@@ -26,7 +26,6 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
@@ -44,7 +43,6 @@ import tschipp.carryon.common.carry.CarryOnDataManager;
 @EventBusSubscriber(modid = Constants.MOD_ID, value = Dist.CLIENT)
 public class ClientEvents {
 
-	@OnlyIn(Dist.CLIENT)
 	@SubscribeEvent
 	public static void renderHand(RenderHandEvent event)
 	{
@@ -58,14 +56,12 @@ public class ClientEvents {
 			event.setCanceled(true);
 	}
 
-	@OnlyIn(Dist.CLIENT)
 	@SubscribeEvent
 	public static void onRenderLevel(RenderLevelStageEvent.AfterParticles event)
 	{
 		CarriedObjectRender.drawThirdPerson(event.getPartialTick().getGameTimeDeltaPartialTick(true), event.getPoseStack().last().pose());
 	}
 
-	@OnlyIn(Dist.CLIENT)
 	@SubscribeEvent
 	public static void onGuiInit(ScreenEvent.Init.Pre event)
 	{
@@ -89,7 +85,6 @@ public class ClientEvents {
 		}
 	}
 
-	@OnlyIn(Dist.CLIENT)
 	@SubscribeEvent
 	public static void onClientTick(ClientTickEvent.Post event)
 	{

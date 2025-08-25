@@ -32,7 +32,6 @@ import tschipp.carryon.client.keybinds.CarryOnKeybinds;
 @EventBusSubscriber(modid = Constants.MOD_ID, value = Dist.CLIENT)
 public class ModClientEvents
 {
-	@OnlyIn(Dist.CLIENT)
 	@SubscribeEvent
 	public static void registerKeybinds(RegisterKeyMappingsEvent event)
 	{

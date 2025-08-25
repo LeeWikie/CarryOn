@@ -4,9 +4,11 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import tschipp.carryon.compat.ClothConfigCompatNeo;
 import tschipp.carryon.config.BuiltConfig;
 import tschipp.carryon.config.neoforge.ConfigLoaderImpl;
+import tschipp.carryon.networking.PacketBase;
 import tschipp.carryon.platform.Services;
 
 import java.util.function.Supplier;
@@ -22,6 +24,10 @@ public class CarryOnNeoForgeClient {
 
             container.registerExtensionPoint(IConfigScreenFactory.class, (Supplier<IConfigScreenFactory>) () -> new ClothConfigCompatNeo(configs[1], configs[0]));
         }
+    }
+
+    public static void sendPacketToServer(PacketBase packet) {
+        ClientPacketDistributor.sendToServer(packet);
     }
 
 }
