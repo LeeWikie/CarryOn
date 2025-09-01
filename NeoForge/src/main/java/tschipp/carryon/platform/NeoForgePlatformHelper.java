@@ -20,6 +20,7 @@
 
 package tschipp.carryon.platform;
 
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
@@ -35,7 +36,9 @@ import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.handling.IPayloadHandler;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import tschipp.carryon.CarryOnCommonClient;
+import tschipp.carryon.CarryOnNeoForge;
 import tschipp.carryon.CarryOnNeoForgeClient;
+import tschipp.carryon.common.carry.CarryOnData;
 import tschipp.carryon.config.BuiltConfig;
 import tschipp.carryon.config.neoforge.ConfigLoaderImpl;
 import tschipp.carryon.networking.PacketBase;
@@ -105,5 +108,15 @@ public class NeoForgePlatformHelper implements IPlatformHelper {
     @Override
     public void sendPacketToPlayer(ResourceLocation id, PacketBase packet, ServerPlayer player) {
         PacketDistributor.sendToPlayer(player, packet);
+    }
+
+    @Override
+    public CarryOnData getCarryData(Player player) {
+        return player.getData(CarryOnNeoForge.CARRY_ON_DATA_ATTACHMENT);
+    }
+
+    @Override
+    public void setCarryData(Player player, CarryOnData data) {
+        player.setData(CarryOnNeoForge.CARRY_ON_DATA_ATTACHMENT, data);
     }
 }

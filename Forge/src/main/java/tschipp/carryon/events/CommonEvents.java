@@ -21,6 +21,7 @@
 package tschipp.carryon.events;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
@@ -32,12 +33,10 @@ import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.common.util.Result;
-import net.minecraftforge.event.AddReloadListenerEvent;
-import net.minecraftforge.event.OnDatapackSyncEvent;
-import net.minecraftforge.event.RegisterCommandsEvent;
-import net.minecraftforge.event.TagsUpdatedEvent;
+import net.minecraftforge.event.*;
 import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.event.TickEvent.ServerTickEvent;
+import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.MobSpawnEvent.FinalizeSpawn;
 import net.minecraftforge.event.entity.player.AttackEntityEvent;
@@ -54,6 +53,7 @@ import net.minecraftforge.fml.common.Mod;
 import oshi.jna.platform.mac.SystemB;
 import tschipp.carryon.CarryOnCommon;
 import tschipp.carryon.Constants;
+import tschipp.carryon.carry.CarryOnDataCapabilityProvider;
 import tschipp.carryon.common.carry.CarryOnData;
 import tschipp.carryon.common.carry.CarryOnData.CarryType;
 import tschipp.carryon.common.carry.CarryOnDataManager;
@@ -61,6 +61,8 @@ import tschipp.carryon.common.carry.PickupHandler;
 import tschipp.carryon.common.carry.PlacementHandler;
 import tschipp.carryon.common.scripting.ScriptReloadListener;
 import tschipp.carryon.config.ConfigLoader;
+import tschipp.carryon.networking.ClientboundSyncCarryDataPacket;
+import tschipp.carryon.platform.Services;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE, modid = Constants.MOD_ID)
 public class CommonEvents
@@ -178,8 +180,16 @@ public class CommonEvents
 	@SubscribeEvent
 	public static void onClone(Clone event)
 	{
-		if (!event.getOriginal().level().isClientSide)
-			PlacementHandler.placeCarriedOnDeath((ServerPlayer) event.getOriginal(), (ServerPlayer) event.getEntity(), event.isWasDeath());
+		if (!event.getOriginal().level().isClientSide) {
+			Player newPlayer = event.getEntity();
+			Player oldPlayer = event.getOriginal();
+			oldPlayer.reviveCaps();
+
+			PlacementHandler.placeCarriedOnDeath((ServerPlayer) oldPlayer, (ServerPlayer) newPlayer, event.isWasDeath());
+
+			oldPlayer.invalidateCaps();
+
+		}
 	}
 
 	@SubscribeEvent
@@ -212,6 +222,27 @@ public class CommonEvents
 	public static void onPlayerLoggedOut(PlayerEvent.PlayerLoggedOutEvent event) {
 		if(event.getEntity() instanceof ServerPlayer player)
 			CarryOnCommon.onRiderDisconnected(player);
+	}
+
+	@SubscribeEvent
+	public static void onAttachCapabilities(AttachCapabilitiesEvent.Entities event) {
+		if (event.getObject() instanceof Player player) {
+			event.addCapability(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "carry_on_data"), new CarryOnDataCapabilityProvider());
+		}
+	}
+
+	@SubscribeEvent
+	public static void onStartTracking(PlayerEvent.StartTracking event) {
+		if(event.getEntity() instanceof ServerPlayer sp && event.getTarget() instanceof ServerPlayer target) {
+			Services.PLATFORM.sendPacketToPlayer(Constants.PACKET_ID_SYNC_CARRY_ON_DATA, new ClientboundSyncCarryDataPacket(sp.getId(), CarryOnDataManager.getCarryData(sp)), target);
+		}
+	}
+
+	@SubscribeEvent
+	public static void onJoinWorld(EntityJoinLevelEvent event) {
+		if (event.getEntity() instanceof ServerPlayer sp) {
+			Services.PLATFORM.sendPacketToPlayer(Constants.PACKET_ID_SYNC_CARRY_ON_DATA, new ClientboundSyncCarryDataPacket(sp.getId(), CarryOnDataManager.getCarryData(sp)), sp);
+		}
 	}
 
 }

@@ -154,7 +154,7 @@ public class PickupHandler {
         level.playSound(null, pos, state.getSoundType().getHitSound(), SoundSource.BLOCKS, 1.0f, 0.5f);
         player.swing(InteractionHand.MAIN_HAND, true);
         if (!player.isCreative() || Constants.COMMON_CONFIG.settings.slownessInCreative)
-            player.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 1000000, CarryOnCommon.potionLevel(carry, player.level()), false, false));
+            player.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 100000000, CarryOnCommon.potionLevel(carry, player.level()), false, false));
         return true;
     }
 
@@ -242,7 +242,7 @@ public class PickupHandler {
             player.level().playSound(null, player.getOnPos(), SoundEvents.ARMOR_EQUIP_GENERIC.value(), SoundSource.AMBIENT, 1.0f, 0.5f);
             CarryOnDataManager.setCarryData(player, carry);
             if (!player.isCreative() || Constants.COMMON_CONFIG.settings.slownessInCreative)
-                player.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 1000000, CarryOnCommon.potionLevel(carry, player.level()), false, false));
+                player.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 100000000, CarryOnCommon.potionLevel(carry, player.level()), false, false));
             return true;
 
         }
@@ -267,7 +267,7 @@ public class PickupHandler {
         CarryOnDataManager.setCarryData(player, carry);
         player.swing(InteractionHand.MAIN_HAND, true);
         if (!player.isCreative() || Constants.COMMON_CONFIG.settings.slownessInCreative)
-            player.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 1000000, CarryOnCommon.potionLevel(carry, player.level()), false, false));
+            player.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 100000000, CarryOnCommon.potionLevel(carry, player.level()), false, false));
         return true;
     }
 

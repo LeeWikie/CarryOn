@@ -38,5 +38,6 @@ public class Constants {
 	public static final ResourceLocation PACKET_ID_START_RIDING =  ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "start_riding");
 	public static final ResourceLocation PACKET_ID_SYNC_SCRIPTS =  ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "sync_scripts");
 	public static final ResourceLocation PACKET_ID_START_RIDING_OTHER =  ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "start_riding_other");
+	public static final ResourceLocation PACKET_ID_SYNC_CARRY_ON_DATA =  ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "sync_carry_data");
 
 }

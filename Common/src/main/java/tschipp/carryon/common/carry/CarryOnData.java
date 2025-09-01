@@ -30,6 +30,9 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.nbt.Tag;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.entity.AreaEffectCloud;
@@ -47,6 +50,7 @@ import tschipp.carryon.Constants;
 import tschipp.carryon.common.scripting.CarryOnScript;
 
 import javax.annotation.Nullable;
+import java.util.Objects;
 import java.util.Optional;
 
 public class CarryOnData {
@@ -57,6 +61,7 @@ public class CarryOnData {
     private CarryOnScript activeScript;
     private int selectedSlot = 0;
     private static final ProblemReporter problemReporter = new ProblemReporter.ScopedCollector(Constants.LOG);
+
 
     public static final Codec<CarryOnData> CODEC = CompoundTag.CODEC.flatXmap(
             tag -> {
@@ -74,6 +79,10 @@ public class CarryOnData {
                 }
             }
     );
+
+    public static final StreamCodec<RegistryFriendlyByteBuf, CarryOnData> STREAM_CODEC = ByteBufCodecs.fromCodecWithRegistries(CODEC);
+
+    public static final String SERIALIZATION_KEY = "CarryOnData";
 
     public CarryOnData(CompoundTag data)
     {
@@ -236,10 +245,13 @@ public class CarryOnData {
 
     public int getTick()
     {
-        if(!this.nbt.contains("tick"))
-            return -1;
         return this.nbt.getIntOr("tick", -1);
     }
+
+    public void setTick(int tick) {
+        this.nbt.putInt("tick", tick);
+    }
+
 
     public enum CarryType {
         BLOCK,

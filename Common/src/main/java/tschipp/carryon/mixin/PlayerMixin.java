@@ -44,54 +44,18 @@ import tschipp.carryon.common.carry.CarryOnDataManager;
 import java.util.Optional;
 
 @Mixin(Player.class)
-public abstract class PlayerMixin extends LivingEntity implements CarryOnDataManager.ICarrying {
-
-    @Unique
-    private static final EntityDataAccessor<CompoundTag> CARRY_DATA_KEY = SynchedEntityData.defineId(Player.class, EntityDataSerializers.COMPOUND_TAG);
-
-    @Override
-    public void setCarryOnData(CarryOnData data)
-    {
-        data.setSelected(this.getInventory().getSelectedSlot());
-        CompoundTag nbt = data.getNbt();
-        nbt.putInt("tick", tickCount);
-        this.getEntityData().set(CARRY_DATA_KEY, nbt);
-    }
-
-    @Override
-    public CarryOnData getCarryOnData()
-    {
-        CompoundTag data = this.getEntityData().get(CARRY_DATA_KEY);
-        return new CarryOnData(data.copy());
-    }
-
-    @Shadow
-    public abstract Inventory getInventory();
-
+public abstract class PlayerMixin extends LivingEntity  {
 
     private PlayerMixin(EntityType<? extends LivingEntity> type, Level level) {
         super(type, level);
     }
 
-
-    @Inject(method = "defineSynchedData(Lnet/minecraft/network/syncher/SynchedEntityData$Builder;)V", at = @At("RETURN"))
-    private void onDefineSynchedData(SynchedEntityData.Builder builder, CallbackInfo ci) {
-        builder.define(CARRY_DATA_KEY, new CompoundTag());
-    }
-
-
-    @Inject(method = "addAdditionalSaveData(Lnet/minecraft/world/level/storage/ValueOutput;)V", at = @At("RETURN"))
-    private void onAddAdditionalSaveData(ValueOutput output, CallbackInfo ci)
-    {
-        CarryOnData carry = CarryOnDataManager.getCarryData((Player)(Object)this);
-        output.store("CarryOnData", CarryOnData.CODEC, carry);
-    }
-
+    //We leave this in here to ensure cross-compatibility if world are upgraded from <1.21.8. Should be removed in the future.
     @Inject(method = "readAdditionalSaveData(Lnet/minecraft/world/level/storage/ValueInput;)V", at = @At("RETURN"))
     private void onReadAdditionalSaveData(ValueInput input, CallbackInfo ci)
     {
         Optional<CarryOnData> res = input.read("CarryOnData", CarryOnData.CODEC);
-        res.ifPresent(this::setCarryOnData);
+        res.ifPresent(data -> CarryOnDataManager.setCarryData((Player)((Object)this), data));
     }
 
 }

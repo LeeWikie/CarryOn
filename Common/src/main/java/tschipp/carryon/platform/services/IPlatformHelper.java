@@ -29,6 +29,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
+import tschipp.carryon.common.carry.CarryOnData;
+import tschipp.carryon.common.carry.CarryOnDataManager;
 import tschipp.carryon.config.BuiltConfig;
 import tschipp.carryon.networking.PacketBase;
 
@@ -73,5 +75,9 @@ public interface IPlatformHelper {
         for(ServerPlayer p : level.players())
             sendPacketToPlayer(id, packet, p);
     }
+
+    CarryOnData getCarryData(Player player);
+
+    void setCarryData(Player player, CarryOnData data);
 
 }

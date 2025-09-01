@@ -25,6 +25,7 @@ import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking.PlayPayloadHandler;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
@@ -35,6 +36,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import tschipp.carryon.CarryOnFabricClientMod;
+import tschipp.carryon.CarryOnFabricMod;
+import tschipp.carryon.common.carry.CarryOnData;
 import tschipp.carryon.config.BuiltConfig;
 import tschipp.carryon.config.fabric.ConfigLoaderImpl;
 import tschipp.carryon.networking.PacketBase;
@@ -100,5 +103,16 @@ public class FabricPlatformHelper implements IPlatformHelper {
     public void sendPacketToPlayer(ResourceLocation id, PacketBase packet, ServerPlayer player)
     {
         ServerPlayNetworking.send(player, packet);
+    }
+
+    @Override
+    public CarryOnData getCarryData(Player player) {
+        CarryOnData data = player.getAttachedOrCreate(CarryOnFabricMod.CARRY_ON_DATA_ATTACHMENT_TYPE);
+        return data.clone();
+    }
+
+    @Override
+    public void setCarryData(Player player, CarryOnData data) {
+        player.setAttached(CarryOnFabricMod.CARRY_ON_DATA_ATTACHMENT_TYPE, data);
     }
 }

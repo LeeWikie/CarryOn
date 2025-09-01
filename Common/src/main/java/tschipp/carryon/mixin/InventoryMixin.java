@@ -23,6 +23,7 @@ package tschipp.carryon.mixin;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.core.NonNullList;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -34,6 +35,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import tschipp.carryon.common.carry.CarryOnData;
 import tschipp.carryon.common.carry.CarryOnDataManager;
 
 @Mixin(Inventory.class)
@@ -77,9 +79,10 @@ public class InventoryMixin
 	}
 
 	@Inject(method = "setSelectedSlot(I)V", at = @At("HEAD"), cancellable = true)
-	private void onSwapPaint(int $$0, CallbackInfo info)
+	private void onSwapPaint(int slot, CallbackInfo info)
 	{
-		if(CarryOnDataManager.getCarryData(player).isCarrying())
+		CarryOnData data = CarryOnDataManager.getCarryData(player);
+		if(data.isCarrying() && data.getSelected() != slot)
 			info.cancel();
 	}
 }
