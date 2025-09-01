@@ -20,18 +20,37 @@
 
 package tschipp.carryon;
 
+import net.minecraft.nbt.CompoundTag;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.neoforge.attachment.AttachmentType;
+import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
+import net.neoforged.neoforge.registries.DeferredRegister;
+import net.neoforged.neoforge.registries.NeoForgeRegistries;
+import tschipp.carryon.carry.CarryOnDataSyncHandler;
+import tschipp.carryon.common.carry.CarryOnData;
 import tschipp.carryon.config.neoforge.ConfigLoaderImpl;
+
+import java.util.function.Supplier;
 
 @Mod(Constants.MOD_ID)
 public class CarryOnNeoForge {
+
+    private static final DeferredRegister<AttachmentType<?>> ATTACHMENT_TYPES = DeferredRegister.create(NeoForgeRegistries.ATTACHMENT_TYPES, Constants.MOD_ID);
+
+    public static final Supplier<AttachmentType<CarryOnData>> CARRY_ON_DATA_ATTACHMENT = ATTACHMENT_TYPES.register(
+            "carry_on_data",
+            () -> AttachmentType.builder(() -> new CarryOnData(new CompoundTag()))
+                    .sync(new CarryOnDataSyncHandler())
+                    .serialize(CarryOnData.CODEC.fieldOf(CarryOnData.SERIALIZATION_KEY))
+                    .build()
+    );
 
     public CarryOnNeoForge(ModContainer container) {
 
@@ -44,6 +63,8 @@ public class CarryOnNeoForge {
         container.getEventBus().addListener(this::registerPackets);
 
         ConfigLoaderImpl.initialize(container);
+
+        ATTACHMENT_TYPES.register(container.getEventBus());
     }
 
     private void setup(final FMLCommonSetupEvent event)

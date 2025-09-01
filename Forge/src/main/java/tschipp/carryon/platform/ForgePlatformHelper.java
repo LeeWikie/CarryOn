@@ -25,6 +25,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.event.network.CustomPayloadEvent;
@@ -34,8 +35,14 @@ import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.PacketDistributor;
 import tschipp.carryon.CarryOnCommonClient;
 import tschipp.carryon.CarryOnForge;
+import tschipp.carryon.Constants;
+import tschipp.carryon.carry.CarryOnDataCapability;
+import tschipp.carryon.carry.CarryOnDataCapabilityProvider;
+import tschipp.carryon.carry.ICarryOnDataCapability;
+import tschipp.carryon.common.carry.CarryOnData;
 import tschipp.carryon.config.BuiltConfig;
 import tschipp.carryon.config.forge.ConfigLoaderImpl;
+import tschipp.carryon.networking.ClientboundSyncCarryDataPacket;
 import tschipp.carryon.networking.PacketBase;
 import tschipp.carryon.platform.services.IPlatformHelper;
 
@@ -110,5 +117,20 @@ public class ForgePlatformHelper implements IPlatformHelper {
     public void sendPacketToPlayer(ResourceLocation id, PacketBase packet, ServerPlayer player)
     {
         CarryOnForge.network.send(packet, PacketDistributor.PLAYER.with(player));
+    }
+
+    @Override
+    public CarryOnData getCarryData(Player player) {
+        var cap = player.getCapability(CarryOnDataCapabilityProvider.CARRY_ON_DATA_CAPABILITY).orElse(new CarryOnDataCapability());
+        return cap.getCarryData();
+    }
+
+    @Override
+    public void setCarryData(Player player, CarryOnData data) {
+        var cap = player.getCapability(CarryOnDataCapabilityProvider.CARRY_ON_DATA_CAPABILITY).orElse(new CarryOnDataCapability());
+        cap.setCarryData(data);
+        if(!player.level().isClientSide) {
+            sendPacketToAllPlayers(Constants.PACKET_ID_SYNC_SCRIPTS, new ClientboundSyncCarryDataPacket(player.getId(), data), (ServerLevel) player.level());
+        }
     }
 }

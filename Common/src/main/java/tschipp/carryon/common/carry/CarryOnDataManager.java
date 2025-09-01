@@ -24,25 +24,22 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
+import tschipp.carryon.platform.Services;
 
 public class CarryOnDataManager {
 
     public static CarryOnData getCarryData(Player player)
     {
-        return ((ICarrying)player).getCarryOnData();
+        return Services.PLATFORM.getCarryData(player);
     }
 
     public static void setCarryData(Player player, CarryOnData data)
     {
-        ((ICarrying)player).setCarryOnData(data);
-    }
-
-    public interface ICarrying {
-
-        void setCarryOnData(CarryOnData data);
-
-        CarryOnData getCarryOnData();
+        data.setSelected(player.getInventory().selected);
+        data.setTick(player.tickCount);
+        Services.PLATFORM.setCarryData(player, data);
     }
 
 }

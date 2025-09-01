@@ -20,7 +20,9 @@
 
 package tschipp.carryon.common.carry;
 
+import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -28,17 +30,27 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.nbt.Tag;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.entity.AreaEffectCloud;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.storage.TagValueInput;
+import net.minecraft.world.level.storage.TagValueOutput;
+import net.minecraft.world.level.storage.ValueInput;
 import tschipp.carryon.Constants;
 import tschipp.carryon.common.scripting.CarryOnScript;
 
 import javax.annotation.Nullable;
+import java.util.Objects;
 import java.util.Optional;
 
 public class CarryOnData {
@@ -48,6 +60,29 @@ public class CarryOnData {
     private boolean keyPressed = false;
     private CarryOnScript activeScript;
     private int selectedSlot = 0;
+    private static final ProblemReporter problemReporter = new ProblemReporter.ScopedCollector(Constants.LOG);
+
+
+    public static final Codec<CarryOnData> CODEC = CompoundTag.CODEC.flatXmap(
+            tag -> {
+                try {
+                    return DataResult.success(new CarryOnData(tag));
+                } catch (Exception e) {
+                    return DataResult.error(e::getMessage);
+                }
+            },
+            carry -> {
+                try {
+                    return DataResult.success(carry.getNbt());
+                } catch (Exception e) {
+                    return DataResult.error(e::getMessage);
+                }
+            }
+    );
+
+    public static final StreamCodec<RegistryFriendlyByteBuf, CarryOnData> STREAM_CODEC = ByteBufCodecs.fromCodecWithRegistries(CODEC);
+
+    public static final String SERIALIZATION_KEY = "CarryOnData";
 
     public CarryOnData(CompoundTag data)
     {
@@ -212,6 +247,11 @@ public class CarryOnData {
             return -1;
         return this.nbt.getInt("tick");
     }
+
+    public void setTick(int tick) {
+        this.nbt.putInt("tick", tick);
+    }
+
 
     public enum CarryType {
         BLOCK,

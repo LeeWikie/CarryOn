@@ -161,7 +161,7 @@ public class CarryOnCommon
 	}
 
 
-	private static int potionLevel(CarryOnData carry, Level level)
+	public static int potionLevel(CarryOnData carry, Level level)
 	{
 		if(carry.isCarrying(CarryType.PLAYER))
 			return 1;

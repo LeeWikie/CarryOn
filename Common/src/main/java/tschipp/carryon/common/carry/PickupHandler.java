@@ -26,6 +26,8 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.AgeableMob;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Entity.RemovalReason;
@@ -38,6 +40,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import tschipp.carryon.CarryOnCommon;
 import tschipp.carryon.Constants;
 import tschipp.carryon.common.config.ListHandler;
 import tschipp.carryon.common.pickupcondition.PickupCondition;
@@ -144,6 +147,8 @@ public class PickupHandler {
         CarryOnDataManager.setCarryData(player, carry);
         level.playSound(null, pos, state.getSoundType().getHitSound(), SoundSource.BLOCKS, 1.0f, 0.5f);
         player.swing(InteractionHand.MAIN_HAND, true);
+        if (!player.isCreative() || Constants.COMMON_CONFIG.settings.slownessInCreative)
+            player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 100000000, CarryOnCommon.potionLevel(carry, player.level()), false, false));
         return true;
     }
 
@@ -224,12 +229,14 @@ public class PickupHandler {
                     player.getServer().getCommands().performPrefixedCommand(player.getServer().createCommandSourceStack(), "/execute as " + player.getGameProfile().getName() + " run " + cmd);
             }
 
-            otherPlayer.startRiding(player);
-            Services.PLATFORM.sendPacketToPlayer(Constants.PACKET_ID_START_RIDING, new ClientboundStartRidingPacket(otherPlayer.getId(), true), player);
+            otherPlayer.startRiding(player, true);
+            Services.PLATFORM.sendPacketToAllPlayers(Constants.PACKET_ID_START_RIDING_OTHER, new ClientboundStartRidingOtherPlayerPacket(player.getId(), otherPlayer.getId(), true), player.level());
             carry.setCarryingPlayer();
             player.swing(InteractionHand.MAIN_HAND, true);
             player.level().playSound(null, player.getOnPos(), SoundEvents.ARMOR_EQUIP_GENERIC.value(), SoundSource.AMBIENT, 1.0f, 0.5f);
             CarryOnDataManager.setCarryData(player, carry);
+            if (!player.isCreative() || Constants.COMMON_CONFIG.settings.slownessInCreative)
+                player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 100000000, CarryOnCommon.potionLevel(carry, player.level()), false, false));
             return true;
 
         }
@@ -253,6 +260,8 @@ public class PickupHandler {
         player.level().playSound(null, player.getOnPos(), SoundEvents.ARMOR_EQUIP_GENERIC.value(), SoundSource.AMBIENT, 1.0f, 0.5f);
         CarryOnDataManager.setCarryData(player, carry);
         player.swing(InteractionHand.MAIN_HAND, true);
+        if (!player.isCreative() || Constants.COMMON_CONFIG.settings.slownessInCreative)
+            player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 100000000, CarryOnCommon.potionLevel(carry, player.level()), false, false));
         return true;
     }
 
