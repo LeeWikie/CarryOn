@@ -37,6 +37,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import tschipp.carryon.CarryOnFabricClientMod;
 import tschipp.carryon.CarryOnFabricMod;
+import tschipp.carryon.Constants;
 import tschipp.carryon.common.carry.CarryOnData;
 import tschipp.carryon.config.BuiltConfig;
 import tschipp.carryon.config.fabric.ConfigLoaderImpl;
@@ -114,5 +115,8 @@ public class FabricPlatformHelper implements IPlatformHelper {
     @Override
     public void setCarryData(Player player, CarryOnData data) {
         player.setAttached(CarryOnFabricMod.CARRY_ON_DATA_ATTACHMENT_TYPE, data);
+        if (player instanceof ServerPlayer sp) {
+            sendPacketToPlayer(tschipp.carryon.Constants.PACKET_ID_SYNC_CARRY_ON_DATA, new tschipp.carryon.networking.clientbound.ClientboundSyncCarryDataPacket(player.getId(), data), sp);
+        }
     }
 }
