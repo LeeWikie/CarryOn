@@ -29,11 +29,30 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import tschipp.carryon.common.carry.CarryOnDataManager;
 
 @Mixin(Minecraft.class)
-public class MinecraftMixin
-{
-	@WrapWithCondition(method = "handleKeybinds()V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Inventory;setSelectedSlot(I)V", ordinal = 0))
-	private boolean allowSlotSelection(Inventory inv,int slot)
-	{
-		return !CarryOnDataManager.getCarryData(inv.player).isCarrying();
-	}
+public class MinecraftMixin {
+
+    @WrapWithCondition(
+            method = "handleKeybinds()V",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/world/entity/player/Inventory;setSelectedSlot(I)V",
+                    ordinal = 0
+            )
+    )
+    private boolean allowSlotSelection(Inventory inv, int slot) {
+        boolean carrying = CarryOnDataManager.getCarryData(inv.player).isCarrying();
+
+        // Allow if not carrying
+        if (!carrying) return true;
+
+        // Block only if trying to switch away
+        boolean allow = inv.getSelectedSlot() == slot;
+
+        if (!allow) {
+            // System.out.println("[CarryOn] Blocked hotbar change while carrying. Tried " + slot + ", staying on " + inv.getSelectedSlot());
+        }
+
+        return allow;
+    }
 }
+

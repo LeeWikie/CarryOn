@@ -52,14 +52,16 @@ public class CarryOnCommonClient
 		return (CarryOnKeybinds.carryKey.matchesMouse(0) && mc.mouseHandler.isLeftPressed()) || (CarryOnKeybinds.carryKey.matchesMouse(1) && mc.mouseHandler.isRightPressed()) || (CarryOnKeybinds.carryKey.matchesMouse(3) && mc.mouseHandler.isMiddlePressed());
 	}
 
-	public static void onCarryClientTick()
-	{
+	public static void onCarryClientTick() {
 		Player player = Minecraft.getInstance().player;
-		if(player != null) {
+		if (player != null) {
 			CarryOnData carry = CarryOnDataManager.getCarryData(player);
-			if(carry.isCarrying())
-			{
-				player.getInventory().setSelectedSlot(carry.getSelected());
+			if (carry.isCarrying()) {
+				int wantedSlot = carry.getSelected();
+				if (player.getInventory().getSelectedSlot() != wantedSlot) {
+					// System.out.println("[CarryOn] Forcing slot " + wantedSlot);
+					player.getInventory().setSelectedSlot(wantedSlot);
+				}
 			}
 		}
 	}
