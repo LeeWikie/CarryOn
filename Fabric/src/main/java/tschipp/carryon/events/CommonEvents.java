@@ -44,6 +44,8 @@ import tschipp.carryon.compat.ArchitecturyCompat;
 import tschipp.carryon.config.ConfigLoader;
 import tschipp.carryon.scripting.IdentifiableScriptReloadListener;
 
+import java.util.Objects;
+
 public class CommonEvents {
 
     public static void registerEvents() {
@@ -91,9 +93,6 @@ public class CommonEvents {
             }
         });
 
-
-
-
         UseEntityCallback.EVENT.register((player, level, hand, entity, hitResult) -> {
 
             if(level.isClientSide)
@@ -113,30 +112,58 @@ public class CommonEvents {
             return InteractionResult.PASS;
         });
 
-
         CommandRegistrationCallback.EVENT.register(((dispatcher, registryAccess, environment) -> {
             CarryOnCommon.registerCommands(dispatcher);
         }));
 
-
         ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(new IdentifiableScriptReloadListener());
-
 
         ServerLifecycleEvents.SYNC_DATA_PACK_CONTENTS.register((player, joined) -> {
             ScriptReloadListener.syncScriptsWithClient(player);
         });
-
 
         ServerTickEvents.END_SERVER_TICK.register(server -> {
             for(ServerPlayer player : server.getPlayerList().getPlayers())
                 CarryOnCommon.onCarryTick(player);
         });
 
-
+        // Handle true deaths during COPY_FROM so placement uses the actual death location/world
         ServerPlayerEvents.COPY_FROM.register(((oldPlayer, newPlayer, alive) -> {
-            PlacementHandler.placeCarriedOnDeath(oldPlayer, newPlayer, !alive);
+            boolean died = !alive;
+            if (died) {
+                boolean keepInv = ((net.minecraft.server.level.ServerLevel) oldPlayer.level()).getGameRules().getBoolean(net.minecraft.world.level.GameRules.RULE_KEEPINVENTORY);
+                if (!keepInv) {
+                    // Place immediately at death location before respawn
+                    PlacementHandler.placeCarriedOnDeath(oldPlayer, newPlayer, true);
+                }
+            }
         }));
 
+        // AFTER_RESPAWN: handle non-death transitions; for deaths with keepInventory, transfer after the player fully exists
+        ServerPlayerEvents.AFTER_RESPAWN.register(((oldPlayer, newPlayer, alive) -> {
+            boolean died = !alive;
+            if (!died) {
+                Objects.requireNonNull(newPlayer.getServer()).execute(() -> PlacementHandler.placeCarriedOnDeath(oldPlayer, newPlayer, false));
+            } else {
+                boolean keepInv = ((net.minecraft.server.level.ServerLevel) oldPlayer.level()).getGameRules().getBoolean(net.minecraft.world.level.GameRules.RULE_KEEPINVENTORY);
+                if (keepInv) {
+                    // Transfer one tick later so the client has the new entity registered before any attachment sync
+                    Objects.requireNonNull(newPlayer.getServer()).execute(() -> newPlayer.getServer().execute(() -> {
+                        var carry = tschipp.carryon.common.carry.CarryOnDataManager.getCarryData(oldPlayer);
+                        tschipp.carryon.common.carry.CarryOnDataManager.setCarryData(newPlayer, carry);
+                    }));
+                } else {
+                    // Ensure no residual carried state remains after respawn when keepInventory is off
+                    Objects.requireNonNull(newPlayer.getServer()).execute(() -> newPlayer.getServer().execute(() -> {
+                        var carryNew = tschipp.carryon.common.carry.CarryOnDataManager.getCarryData(newPlayer);
+                        if (carryNew.isCarrying()) {
+                            carryNew.clear();
+                            tschipp.carryon.common.carry.CarryOnDataManager.setCarryData(newPlayer, carryNew);
+                        }
+                    }));
+                }
+            }
+        }));
 
         PlayerBlockBreakEvents.BEFORE.register(((world, player, pos, state, blockEntity) -> {
             if(!CarryOnCommon.onTryBreakBlock(player))

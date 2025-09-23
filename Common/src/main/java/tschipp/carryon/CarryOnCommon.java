@@ -86,6 +86,14 @@ public class CarryOnCommon
 		);
 
 		Services.PLATFORM.registerClientboundPacket(
+				tschipp.carryon.networking.clientbound.ClientboundSyncCarryDataPacket.TYPE,
+				tschipp.carryon.networking.clientbound.ClientboundSyncCarryDataPacket.class,
+				tschipp.carryon.networking.clientbound.ClientboundSyncCarryDataPacket.CODEC,
+				tschipp.carryon.networking.clientbound.ClientboundSyncCarryDataPacket::handle,
+				args
+		);
+
+		Services.PLATFORM.registerClientboundPacket(
 				ClientboundStartRidingOtherPlayerPacket.TYPE,
 				ClientboundStartRidingOtherPlayerPacket.class,
 				ClientboundStartRidingOtherPlayerPacket.CODEC,

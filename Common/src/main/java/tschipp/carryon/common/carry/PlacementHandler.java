@@ -290,15 +290,46 @@ public class PlacementHandler
 	public static void placeCarriedOnDeath(ServerPlayer oldPlayer, ServerPlayer newPlayer, boolean died)
 	{
 		CarryOnData carry = CarryOnDataManager.getCarryData(oldPlayer);
-		if (((ServerLevel) oldPlayer.level()).getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY) || !died) {
-			if (!carry.isCarrying(CarryType.PLAYER)) {
+		if (died) {
+			boolean keepInv = ((ServerLevel) oldPlayer.level()).getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY);
+			if (keepInv) {
+				// With keepInventory, the carried content should persist on the player after respawn
+				if (!carry.isCarrying(CarryType.PLAYER)) {
+					CarryOnDataManager.setCarryData(newPlayer, carry);
+					newPlayer.getInventory().setSelectedSlot(oldPlayer.getInventory().getSelectedSlot());
+				}
+			} else {
+				// Without keepInventory, place the carried content at the death location (not respawn)
+				ServerLevel deathLevel = (ServerLevel) oldPlayer.level();
+				BlockPos deathPos = oldPlayer.blockPosition();
+				if (carry.isCarrying(CarryType.ENTITY)) {
+					Entity entity = carry.getEntity(deathLevel);
+					entity.setPos(Vec3.atBottomCenterOf(deathPos));
+					deathLevel.addFreshEntity(entity);
+					if (entity instanceof Mob mob)
+						mob.playAmbientSound();
+				} else if (carry.isCarrying(CarryType.BLOCK)) {
+					BlockState state = carry.getBlock();
+					BlockPlaceContext context = new BlockPlaceContext(oldPlayer, InteractionHand.MAIN_HAND, ItemStack.EMPTY, BlockHitResult.miss(Vec3.atCenterOf(deathPos), Direction.DOWN, deathPos));
+					state = getPlacementState(state, oldPlayer, context, deathPos);
+					BlockPos placePos = getDeathPlacementPosFrom(state, oldPlayer, deathPos);
+					BlockEntity blockEntity = carry.getBlockEntity(placePos, deathLevel.registryAccess());
+					deathLevel.setBlock(placePos, state, 3);
+					if (blockEntity != null)
+						deathLevel.setBlockEntity(blockEntity);
+				}
+				// Clear carry data on the new player only to avoid syncing an update for the despawned old player
+				carry.clear();
 				CarryOnDataManager.setCarryData(newPlayer, carry);
-				newPlayer.getInventory().setSelectedSlot(oldPlayer.getInventory().getSelectedSlot());
-				return;
 			}
+			return;
 		}
 
-		placeCarried(oldPlayer);
+		// Not a death (e.g., dimension change): transfer carry data to the new player instance
+		if (!carry.isCarrying(CarryType.PLAYER)) {
+			CarryOnDataManager.setCarryData(newPlayer, carry);
+			newPlayer.getInventory().setSelectedSlot(oldPlayer.getInventory().getSelectedSlot());
+		}
 	}
 
 	public static void placeCarried(ServerPlayer player)
@@ -327,6 +358,39 @@ public class PlacementHandler
 	private static BlockPos getDeathPlacementPos(BlockState state, ServerPlayer player)
 	{
 		BlockPos p = player.blockPosition();
+
+		int DISTANCE = 15;
+
+		List<BlockPos> potentialPositions = new ArrayList<>();
+
+		for (int j = 0; j < DISTANCE * 2; j++) {
+			for (int i = 0; i < DISTANCE * 2; i++) {
+				for (int k = 0; k < DISTANCE * 2; k++) {
+					int x = i % 2 == 0 ? i / 2 : -(i / 2);
+					int y = j % 2 == 0 ? j / 2 : -(j / 2);
+					int z = k % 2 == 0 ? k / 2 : -(k / 2);
+					potentialPositions.add(new BlockPos(p.getX() + x, p.getY() + y, p.getZ() + z));
+				}
+			}
+		}
+
+		potentialPositions.sort(Comparator.comparingDouble(posA -> player.distanceToSqr(posA.getCenter())));
+
+		for(BlockPos potential : potentialPositions)
+		{
+			BlockPlaceContext context = new BlockPlaceContext(player, InteractionHand.MAIN_HAND, ItemStack.EMPTY, BlockHitResult.miss(Vec3.atCenterOf(potential), Direction.DOWN, potential));
+			boolean canPlace = state.canSurvive(player.level(), potential) && player.level().getBlockState(potential).canBeReplaced(context) && player.level().isUnobstructed(state, potential, CollisionContext.of(player));
+
+			if (canPlace)
+				return potential;
+		}
+
+		return p;
+	}
+
+	private static BlockPos getDeathPlacementPosFrom(BlockState state, ServerPlayer player, BlockPos origin)
+	{
+		BlockPos p = origin;
 
 		int DISTANCE = 15;
 
