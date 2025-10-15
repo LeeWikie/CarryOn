@@ -43,7 +43,7 @@ public class CarryOnFabricMod implements ModInitializer {
                         // player.tickCount > 0 avoids us syncing attachment data about players the instant they spawn. 
                         // Which also causes a disconnect as the player entity may not be synced yet.
             
-                        return p.connection != null && player.isAlive() && player.tickCount >0;
+                        return p.connection != null && player.isAlive() && player.tickCount > 0;
                     })
          
 
