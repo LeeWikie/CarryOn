@@ -20,7 +20,7 @@ public class CarryOnDataSyncHandler implements AttachmentSyncHandler<CarryOnData
 
     @Override
     public boolean sendToPlayer(IAttachmentHolder holder, ServerPlayer to) {
-        if (to.connection == null)
+        if (to.connection == null || to.isRemoved())
             return false;
         return AttachmentSyncHandler.super.sendToPlayer(holder, to);
     }
