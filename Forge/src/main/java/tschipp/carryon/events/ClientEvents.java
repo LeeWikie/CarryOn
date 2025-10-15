@@ -48,7 +48,7 @@ public class ClientEvents {
 		PoseStack matrix = event.getPoseStack();
 		int light = event.getPackedLight();
 		float partialTicks = event.getPartialTick();
-SubmitNodeCollector nodes =event.getNodeCollector();
+		SubmitNodeCollector nodes =event.getNodeCollector();
 		//If true, cancels event
         return CarriedObjectRender.drawFirstPerson(player, matrix, light, partialTicks,nodes) && CarryRenderHelper.getPerspective() == 0;
     }
