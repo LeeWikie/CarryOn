@@ -20,17 +20,12 @@
 
 package tschipp.carryon.platform;
 
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking.PlayPayloadHandler;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.codec.StreamDecoder;
-import net.minecraft.network.codec.StreamMemberEncoder;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -44,7 +39,6 @@ import tschipp.carryon.networking.PacketBase;
 import tschipp.carryon.platform.services.IPlatformHelper;
 
 import java.util.function.BiConsumer;
-import java.util.function.Function;
 
 public class FabricPlatformHelper implements IPlatformHelper {
 

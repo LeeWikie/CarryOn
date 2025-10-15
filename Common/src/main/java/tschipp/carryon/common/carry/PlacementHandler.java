@@ -27,7 +27,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
@@ -44,7 +43,6 @@ import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
-import tschipp.carryon.CarryOnCommon;
 import tschipp.carryon.Constants;
 import tschipp.carryon.common.carry.CarryOnData.CarryType;
 import tschipp.carryon.common.config.ListHandler;
@@ -99,7 +97,7 @@ public class PlacementHandler
 			ScriptEffects effects = carry.getActiveScript().get().scriptEffects();
 			String cmd = effects.commandPlace();
 			if (!cmd.isEmpty())
-				player.getServer().getCommands().performPrefixedCommand(player.getServer().createCommandSourceStack(), "/execute as " + player.getGameProfile().getName() + " run " + cmd);
+				player.level().getServer().getCommands().performPrefixedCommand(player.level().getServer().createCommandSourceStack(), "/execute as " + player.getGameProfile().name() + " run " + cmd);
 		}
 
 		level.setBlockAndUpdate(pos, state);
@@ -199,7 +197,7 @@ public class PlacementHandler
 			ScriptEffects effects = carry.getActiveScript().get().scriptEffects();
 			String cmd = effects.commandPlace();
 			if (!cmd.isEmpty())
-				player.getServer().getCommands().performPrefixedCommand(player.getServer().createCommandSourceStack(), "/execute as " + player.getGameProfile().getName() + " run " + cmd);
+				player.level().getServer().getCommands().performPrefixedCommand(player.level().getServer().createCommandSourceStack(), "/execute as " + player.getGameProfile().name() + " run " + cmd);
 		}
 
 		level.addFreshEntity(entity);
@@ -257,20 +255,20 @@ public class PlacementHandler
 							level.addFreshEntity(entityHeld);
 							entityHeld.teleportTo(tempX, tempY, tempZ);
 						}
-						entityHeld.startRiding(topEntity, false);
+						entityHeld.startRiding(topEntity, false,false);
 					} else {
 						if (carry.isCarrying(CarryType.ENTITY)) {
 							entityHeld.setPos(entityClicked.getX(), entityClicked.getY(), entityClicked.getZ());
 							level.addFreshEntity(entityHeld);
 						}
-						entityHeld.startRiding(topEntity, false);
+						entityHeld.startRiding(topEntity, false,false);
 					}
 
 					if (carry.getActiveScript().isPresent()) {
 						ScriptEffects effects = carry.getActiveScript().get().scriptEffects();
 						String cmd = effects.commandPlace();
 						if (!cmd.isEmpty())
-							player.getServer().getCommands().performPrefixedCommand(player.getServer().createCommandSourceStack(), "/execute as " + player.getGameProfile().getName() + " run " + cmd);
+							player.level().getServer().getCommands().performPrefixedCommand(player.level().getServer().createCommandSourceStack(), "/execute as " + player.getGameProfile().name() + " run " + cmd);
 					}
 
 					player.swing(InteractionHand.MAIN_HAND, true);

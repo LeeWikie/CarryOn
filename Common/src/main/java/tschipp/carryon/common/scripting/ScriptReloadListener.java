@@ -20,13 +20,8 @@
 
 package tschipp.carryon.common.scripting;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
-import com.mojang.serialization.JsonOps;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.FileToIdConverter;
@@ -37,11 +32,9 @@ import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
 import org.jetbrains.annotations.NotNull;
 import tschipp.carryon.Constants;
-import tschipp.carryon.common.carry.CarryOnData;
 import tschipp.carryon.networking.clientbound.ClientboundSyncScriptsPacket;
 import tschipp.carryon.platform.Services;
 
-import java.util.Collections;
 import java.util.Map;
 
 public class ScriptReloadListener extends SimpleJsonResourceReloadListener<CarryOnScript>

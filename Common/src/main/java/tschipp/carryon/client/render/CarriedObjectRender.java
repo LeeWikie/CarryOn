@@ -20,34 +20,24 @@
 
 package tschipp.carryon.client.render;
 
-import com.mojang.blaze3d.pipeline.BlendFunction;
-import com.mojang.blaze3d.pipeline.RenderPipeline;
-import com.mojang.blaze3d.pipeline.RenderTarget;
-import com.mojang.blaze3d.platform.DepthTestFunction;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.textures.GpuTexture;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.ShaderDefines;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
+import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
 import tschipp.carryon.Constants;
 import tschipp.carryon.common.carry.CarryOnData;
@@ -62,16 +52,7 @@ import java.util.*;
 public class CarriedObjectRender
 {
 
-	private static final SequencedMap<RenderType, ByteBufferBuilder> builders = new LinkedHashMap<>(Map.of(
-			RenderType.glint(), new ByteBufferBuilder(RenderType.glint().bufferSize()),
-			RenderType.armorEntityGlint(), new ByteBufferBuilder(RenderType.armorEntityGlint().bufferSize()),
-			RenderType.glintTranslucent(), new ByteBufferBuilder(RenderType.glintTranslucent().bufferSize()),
-			RenderType.entityGlint(), new ByteBufferBuilder(RenderType.entityGlint().bufferSize())
-			//RenderType.entityGlintDirect(), new ByteBufferBuilder(RenderType.entityGlintDirect().bufferSize())
-	));
-
-
-	public static boolean drawFirstPerson(Player player, MultiBufferSource buffer, PoseStack matrix, int light, float partialTicks)
+	public static boolean drawFirstPerson(Player player, PoseStack matrix, int light, float partialTicks,SubmitNodeCollector nodeCollector)
 	{
 		if(Services.PLATFORM.isModLoaded("firstperson") || Services.PLATFORM.isModLoaded("firstpersonmod"))
 			return false;
@@ -79,9 +60,9 @@ public class CarriedObjectRender
 		CarryOnData carry = CarryOnDataManager.getCarryData(player);
 		try {
 			if (carry.isCarrying(CarryType.BLOCK))
-				drawFirstPersonBlock(player, buffer, matrix, light, CarryRenderHelper.getRenderState(player));
+				drawFirstPersonBlock(player,  matrix, light, CarryRenderHelper.getRenderState(player), nodeCollector);
 			else if (carry.isCarrying(CarryType.ENTITY))
-				drawFirstPersonEntity(player, buffer, matrix, light, partialTicks);
+				drawFirstPersonEntity(player, matrix, light, partialTicks,nodeCollector);
 		}
 		catch (Exception e)
 		{
@@ -101,7 +82,7 @@ public class CarriedObjectRender
 		return carry.isCarrying();
 	}
 
-	private static void drawFirstPersonBlock(Player player, MultiBufferSource buffer, PoseStack matrix, int light, BlockState state)
+	private static void drawFirstPersonBlock(Player player, PoseStack matrix, int light, BlockState state,SubmitNodeCollector nodeCollector)
 	{
 		matrix.pushPose();
 		matrix.scale(2.5f, 2.5f, 2.5f);
@@ -128,8 +109,8 @@ public class CarriedObjectRender
 
 		ItemStack renderStack = CarryRenderHelper.getRenderItemStack(player);
 		Minecraft.getInstance().getItemModelResolver().updateForTopItem(renderState, renderStack, ItemDisplayContext.NONE, player.level(), null, 0);
-		renderState.render(matrix, buffer, light, OverlayTexture.NO_OVERLAY);
-
+		//renderState.render(matrix, light, OverlayTexture.NO_OVERLAY);
+renderState.submit(matrix, nodeCollector, light,  OverlayTexture.NO_OVERLAY, 0);
 
 
 		//RenderSystem.enableCull();
@@ -137,8 +118,10 @@ public class CarriedObjectRender
 		matrix.popPose();
 	}
 
-	private static void drawFirstPersonEntity(Player player, MultiBufferSource buffer, PoseStack matrix, int light, float partialTicks) {
+	private static void drawFirstPersonEntity(Player player, PoseStack matrix, int light, float partialTicks,SubmitNodeCollector nodeCollector) {
 		EntityRenderDispatcher manager = Minecraft.getInstance().getEntityRenderDispatcher();
+		
+				
 		Entity entity = CarryRenderHelper.getRenderEntity(player);
 		CarryOnData carry = CarryOnDataManager.getCarryData(player);
 
@@ -159,7 +142,7 @@ public class CarriedObjectRender
 			matrix.mulPose(Axis.YP.rotationDegrees(180));
 			matrix.translate(0.0, -height - .2, width * 1.3 + 0.1);
 
-			manager.setRenderShadow(false);
+			// manager.setRenderShadow(false);
 
 			Optional<CarryOnScript> res = carry.getActiveScript();
 			if(res.isPresent())
@@ -175,12 +158,15 @@ public class CarriedObjectRender
 				((LivingEntity) entity).hurtTime = 0;
 
 			try {
-				manager.render(entity, 0, 0, 0, 0f, matrix, buffer, light);
+		manager.submit(manager.extractEntity(entity, 0), new CameraRenderState(), 0, 0, 0, matrix, nodeCollector);
+			//	manager.render(entity, 0, 0, 0, 0f, matrix, buffer, light);
+			//nodeCollector.submit
+			//manager.getRenderer(entity).submit(new EntityRenderState(), matrix, nodeCollector, null);
 			}
 			catch (Exception e)
 			{
 			}
-			manager.setRenderShadow(true);
+		//	manager.setRenderShadow(true);
 			matrix.popPose();
 
 		}
@@ -193,21 +179,17 @@ public class CarriedObjectRender
 	 * @param partialticks
 	 * @param mat
 	 */
-	public static void drawThirdPerson(float partialticks, Matrix4f mat) {
+	public static void drawThirdPerson(float partialticks, Matrix4f mat,SubmitNodeCollector nodeCollector) {
 		Minecraft mc = Minecraft.getInstance();
 		Level level = mc.level;
-		int light = 0;
 		int perspective = CarryRenderHelper.getPerspective();
-		EntityRenderDispatcher manager = mc.getEntityRenderDispatcher();
 
 		PoseStack matrix = new PoseStack();
 		matrix.mulPose(mat);
 
-		//RenderSystem.enableBlend();
-		//RenderSystem.disableCull();
-		//RenderSystem.disableDepthTest();
-
-		BufferSource buffer = MultiBufferSource.immediateWithBuffers(builders, builders.get(RenderType.glint()));
+		// RenderSystem.enableBlend();
+		// RenderSystem.disableCull();
+		// RenderSystem.disableDepthTest();
 		ItemStackRenderState renderState = new ItemStackRenderState();
 		var layer = renderState.newLayer();
 		layer.setRenderType(RenderType.glint());
@@ -221,7 +203,6 @@ public class CarriedObjectRender
 				if (perspective == 0 && player == mc.player && !(Services.PLATFORM.isModLoaded("firstperson") || Services.PLATFORM.isModLoaded("firstpersonmod") || Services.PLATFORM.isModLoaded("realcamera")))
 					continue;
 
-				light = manager.getPackedLightCoords(player, partialticks);
 
 				if (carry.isCarrying(CarryType.BLOCK)) {
 					BlockState state = CarryRenderHelper.getRenderState(player);
@@ -245,7 +226,9 @@ public class CarriedObjectRender
 
 					//RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 
-					renderState.render(copy, buffer, light, OverlayTexture.NO_OVERLAY);
+					renderState.submit(copy, null, 0, OverlayTexture.NO_OVERLAY, 0);
+
+				//	renderState.render(copy, buffer, light, OverlayTexture.NO_OVERLAY);
 
 					matrix.popPose();
 				} else if (carry.isCarrying(CarryType.ENTITY)) {
@@ -254,7 +237,7 @@ public class CarriedObjectRender
 					if (entity != null) {
 						CarryRenderHelper.applyEntityTransformations(player, partialticks, matrix, entity);
 
-						manager.setRenderShadow(false);
+				//		manager.setRenderShadow(false);
 
 						Optional<CarryOnScript> res = carry.getActiveScript();
                         res.ifPresent(script -> CarryRenderHelper.performScriptTransformation(matrix, script));
@@ -264,9 +247,9 @@ public class CarriedObjectRender
 
 						//RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 
-						manager.render(entity, 0, 0, 0, 0f, matrix, buffer, light);
+					//	manager.render(entity, 0, 0, 0, 0f, matrix, buffer, light);
 						matrix.popPose();
-						manager.setRenderShadow(true);
+					//	manager.setRenderShadow(true);
 						matrix.popPose();
 					}
 				}
@@ -278,16 +261,7 @@ public class CarriedObjectRender
 			}
 
 		}
-		buffer.endLastBatch();
-
-		buffer.endBatch(RenderType.entitySolid(TextureAtlas.LOCATION_BLOCKS));
-		buffer.endBatch(RenderType.entityCutout(TextureAtlas.LOCATION_BLOCKS));
-		buffer.endBatch(RenderType.entityCutoutNoCull(TextureAtlas.LOCATION_BLOCKS));
-		buffer.endBatch(RenderType.entitySmoothCutout(TextureAtlas.LOCATION_BLOCKS));
-
-		//RenderSystem.enableDepthTest();
-		//RenderSystem.enableCull();
-		//RenderSystem.disableBlend();
+	
 	}
 
 }

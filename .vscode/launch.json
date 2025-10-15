@@ -1,0 +1,71 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "request": "launch",
+      "name": "NeoForge Client (:NeoForge)",
+      "presentation": {
+        "group": "Mod Development - NeoForge",
+        "order": 0
+      },
+      "projectName": "NeoForge",
+      "mainClass": "net.neoforged.devlaunch.Main",
+      "args": [
+        "@/home/hanro/Documents/GitHub/CarryOn/NeoForge/build/moddev/clientRunProgramArgs.txt"
+      ],
+      "vmArgs": [
+        "@/home/hanro/Documents/GitHub/CarryOn/NeoForge/build/moddev/clientRunVmArgs.txt",
+        "-Dfml.modFolders\u003dcarryon%%/home/hanro/Documents/GitHub/CarryOn/NeoForge/bin/main"
+      ],
+      "cwd": "${workspaceFolder}/NeoForge/run",
+      "env": {},
+      "console": "internalConsole",
+      "shortenCommandLine": "none"
+    },
+    {
+      "type": "java",
+      "request": "launch",
+      "name": "NeoForge Data (:NeoForge)",
+      "presentation": {
+        "group": "Mod Development - NeoForge",
+        "order": 1
+      },
+      "projectName": "NeoForge",
+      "mainClass": "net.neoforged.devlaunch.Main",
+      "args": [
+        "@/home/hanro/Documents/GitHub/CarryOn/NeoForge/build/moddev/dataRunProgramArgs.txt"
+      ],
+      "vmArgs": [
+        "@/home/hanro/Documents/GitHub/CarryOn/NeoForge/build/moddev/dataRunVmArgs.txt",
+        "-Dfml.modFolders\u003dcarryon%%/home/hanro/Documents/GitHub/CarryOn/NeoForge/bin/main"
+      ],
+      "cwd": "${workspaceFolder}/NeoForge/run",
+      "env": {},
+      "console": "internalConsole",
+      "shortenCommandLine": "none"
+    },
+    {
+      "type": "java",
+      "request": "launch",
+      "name": "NeoForge Server (:NeoForge)",
+      "presentation": {
+        "group": "Mod Development - NeoForge",
+        "order": 2
+      },
+      "projectName": "NeoForge",
+      "mainClass": "net.neoforged.devlaunch.Main",
+      "args": [
+        "@/home/hanro/Documents/GitHub/CarryOn/NeoForge/build/moddev/serverRunProgramArgs.txt"
+      ],
+      "vmArgs": [
+        "@/home/hanro/Documents/GitHub/CarryOn/NeoForge/build/moddev/serverRunVmArgs.txt",
+        "-Dfml.modFolders\u003dcarryon%%/home/hanro/Documents/GitHub/CarryOn/NeoForge/bin/main"
+      ],
+      "cwd": "${workspaceFolder}/NeoForge/run",
+      "env": {},
+      "console": "internalConsole",
+      "shortenCommandLine": "none"
+    }
+  ]
+}

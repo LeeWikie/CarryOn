@@ -50,7 +50,6 @@ import tschipp.carryon.common.pickupcondition.PickupConditionHandler;
 import tschipp.carryon.common.scripting.CarryOnScript;
 import tschipp.carryon.common.scripting.ScriptManager;
 import tschipp.carryon.networking.clientbound.ClientboundStartRidingOtherPlayerPacket;
-import tschipp.carryon.networking.clientbound.ClientboundStartRidingPacket;
 import tschipp.carryon.platform.Services;
 
 import javax.annotation.Nullable;
@@ -142,7 +141,7 @@ public class PickupHandler {
 
             String cmd = script.scriptEffects().commandInit();
             if(!cmd.isEmpty())
-                player.getServer().getCommands().performPrefixedCommand(player.getServer().createCommandSourceStack(), "/execute as " + player.getGameProfile().getName() + " run " + cmd);
+                player.level().getServer().getCommands().performPrefixedCommand(player.level().getServer().createCommandSourceStack(), "/execute as " + player.getGameProfile().name() + " run " + cmd);
         }
 
         carry.setBlock(state, blockEntity, player, pos);
@@ -174,7 +173,7 @@ public class PickupHandler {
         if (entity instanceof TamableAnimal tame)
         {
             UUID owner = tame.getOwnerReference().getUUID();
-            UUID playerID = player.getGameProfile().getId();
+            UUID playerID = player.getGameProfile().id();
             if (owner != null && !owner.equals(playerID))
                 return false;
         }
@@ -232,10 +231,10 @@ public class PickupHandler {
             if (result.isPresent()) {
                 String cmd = result.get().scriptEffects().commandInit();
                 if (!cmd.isEmpty())
-                    player.getServer().getCommands().performPrefixedCommand(player.getServer().createCommandSourceStack(), "/execute as " + player.getGameProfile().getName() + " run " + cmd);
+                    player.level().getServer().getCommands().performPrefixedCommand(player.level().getServer().createCommandSourceStack(), "/execute as " + player.getGameProfile().name() + " run " + cmd);
             }
 
-            otherPlayer.startRiding(player, true);
+            otherPlayer.startRiding(player, true,true);
             Services.PLATFORM.sendPacketToAllPlayers(Constants.PACKET_ID_START_RIDING_OTHER, new ClientboundStartRidingOtherPlayerPacket(player.getId(), otherPlayer.getId(), true), player.level());
             carry.setCarryingPlayer();
             player.swing(InteractionHand.MAIN_HAND, true);
@@ -257,7 +256,7 @@ public class PickupHandler {
         {
             String cmd = result.get().scriptEffects().commandInit();
             if(!cmd.isEmpty())
-                player.getServer().getCommands().performPrefixedCommand(player.getServer().createCommandSourceStack(), "/execute as " + player.getGameProfile().getName() + " run " + cmd);
+                player.level().getServer().getCommands().performPrefixedCommand(player.level().getServer().createCommandSourceStack(), "/execute as " + player.getGameProfile().name() + " run " + cmd);
         }
 
         carry.setEntity(entity);

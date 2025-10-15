@@ -20,9 +20,7 @@
 
 package tschipp.carryon.platform.services;
 
-import net.minecraft.core.HolderLookup;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
@@ -30,12 +28,10 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import tschipp.carryon.common.carry.CarryOnData;
-import tschipp.carryon.common.carry.CarryOnDataManager;
 import tschipp.carryon.config.BuiltConfig;
 import tschipp.carryon.networking.PacketBase;
 
 import java.util.function.BiConsumer;
-import java.util.function.Function;
 
 public interface IPlatformHelper {
 

@@ -1,12 +1,12 @@
 package tschipp.carryon.mixin;
 
-import net.minecraft.client.renderer.entity.state.PlayerRenderState;
+import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import tschipp.carryon.client.render.ICarryOnRenderState;
 import tschipp.carryon.common.carry.CarryOnData;
 
-@Mixin(PlayerRenderState.class)
+@Mixin(HumanoidRenderState.class)
 public class PlayerRenderStateMixin implements ICarryOnRenderState {
 
     @Unique

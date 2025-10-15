@@ -47,7 +47,7 @@ public record ClientboundStartRidingOtherPlayerPacket(int mount, int rider, bool
 
 		if(mount != null && rider != null)
 			if(ride)
-				rider.startRiding(mount, true);
+				rider.startRiding(mount, true,true);
 			else
 				rider.stopRiding();
 	}

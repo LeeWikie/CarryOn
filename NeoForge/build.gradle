@@ -47,7 +47,7 @@ neoForge {
 
 
 dependencies {
-    api "me.shedaniel.cloth:cloth-config-neoforge:${cloth_config_version}"
+    compileOnly "me.shedaniel.cloth:cloth-config-neoforge:${cloth_config_version}"
 }
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }

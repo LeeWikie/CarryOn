@@ -22,10 +22,8 @@ package tschipp.carryon.common.scripting;
 
 import com.mojang.serialization.Codec;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.resources.ResourceLocation;
@@ -34,7 +32,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.scores.Objective;
-import net.minecraft.world.scores.Score;
 import net.minecraft.world.scores.Scoreboard;
 import tschipp.carryon.platform.Services;
 
@@ -127,7 +124,7 @@ public final class Matchables
 		@Override
 		public boolean matches(ServerPlayer player)
 		{
-			ServerAdvancementManager manager = player.getServer().getAdvancements();
+			ServerAdvancementManager manager = player.level().getServer().getAdvancements();
 			AdvancementHolder adv = manager.get(ResourceLocation.parse(advancement.isEmpty() ? "" : advancement));
 
 			boolean achievement = adv == null ? true : player.getAdvancements().getOrStartProgress(adv).isDone();
@@ -167,7 +164,7 @@ public final class Matchables
 			if (cond == null || cond.isEmpty())
 				return true;
 
-			Scoreboard score = player.getScoreboard();
+			Scoreboard score = player.level().getScoreboard();
 			String numb;
 			String scorename;
 			int iE = cond.indexOf("=");
