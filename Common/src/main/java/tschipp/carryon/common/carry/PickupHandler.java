@@ -32,6 +32,8 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.AgeableMob;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Entity.RemovalReason;
+import net.minecraft.world.entity.EntityReference;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.TamableAnimal;
 import net.minecraft.world.entity.animal.Animal;
@@ -172,10 +174,13 @@ public class PickupHandler {
 
         if (entity instanceof TamableAnimal tame)
         {
-            UUID owner = tame.getOwnerReference().getUUID();
-            UUID playerID = player.getGameProfile().id();
-            if (owner != null && !owner.equals(playerID))
-                return false;
+            EntityReference<LivingEntity> ref  = tame.getOwnerReference();
+            if (ref != null) {
+                UUID owner = tame.getOwnerReference().getUUID();
+                UUID playerID = player.getGameProfile().id();
+                if (!owner.equals(playerID))
+                    return false;
+            }
         }
 
         if(!ListHandler.isPermitted(entity))
