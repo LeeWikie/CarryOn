@@ -25,10 +25,10 @@ import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
 import tschipp.carryon.common.carry.CarryOnData;
 import tschipp.carryon.config.fabric.ConfigLoaderImpl;
 import tschipp.carryon.events.CommonEvents;
-
 import java.io.IOException;
 
 public class CarryOnFabricMod implements ModInitializer {
@@ -37,9 +37,15 @@ public class CarryOnFabricMod implements ModInitializer {
             ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "carry_on_data"),
             builder -> builder
                     .initializer(() -> new CarryOnData(new CompoundTag()))
-                    .persistent(CarryOnData.CODEC)
-                    .syncWith(CarryOnData.STREAM_CODEC, (t, p) -> p.connection != null && !p.isRemoved())
-                    .copyOnDeath()
+                    .syncWith(CarryOnData.STREAM_CODEC, (t, p) ->{ 
+                        ServerPlayer player = (ServerPlayer) t;
+                        // the isAlive check avoids us syncing attachment data about dead players. Which causes a disconnect
+                        // player.tickCount > 0 avoids us syncing attachment data about players the instant they spawn. 
+                        // Which also causes a disconnect as the player entity may not be synced yet.
+            
+                        return p.connection != null && player.isAlive() && player.tickCount >0;
+                    })
+         
 
     );
 
