@@ -176,7 +176,7 @@ public class PickupHandler {
         {
             EntityReference<LivingEntity> ref  = tame.getOwnerReference();
             if (ref != null) {
-                UUID owner = tame.getOwnerReference().getUUID();
+                UUID owner = ref.getUUID();
                 UUID playerID = player.getGameProfile().id();
                 if (!owner.equals(playerID))
                     return false;
