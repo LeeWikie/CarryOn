@@ -30,7 +30,6 @@ import net.minecraftforge.network.ChannelBuilder;
 import net.minecraftforge.network.SimpleChannel;
 import tschipp.carryon.config.forge.ConfigLoaderImpl;
 import tschipp.carryon.networking.ClientboundSyncCarryDataPacket;
-import tschipp.carryon.networking.clientbound.ClientboundStartRidingPacket;
 import tschipp.carryon.platform.Services;
 
 @Mod(Constants.MOD_ID)
