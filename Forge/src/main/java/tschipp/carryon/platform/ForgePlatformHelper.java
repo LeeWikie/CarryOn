@@ -129,7 +129,7 @@ public class ForgePlatformHelper implements IPlatformHelper {
     public void setCarryData(Player player, CarryOnData data) {
         var cap = player.getCapability(CarryOnDataCapabilityProvider.CARRY_ON_DATA_CAPABILITY).orElse(new CarryOnDataCapability());
         cap.setCarryData(data);
-        if(!player.level().isClientSide) {
+        if(!player.level().isClientSide()) {
             sendPacketToAllPlayers(Constants.PACKET_ID_SYNC_SCRIPTS, new ClientboundSyncCarryDataPacket(player.getId(), data), (ServerLevel) player.level());
         }
     }

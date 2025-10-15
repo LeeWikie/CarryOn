@@ -37,11 +37,11 @@ public class ParticleEngineMixin
 {
 	//I am injecting into a lambda, lord help me
 
-	@Inject(method = "render(Lnet/minecraft/client/Camera;FLnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/renderer/culling/Frustum;)V",
-		   at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;endBatch()V",
-		   shift = At.Shift.AFTER))
-	private void onRenderLevel(Camera p_107340_, float partialTick, MultiBufferSource.BufferSource p_377798_, Frustum frustum, CallbackInfo ci)
-	{
-		CarriedObjectRender.drawThirdPerson(partialTick, new PoseStack().last().pose());
-	}
+	// @Inject(method = "render(Lnet/minecraft/client/Camera;FLnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/renderer/culling/Frustum;)V",
+	// 	   at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;endBatch()V",
+	// 	   shift = At.Shift.AFTER))
+	// private void onRenderLevel(Camera p_107340_, float partialTick, Frustum frustum, CallbackInfo ci)
+	// {
+	// 	CarriedObjectRender.drawThirdPerson(partialTick, new PoseStack().last().pose());
+	// }
 }

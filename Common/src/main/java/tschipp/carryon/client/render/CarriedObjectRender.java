@@ -179,7 +179,7 @@ renderState.submit(matrix, nodeCollector, light,  OverlayTexture.NO_OVERLAY, 0);
 	 * @param partialticks
 	 * @param mat
 	 */
-	public static void drawThirdPerson(float partialticks, Matrix4f mat,SubmitNodeCollector nodeCollector) {
+	public static void drawThirdPerson(float partialticks, Matrix4f mat) {
 		Minecraft mc = Minecraft.getInstance();
 		Level level = mc.level;
 		int perspective = CarryRenderHelper.getPerspective();

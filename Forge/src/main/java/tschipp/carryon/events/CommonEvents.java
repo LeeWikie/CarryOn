@@ -30,11 +30,9 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.common.util.Result;
 import net.minecraftforge.event.*;
-import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.event.TickEvent.ServerTickEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
@@ -50,7 +48,6 @@ import net.minecraftforge.event.level.BlockEvent.EntityPlaceEvent;
 import net.minecraftforge.eventbus.api.listener.Priority;
 import net.minecraftforge.eventbus.api.listener.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import oshi.jna.platform.mac.SystemB;
 import tschipp.carryon.CarryOnCommon;
 import tschipp.carryon.Constants;
 import tschipp.carryon.carry.CarryOnDataCapabilityProvider;
@@ -74,7 +71,7 @@ public class CommonEvents
 		Level level = event.getLevel();
 		BlockPos pos = event.getPos();
 
-		if (level.isClientSide)
+		if (level.isClientSide())
 			return false;
 
 		boolean success = false;
@@ -122,7 +119,7 @@ public class CommonEvents
 		Level level = event.getLevel();
 		Entity target = event.getTarget();
 
-		if (level.isClientSide)
+		if (level.isClientSide())
 			return false;
 
 		CarryOnData carry = CarryOnDataManager.getCarryData(player);
@@ -173,14 +170,14 @@ public class CommonEvents
 	@SubscribeEvent
 	public static void onServerTick(ServerTickEvent.Post event)
 	{
-		for (ServerPlayer player : event.getServer().getPlayerList().getPlayers())
+		for (ServerPlayer player : event.server().getPlayerList().getPlayers())
 			CarryOnCommon.onCarryTick(player);
 	}
 
 	@SubscribeEvent
 	public static void onClone(Clone event)
 	{
-		if (!event.getOriginal().level().isClientSide) {
+		if (!event.getOriginal().level().isClientSide()) {
 			Player newPlayer = event.getEntity();
 			Player oldPlayer = event.getOriginal();
 			oldPlayer.reviveCaps();
