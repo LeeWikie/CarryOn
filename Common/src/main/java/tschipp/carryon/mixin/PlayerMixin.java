@@ -21,17 +21,23 @@
 package tschipp.carryon.mixin;
 
 
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.ValueInput;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import tschipp.carryon.common.carry.CarryOnData;
 import tschipp.carryon.common.carry.CarryOnDataManager;
+import tschipp.carryon.common.carry.PlacementHandler;
+import tschipp.carryon.common.carry.CarryOnData.CarryType;
 
 import java.util.Optional;
 
@@ -50,4 +56,17 @@ public abstract class PlayerMixin extends LivingEntity  {
         res.ifPresent(data -> CarryOnDataManager.setCarryData((Player)((Object)this), data));
     }
 
+
+    @Override
+    public void stopRiding() {
+        Entity entity = this.getVehicle();
+        if (entity instanceof Player && entity.getPassengers().size() < 2){
+            CarryOnData carry = CarryOnDataManager.getCarryData((Player) entity);
+            if (carry.getType() == CarryType.PLAYER){
+                carry.clear();
+                ((Player) entity).removeEffect(MobEffects.SLOWNESS);
+            }
+        }
+        super.stopRiding();
+    }
 }

@@ -175,7 +175,7 @@ public class PlacementHandler
 		Vec3 placementPos = Vec3.atBottomCenterOf(pos);
 
 		if (carry.isCarrying(CarryType.PLAYER)) {
-			Entity otherPlayer = player.getFirstPassenger();
+			Entity otherPlayer = carry.getCarryingPlayer(level);
 			player.ejectPassengers();
 			Services.PLATFORM.sendPacketToAllPlayers(Constants.PACKET_ID_START_RIDING_OTHER, new ClientboundStartRidingOtherPlayerPacket(player.getId(), otherPlayer.getId(), false), player.level());
 			carry.clear();

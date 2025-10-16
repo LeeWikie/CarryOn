@@ -34,6 +34,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+
 import tschipp.carryon.Constants;
 import tschipp.carryon.common.carry.CarryOnData;
 import tschipp.carryon.common.carry.CarryOnData.CarryType;
@@ -46,6 +49,13 @@ public abstract class EntityMixin
 {
 	@Shadow
 	public boolean hasPassenger(Entity pEntity) {throw new IllegalStateException("EntityMixin application failed");}
+
+
+	@ModifyExpressionValue(method = "startRiding(Lnet/minecraft/world/entity/Entity;ZZ)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/EntityType;canSerialize()Z"))
+	private boolean onStartRidingCheck(boolean original, Entity entity, boolean force) {
+		if (force && entity instanceof Player) return true;
+		return original;
+	}
 
 	@Shadow public abstract void onPassengerTurned(Entity $$0);
 

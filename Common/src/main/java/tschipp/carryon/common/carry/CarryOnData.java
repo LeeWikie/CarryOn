@@ -38,6 +38,7 @@ import net.minecraft.world.entity.AreaEffectCloud;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -50,6 +51,7 @@ import tschipp.carryon.common.scripting.CarryOnScript;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
+import java.util.UUID;
 
 public class CarryOnData {
 
@@ -101,6 +103,11 @@ public class CarryOnData {
 
         this.selectedSlot = data.getIntOr("selected", 0);
 
+    }
+
+    public CarryType getType()
+    {
+        return this.type;
     }
 
     public CompoundTag getNbt()
@@ -201,8 +208,20 @@ public class CarryOnData {
         this.activeScript = script;
     }
 
-    public void setCarryingPlayer() {
+    public void setCarryingPlayer(Player player) 
+    {
         this.type = CarryType.PLAYER;
+        nbt.putString("player",  player.getStringUUID().toString());
+    }
+
+    public Player getCarryingPlayer(Level level) 
+    {
+        if(this.type != CarryType.PLAYER)
+            throw new IllegalStateException("Called getCarryingPlayer on data that contained " + this.type);
+        if(!nbt.contains("player"))
+            return null;
+        UUID uuid = UUID.fromString(nbt.getString("player").get());
+        return level.getServer().getPlayerList().getPlayer(uuid);
     }
 
     public boolean isCarrying()
