@@ -138,8 +138,7 @@ public class CommonEvents {
             if (!(entity instanceof ServerPlayer)) return;
             var player = (ServerPlayer) entity;
             var carry = CarryOnDataManager.getCarryData(player);
-            if (!carry.isCarrying() || player.level().getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY) && !carry.isCarrying(CarryType.PLAYER)) return;
-            PlacementHandler.placeCarried(player);
+            if (carry.isCarrying(CarryType.PLAYER) || !player.level().getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY)) PlacementHandler.placeCarried(player);
         });
 
 
