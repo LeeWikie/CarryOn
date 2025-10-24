@@ -49,16 +49,10 @@ public class ClientEvents {
 		PoseStack matrix = event.getPoseStack();
 		int light = event.getPackedLight();
 		float partialTicks = event.getPartialTick();
-SubmitNodeCollector nodes =event.getSubmitNodeCollector();
+		SubmitNodeCollector nodes =event.getSubmitNodeCollector();
 
-		if(CarriedObjectRender.drawFirstPerson(player, matrix, light, partialTicks,nodes) && CarryRenderHelper.getPerspective() == 0)
+		if(CarriedObjectRender.draw(player, matrix, light, partialTicks,nodes,true) && CarryRenderHelper.getPerspective() == 0)
 			event.setCanceled(true);
-	}
-
-	@SubscribeEvent
-	public static void onRenderLevel(RenderLevelStageEvent.AfterEntities event)
-	{
-		CarriedObjectRender.drawThirdPerson(event.getLevelRenderer().getTicks(), event.getPoseStack().last().pose());
 	}
 
 	@SubscribeEvent

@@ -12,7 +12,8 @@
     "HumanoidModelMixin",
     "MinecraftMixin",
     "PlayerRenderStateMixin",
-    "EntityRendererMixin"
+    "EntityRendererMixin",
+    "AvatarRendererMixin"  
   ],
   "server": [
   ],

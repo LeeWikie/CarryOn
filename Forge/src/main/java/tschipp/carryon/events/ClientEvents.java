@@ -50,17 +50,8 @@ public class ClientEvents {
 		float partialTicks = event.getPartialTick();
 		SubmitNodeCollector nodes =event.getNodeCollector();
 		//If true, cancels event
-        return CarriedObjectRender.drawFirstPerson(player, matrix, light, partialTicks,nodes) && CarryRenderHelper.getPerspective() == 0;
+        return CarriedObjectRender.draw(player, matrix, light, partialTicks,nodes,true) && CarryRenderHelper.getPerspective() == 0;
     }
-
-	/*
-	@SubscribeEvent
-	public static void onRenderLevel(Render event)
-	{
-		if(event.getStage() == Stage.AFTER_PARTICLES)
-			CarriedObjectRender.drawThirdPerson(Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(true), event.getPoseStack());
-	}
-	 */
 
 	@SubscribeEvent
 	public static boolean onGuiInit(ScreenEvent.Init.Pre event)

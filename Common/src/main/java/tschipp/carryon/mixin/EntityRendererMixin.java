@@ -30,6 +30,8 @@ public class EntityRendererMixin {
             ICarryOnRenderState carryOnRenderState = (ICarryOnRenderState) state;
             carryOnRenderState.setCarryOnData(carry);
             carryOnRenderState.setRenderWidth(CarryRenderHelper.getRenderWidth(player));
+
+            carryOnRenderState.setPlayer(player);
         }
     }
 }

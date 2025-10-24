@@ -35,10 +35,8 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Matrix4f;
 import tschipp.carryon.Constants;
 import tschipp.carryon.common.carry.CarryOnData;
 import tschipp.carryon.common.carry.CarryOnData.CarryType;
@@ -51,8 +49,7 @@ import java.util.*;
 
 public class CarriedObjectRender
 {
-
-	public static boolean drawFirstPerson(Player player, PoseStack matrix, int light, float partialTicks,SubmitNodeCollector nodeCollector)
+	public static boolean draw(Player player, PoseStack matrix, int light, float partialTicks,SubmitNodeCollector nodeCollector, boolean firstPerson)
 	{
 		if(Services.PLATFORM.isModLoaded("firstperson") || Services.PLATFORM.isModLoaded("firstpersonmod"))
 			return false;
@@ -60,9 +57,9 @@ public class CarriedObjectRender
 		CarryOnData carry = CarryOnDataManager.getCarryData(player);
 		try {
 			if (carry.isCarrying(CarryType.BLOCK))
-				drawFirstPersonBlock(player,  matrix, light, CarryRenderHelper.getRenderState(player), nodeCollector);
+				drawBlock(player,  matrix, light, CarryRenderHelper.getRenderState(player), nodeCollector, firstPerson);
 			else if (carry.isCarrying(CarryType.ENTITY))
-				drawFirstPersonEntity(player, matrix, light, partialTicks,nodeCollector);
+				drawEntity(player, matrix, light, partialTicks,nodeCollector, firstPerson);
 		}
 		catch (Exception e)
 		{
@@ -82,13 +79,18 @@ public class CarriedObjectRender
 		return carry.isCarrying();
 	}
 
-	private static void drawFirstPersonBlock(Player player, PoseStack matrix, int light, BlockState state,SubmitNodeCollector nodeCollector)
+	private static void drawBlock(Player player, PoseStack matrix, int light, BlockState state,SubmitNodeCollector nodeCollector, boolean firstPerson)
 	{
 		matrix.pushPose();
-		matrix.scale(2.5f, 2.5f, 2.5f);
-		matrix.translate(0, -0.5, -1);
-		//RenderSystem.enableBlend();
-		//RenderSystem.disableCull();
+		if (firstPerson){
+			matrix.scale(2.5f, 2.5f, 2.5f);
+			matrix.translate(0, -0.5, -1);
+		}else{
+			matrix.scale(0.6f, 0.6f, 0.6f);
+			matrix.translate(0, 0.5, -0.8);
+			matrix.mulPose(Axis.ZN.rotationDegrees(180));
+
+		}
 
 		CarryOnData carry = CarryOnDataManager.getCarryData(player);
 		ItemStackRenderState renderState = new ItemStackRenderState();
@@ -105,20 +107,13 @@ public class CarriedObjectRender
 		if(carry.getActiveScript().isPresent())
 			CarryRenderHelper.performScriptTransformation(matrix, carry.getActiveScript().get());
 
-		//RenderSystem.setShaderTexture(0, GpuTexture);
-
 		ItemStack renderStack = CarryRenderHelper.getRenderItemStack(player);
 		Minecraft.getInstance().getItemModelResolver().updateForTopItem(renderState, renderStack, ItemDisplayContext.NONE, player.level(), null, 0);
-		//renderState.render(matrix, light, OverlayTexture.NO_OVERLAY);
-renderState.submit(matrix, nodeCollector, light,  OverlayTexture.NO_OVERLAY, 0);
-
-
-		//RenderSystem.enableCull();
-		//RenderSystem.disableBlend();
+		renderState.submit(matrix, nodeCollector, light,  OverlayTexture.NO_OVERLAY, 0);
 		matrix.popPose();
 	}
 
-	private static void drawFirstPersonEntity(Player player, PoseStack matrix, int light, float partialTicks,SubmitNodeCollector nodeCollector) {
+	private static void drawEntity(Player player, PoseStack matrix, int light, float partialTicks,SubmitNodeCollector nodeCollector, boolean firstPerson) {
 		EntityRenderDispatcher manager = Minecraft.getInstance().getEntityRenderDispatcher();
 		
 				
@@ -136,13 +131,17 @@ renderState.submit(matrix, nodeCollector, light,  OverlayTexture.NO_OVERLAY, 0);
 
 			float height = entity.getBbHeight();
 			float width = entity.getBbWidth();
-
-			matrix.pushPose();
-			matrix.scale(0.8f, 0.8f, 0.8f);
-			matrix.mulPose(Axis.YP.rotationDegrees(180));
-			matrix.translate(0.0, -height - .2, width * 1.3 + 0.1);
-
-			// manager.setRenderShadow(false);
+		    matrix.pushPose();
+		    matrix.mulPose(Axis.YP.rotationDegrees(180));
+			if (firstPerson){
+				matrix.scale(0.8f, 0.8f, 0.8f);
+				matrix.translate(0.0, -height - .2, width * 1.3 + 0.1);
+			}else{
+				float multiplier = Math.min(9.9f, height * width) ;
+				matrix.scale((10 - multiplier) * 0.08f, (10 - multiplier) * 0.08f, (10 - multiplier) * 0.08f);
+				matrix.translate(0.0, height / 2 + -(height / 4) + 0.5f, width - 0.1 < 0.7 ? width - 0.1 + (0.7 - (width - 0.1)) : width - 0.1);
+				matrix.mulPose(Axis.ZN.rotationDegrees(180));
+			}
 
 			Optional<CarryOnScript> res = carry.getActiveScript();
 			if(res.isPresent())
@@ -158,111 +157,13 @@ renderState.submit(matrix, nodeCollector, light,  OverlayTexture.NO_OVERLAY, 0);
 				((LivingEntity) entity).hurtTime = 0;
 
 			try {
-		manager.submit(manager.extractEntity(entity, 0), new CameraRenderState(), 0, 0, 0, matrix, nodeCollector);
-			//	manager.render(entity, 0, 0, 0, 0f, matrix, buffer, light);
-			//nodeCollector.submit
-			//manager.getRenderer(entity).submit(new EntityRenderState(), matrix, nodeCollector, null);
+		       manager.submit(manager.extractEntity(entity, 0), new CameraRenderState(), 0, 0, 0, matrix, nodeCollector);
 			}
 			catch (Exception e)
 			{
 			}
-		//	manager.setRenderShadow(true);
 			matrix.popPose();
-
 		}
-
-		// RenderSystem.disableAlphaTest();
 	}
-
-	/**
-	 * Draws the third person view of entities and blocks
-	 * @param partialticks
-	 * @param mat
-	 */
-	public static void drawThirdPerson(float partialticks, Matrix4f mat) {
-		Minecraft mc = Minecraft.getInstance();
-		Level level = mc.level;
-		int perspective = CarryRenderHelper.getPerspective();
-
-		PoseStack matrix = new PoseStack();
-		matrix.mulPose(mat);
-
-		// RenderSystem.enableBlend();
-		// RenderSystem.disableCull();
-		// RenderSystem.disableDepthTest();
-		ItemStackRenderState renderState = new ItemStackRenderState();
-		var layer = renderState.newLayer();
-		layer.setRenderType(RenderType.glint());
-
-		for (Player player : level.players())
-		{
-			try {
-
-				CarryOnData carry = CarryOnDataManager.getCarryData(player);
-
-				if (perspective == 0 && player == mc.player && !(Services.PLATFORM.isModLoaded("firstperson") || Services.PLATFORM.isModLoaded("firstpersonmod") || Services.PLATFORM.isModLoaded("realcamera")))
-					continue;
-
-
-				if (carry.isCarrying(CarryType.BLOCK)) {
-					BlockState state = CarryRenderHelper.getRenderState(player);
-
-					CarryRenderHelper.applyBlockTransformations(player, partialticks, matrix, state.getBlock());
-
-					ItemStack renderItemStack = CarryRenderHelper.getRenderItemStack(player);
-
-					mc.getItemModelResolver().updateForTopItem(renderState, renderItemStack, ItemDisplayContext.NONE, level, null, 0);
-
-					Optional<CarryOnScript> res = carry.getActiveScript();
-                    res.ifPresent(script -> CarryRenderHelper.performScriptTransformation(matrix, script));
-
-					//RenderSystem.setShaderTexture(0, TextureAtlas.LOCATION_BLOCKS);
-					//RenderSystem.enableCull();
-
-					PoseStack.Pose p = matrix.last();
-					PoseStack copy = new PoseStack();
-					copy.mulPose(p.pose());
-					matrix.popPose();
-
-					//RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-
-					renderState.submit(copy, null, 0, OverlayTexture.NO_OVERLAY, 0);
-
-				//	renderState.render(copy, buffer, light, OverlayTexture.NO_OVERLAY);
-
-					matrix.popPose();
-				} else if (carry.isCarrying(CarryType.ENTITY)) {
-					Entity entity = CarryRenderHelper.getRenderEntity(player);
-
-					if (entity != null) {
-						CarryRenderHelper.applyEntityTransformations(player, partialticks, matrix, entity);
-
-				//		manager.setRenderShadow(false);
-
-						Optional<CarryOnScript> res = carry.getActiveScript();
-                        res.ifPresent(script -> CarryRenderHelper.performScriptTransformation(matrix, script));
-
-						if (entity instanceof LivingEntity le)
-							le.hurtTime = 0;
-
-						//RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-
-					//	manager.render(entity, 0, 0, 0, 0f, matrix, buffer, light);
-						matrix.popPose();
-					//	manager.setRenderShadow(true);
-						matrix.popPose();
-					}
-				}
-
-
-			}
-			catch (Exception e)
-			{
-			}
-
-		}
-	
-	}
-
 }
 
