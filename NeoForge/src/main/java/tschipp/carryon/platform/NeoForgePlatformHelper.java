@@ -69,6 +69,7 @@ public class NeoForgePlatformHelper implements IPlatformHelper {
         ConfigLoaderImpl.registerConfig(cfg);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T extends PacketBase, B extends FriendlyByteBuf> void registerServerboundPacket(CustomPacketPayload.Type<T> type, Class<T> clazz, StreamCodec<B, T> codec, BiConsumer<T, Player> handler, Object... args) {
         PayloadRegistrar registrar = (PayloadRegistrar) args[0];
@@ -82,6 +83,7 @@ public class NeoForgePlatformHelper implements IPlatformHelper {
         registrar.playToServer(type, (StreamCodec<RegistryFriendlyByteBuf, T>)codec, serverHandler);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T extends PacketBase, B extends FriendlyByteBuf> void registerClientboundPacket(CustomPacketPayload.Type<T> type, Class<T> clazz, StreamCodec<B, T> codec, BiConsumer<T, Player> handler, Object... args)
     {

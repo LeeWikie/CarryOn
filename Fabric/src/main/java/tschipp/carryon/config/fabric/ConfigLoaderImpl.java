@@ -23,8 +23,6 @@ package tschipp.carryon.config.fabric;
 import com.google.gson.*;
 import net.fabricmc.loader.api.FabricLoader;
 import org.apache.commons.io.FileUtils;
-import tschipp.carryon.Constants;
-import tschipp.carryon.common.config.CarryConfig;
 import tschipp.carryon.common.config.ListHandler;
 import tschipp.carryon.config.*;
 
@@ -149,6 +147,7 @@ public class ConfigLoaderImpl {
         builder.add(category.category, categoryJson);
     }
 
+    @SuppressWarnings("unchecked")
     private static void buildProperty(JsonObject builder, PropertyData data) throws IllegalAccessException {
         AnnotationData annotationData = data.getData();
         builder.addProperty("//"+data.getId(), annotationData.description());

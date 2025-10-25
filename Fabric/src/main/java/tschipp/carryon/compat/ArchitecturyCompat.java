@@ -38,6 +38,7 @@ public class ArchitecturyCompat {
     private static Method PLACE_BLOCK;
     private static Method IS_FALSE;
 
+    @SuppressWarnings("unchecked")
     private static void setup( ) {
         try {
             Class BlockEvent = Class.forName("dev.architectury.event.events.common.BlockEvent");

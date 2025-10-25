@@ -64,6 +64,7 @@ public class FabricPlatformHelper implements IPlatformHelper {
         ConfigLoaderImpl.registerConfig(cfg);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T extends PacketBase, B extends FriendlyByteBuf> void  registerServerboundPacket(CustomPacketPayload.Type<T> type, Class<T> clazz, StreamCodec<B, T> codec, BiConsumer<T, Player> handler, Object... args)
     {
@@ -76,6 +77,7 @@ public class FabricPlatformHelper implements IPlatformHelper {
         });
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T extends PacketBase, B extends FriendlyByteBuf> void  registerClientboundPacket(CustomPacketPayload.Type<T> type, Class<T> clazz, StreamCodec<B, T> codec, BiConsumer<T, Player> handler, Object... args)
     {

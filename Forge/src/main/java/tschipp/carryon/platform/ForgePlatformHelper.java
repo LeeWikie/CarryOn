@@ -70,6 +70,7 @@ public class ForgePlatformHelper implements IPlatformHelper {
         ConfigLoaderImpl.registerConfig(cfg);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T extends PacketBase, B extends FriendlyByteBuf> void  registerServerboundPacket(CustomPacketPayload.Type<T> type, Class<T> clazz, StreamCodec<B, T> codec, BiConsumer<T, Player> handler, Object... args)
     {
@@ -86,6 +87,7 @@ public class ForgePlatformHelper implements IPlatformHelper {
         CarryOnForge.network.messageBuilder(clazz).codec((StreamCodec<FriendlyByteBuf, T>) codec).consumerMainThread(serverHandler).add();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T extends PacketBase, B extends FriendlyByteBuf> void  registerClientboundPacket(CustomPacketPayload.Type<T> type, Class<T> clazz, StreamCodec<B, T> codec, BiConsumer<T, Player> handler, Object... args)
     {

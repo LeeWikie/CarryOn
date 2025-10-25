@@ -43,9 +43,7 @@ public class ModClientEvents
 	public static void clientSetup(FMLClientSetupEvent event)
 	{
 		if(Services.PLATFORM.isModLoaded("cloth_config")) {
-
-			BuiltConfig[] configs = ConfigLoaderImpl.CONFIGS.values().toArray(new BuiltConfig[0]);
-			//ModLoadingContext.get().registerExtensionPoint(ConfigScreenHandler.ConfigScreenFactory.class, () -> new ConfigScreenHandler.ConfigScreenFactory((mc, prevScreen) -> ClothConfigCompatForge.createScreen(configs[1], configs[0], prevScreen)));
+			ConfigLoaderImpl.CONFIGS.values().toArray(new BuiltConfig[0]);
 		}
 	}
 }

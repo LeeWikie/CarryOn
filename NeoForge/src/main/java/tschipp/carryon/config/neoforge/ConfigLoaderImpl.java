@@ -111,6 +111,7 @@ public class ConfigLoaderImpl {
         builder.pop();
     }
 
+    @SuppressWarnings("unchecked")
     private static void buildProperty(ModConfigSpec.Builder builder, PropertyData data) throws IllegalAccessException {
         AnnotationData annotationData = data.getData();
         builder.comment(annotationData.description());
