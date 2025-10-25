@@ -23,7 +23,6 @@ public class EntityRendererMixin {
             shift = At.Shift.AFTER
     ), method = "createRenderState(Lnet/minecraft/world/entity/Entity;F)Lnet/minecraft/client/renderer/entity/state/EntityRenderState;")
     private void onCreateRenderState(Entity entity, float $$1, CallbackInfoReturnable<EntityRenderState> cir, @Local(ordinal = 0) EntityRenderState state) {
-
         if (entity instanceof Player player) {
             CarryOnData carry = CarryOnDataManager.getCarryData(player);
 

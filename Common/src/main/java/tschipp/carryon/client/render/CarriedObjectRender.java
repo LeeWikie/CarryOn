@@ -51,7 +51,7 @@ public class CarriedObjectRender
 {
 	public static boolean draw(Player player, PoseStack matrix, int light, float partialTicks,SubmitNodeCollector nodeCollector, boolean firstPerson)
 	{
-		if(Services.PLATFORM.isModLoaded("firstperson") || Services.PLATFORM.isModLoaded("firstpersonmod"))
+		if(Services.PLATFORM.isModLoaded("firstperson") || Services.PLATFORM.isModLoaded("firstpersonmod") || player == null)
 			return false;
 
 		CarryOnData carry = CarryOnDataManager.getCarryData(player);
