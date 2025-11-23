@@ -127,7 +127,7 @@ public final class Matchables
 		@Override
 		public boolean matches(ServerPlayer player)
 		{
-			ServerAdvancementManager manager = player.getServer().getAdvancements();
+			ServerAdvancementManager manager = player.level().getServer().getAdvancements();
 			AdvancementHolder adv = manager.get(ResourceLocation.parse(advancement.isEmpty() ? "" : advancement));
 
 			boolean achievement = adv == null ? true : player.getAdvancements().getOrStartProgress(adv).isDone();
@@ -167,7 +167,7 @@ public final class Matchables
 			if (cond == null || cond.isEmpty())
 				return true;
 
-			Scoreboard score = player.getScoreboard();
+			Scoreboard score = player.level().getScoreboard();
 			String numb;
 			String scorename;
 			int iE = cond.indexOf("=");

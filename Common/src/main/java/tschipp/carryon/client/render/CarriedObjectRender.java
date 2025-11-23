@@ -128,7 +128,7 @@ public class CarriedObjectRender
 
 		ItemStack renderStack = CarryRenderHelper.getRenderItemStack(player);
 		Minecraft.getInstance().getItemModelResolver().updateForTopItem(renderState, renderStack, ItemDisplayContext.NONE, player.level(), null, 0);
-		renderState.render(matrix, buffer, light, OverlayTexture.NO_OVERLAY);
+		renderState.submit(matrix, buffer, light, OverlayTexture.NO_OVERLAY);
 
 
 

@@ -25,12 +25,12 @@ import net.minecraft.client.KeyMapping;
 
 public class ConflictFreeKeyMapping extends KeyMapping
 {
-	public ConflictFreeKeyMapping(String $$0, int $$1, String $$2)
+	public ConflictFreeKeyMapping(String $$0, int $$1, Category $$2)
 	{
 		super($$0, $$1, $$2);
 	}
 
-	public ConflictFreeKeyMapping(String $$0, Type $$1, int $$2, String $$3)
+	public ConflictFreeKeyMapping(String $$0, Type $$1, int $$2, Category $$3)
 	{
 		super($$0, $$1, $$2, $$3);
 	}

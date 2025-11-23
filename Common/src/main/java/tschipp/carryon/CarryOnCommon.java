@@ -108,6 +108,8 @@ public class CarryOnCommon
 
 	public static void onCarryTick(ServerPlayer player)
 	{
+		//TODO: Remove
+		System.out.println(player.getGameProfile());
 	    CarryOnData carry = CarryOnDataManager.getCarryData(player);
 	    if(carry.isCarrying())
 	    {
@@ -115,7 +117,7 @@ public class CarryOnCommon
 	        {
 	            String cmd = carry.getActiveScript().get().scriptEffects().commandLoop();
 	            if(!cmd.isEmpty())
-	                player.getServer().getCommands().performPrefixedCommand(player.getServer().createCommandSourceStack(), "/execute as " + player.getGameProfile().getName() + " run " + cmd);
+	                player.level().getServer().getCommands().performPrefixedCommand(player.level().getServer().createCommandSourceStack(), "/execute as " + player.getGameProfile() + " run " + cmd);
 	        }
 
 		    Inventory inv = player.getInventory();
@@ -153,7 +155,7 @@ public class CarryOnCommon
 
 	public static void onPlayerAttacked(Player player)
 	{
-		if (Constants.COMMON_CONFIG.settings.dropCarriedWhenHit && !player.level().isClientSide)
+		if (Constants.COMMON_CONFIG.settings.dropCarriedWhenHit && !player.level().isClientSide())
 		{
 			CarryOnData carry = CarryOnDataManager.getCarryData(player);
 			if (carry.isCarrying())

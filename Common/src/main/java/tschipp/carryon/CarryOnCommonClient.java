@@ -21,6 +21,8 @@
 package tschipp.carryon;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.input.MouseButtonInfo;
 import net.minecraft.world.entity.player.Player;
 import tschipp.carryon.client.keybinds.CarryOnKeybinds;
 import tschipp.carryon.common.carry.CarryOnData;
@@ -49,7 +51,7 @@ public class CarryOnCommonClient
 	private static boolean checkMouse()
 	{
 		Minecraft mc = Minecraft.getInstance();
-		return (CarryOnKeybinds.carryKey.matchesMouse(0) && mc.mouseHandler.isLeftPressed()) || (CarryOnKeybinds.carryKey.matchesMouse(1) && mc.mouseHandler.isRightPressed()) || (CarryOnKeybinds.carryKey.matchesMouse(3) && mc.mouseHandler.isMiddlePressed());
+		return (CarryOnKeybinds.carryKey.matchesMouse(new MouseButtonEvent(0,0, new MouseButtonInfo(0,0))) && mc.mouseHandler.isLeftPressed()) || (CarryOnKeybinds.carryKey.matchesMouse(new MouseButtonEvent(0,0, new MouseButtonInfo(1,0))) || CarryOnKeybinds.carryKey.matchesMouse(new MouseButtonEvent(0,0, new MouseButtonInfo(3,0))) && mc.mouseHandler.isMiddlePressed());
 	}
 
 	public static void onCarryClientTick()
