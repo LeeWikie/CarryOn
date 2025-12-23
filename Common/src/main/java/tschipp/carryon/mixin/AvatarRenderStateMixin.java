@@ -1,19 +1,25 @@
 package tschipp.carryon.mixin;
 
-import net.minecraft.client.renderer.entity.state.AvatarRenderState;
+import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
+import net.minecraft.world.entity.player.Player;
+
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import tschipp.carryon.client.render.ICarryOnRenderState;
 import tschipp.carryon.common.carry.CarryOnData;
 
-@Mixin(AvatarRenderState.class)
-public class AvatarRenderStateMixin implements ICarryOnRenderState {
+@Mixin(HumanoidRenderState.class)
+public class PlayerRenderStateMixin implements ICarryOnRenderState {
 
     @Unique
     public CarryOnData carryOnData = null;
 
     @Unique
     public float renderWidth = 0f;
+
+
+    @Unique
+    public Player player = null;
 
     @Unique
     @Override
@@ -37,5 +43,15 @@ public class AvatarRenderStateMixin implements ICarryOnRenderState {
     @Override
     public void setRenderWidth(float val) {
         renderWidth = val;
+    }
+
+    @Override
+    public Player getPlayer() {
+        return player;
+    }
+
+    @Override
+    public void setPlayer(Player player) {
+      this.player = player;
     }
 }

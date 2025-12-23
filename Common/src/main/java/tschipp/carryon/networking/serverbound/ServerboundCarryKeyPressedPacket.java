@@ -20,20 +20,15 @@
 
 package tschipp.carryon.networking.serverbound;
 
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import tschipp.carryon.Constants;
 import tschipp.carryon.common.carry.CarryOnData;
 import tschipp.carryon.common.carry.CarryOnDataManager;
 import tschipp.carryon.networking.PacketBase;
-import tschipp.carryon.networking.clientbound.ClientboundStartRidingPacket;
-import tschipp.carryon.networking.clientbound.ClientboundSyncScriptsPacket;
 
 public record ServerboundCarryKeyPressedPacket(boolean pressed) implements PacketBase
 {

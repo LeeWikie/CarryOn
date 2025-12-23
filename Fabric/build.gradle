@@ -1,6 +1,6 @@
 plugins {
     id 'multiloader-loader'
-    id 'fabric-loom' version '1.11-SNAPSHOT'
+ 	id 'fabric-loom' version "${loom_version}"
 }
 
 repositories {
@@ -32,7 +32,7 @@ dependencies {
     modApi("me.shedaniel.cloth:cloth-config-fabric:${cloth_config_version}") {
         exclude(group: "net.fabricmc.fabric-api")
     }
-    modApi "com.terraformersmc:modmenu:15.0.0-beta.3"
+    modApi "com.terraformersmc:modmenu:16.0.0-rc.1"
 }
 
 loom {

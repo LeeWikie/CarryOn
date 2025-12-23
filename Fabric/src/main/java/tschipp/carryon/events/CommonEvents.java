@@ -21,7 +21,7 @@
 package tschipp.carryon.events;
 
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
-import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
+import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.CommonLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -33,6 +33,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.level.GameRules;
 import tschipp.carryon.CarryOnCommon;
 import tschipp.carryon.common.carry.CarryOnData;
 import tschipp.carryon.common.carry.CarryOnData.CarryType;
@@ -55,7 +56,7 @@ public class CommonEvents {
 
         UseBlockCallback.EVENT.register((player, world, hand, hitResult) -> {
 
-            if(world.isClientSide)
+            if(world.isClientSide())
                 return InteractionResult.PASS;
 
             BlockPos pos = hitResult.getBlockPos();
@@ -96,7 +97,7 @@ public class CommonEvents {
 
         UseEntityCallback.EVENT.register((player, level, hand, entity, hitResult) -> {
 
-            if(level.isClientSide)
+            if(level.isClientSide())
                 return InteractionResult.PASS;
 
             CarryOnData carry = CarryOnDataManager.getCarryData(player);
@@ -132,10 +133,12 @@ public class CommonEvents {
                 CarryOnCommon.onCarryTick(player);
         });
 
-
-        ServerPlayerEvents.COPY_FROM.register(((oldPlayer, newPlayer, alive) -> {
-            PlacementHandler.placeCarriedOnDeath(oldPlayer, newPlayer, !alive);
-        }));
+        ServerLivingEntityEvents.AFTER_DEATH.register((entity, damageSource)->{
+            if (!(entity instanceof ServerPlayer)) return;
+            var player = (ServerPlayer) entity;
+            var carry = CarryOnDataManager.getCarryData(player);
+            if (carry.isCarrying(CarryType.PLAYER) || !player.level().getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY)) PlacementHandler.placeCarried(player);
+        });
 
 
         PlayerBlockBreakEvents.BEFORE.register(((world, player, pos, state, blockEntity) -> {

@@ -22,25 +22,16 @@ package tschipp.carryon.config.neoforge;
 
 import com.electronwill.nightconfig.core.AbstractConfig;
 import com.electronwill.nightconfig.core.UnmodifiableConfig;
-import net.minecraft.client.Minecraft;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
-import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.common.Mod;
-import net.neoforged.fml.config.IConfigSpec;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.config.ModConfigEvent;
 import net.neoforged.neoforge.common.ModConfigSpec;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import tschipp.carryon.Constants;
 import tschipp.carryon.config.*;
 
 import java.util.*;
-import java.util.function.Consumer;
 
 @EventBusSubscriber(modid = Constants.MOD_ID)
 public class ConfigLoaderImpl {
@@ -120,6 +111,7 @@ public class ConfigLoaderImpl {
         builder.pop();
     }
 
+    @SuppressWarnings("unchecked")
     private static void buildProperty(ModConfigSpec.Builder builder, PropertyData data) throws IllegalAccessException {
         AnnotationData annotationData = data.getData();
         builder.comment(annotationData.description());

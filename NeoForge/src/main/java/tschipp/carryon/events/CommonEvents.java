@@ -31,11 +31,9 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
-import net.neoforged.bus.api.Event;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.common.util.BlockSnapshot;
 import net.neoforged.neoforge.event.*;
@@ -68,7 +66,7 @@ public class CommonEvents
 		Level level = event.getLevel();
 		BlockPos pos = event.getPos();
 
-		if (level.isClientSide)
+		if (level.isClientSide())
 			return;
 
 		boolean success = false;
@@ -122,7 +120,7 @@ public class CommonEvents
 		Level level = event.getLevel();
 		Entity target = event.getTarget();
 
-		if (level.isClientSide)
+		if (level.isClientSide())
 			return;
 
 		CarryOnData carry = CarryOnDataManager.getCarryData(player);
@@ -180,7 +178,7 @@ public class CommonEvents
 	@SubscribeEvent
 	public static void onClone(PlayerEvent.Clone event)
 	{
-		if (!event.getOriginal().level().isClientSide)
+		if (!event.getOriginal().level().isClientSide())
 			PlacementHandler.placeCarriedOnDeath((ServerPlayer) event.getOriginal(), (ServerPlayer) event.getEntity(), event.isWasDeath());
 	}
 

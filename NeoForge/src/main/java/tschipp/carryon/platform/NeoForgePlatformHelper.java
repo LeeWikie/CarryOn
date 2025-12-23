@@ -20,12 +20,10 @@
 
 package tschipp.carryon.platform;
 
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.codec.StreamDecoder;
-import net.minecraft.network.codec.StreamMemberEncoder;
+
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -45,7 +43,6 @@ import tschipp.carryon.networking.PacketBase;
 import tschipp.carryon.platform.services.IPlatformHelper;
 
 import java.util.function.BiConsumer;
-import java.util.function.Function;
 
 public class NeoForgePlatformHelper implements IPlatformHelper {
 
@@ -64,7 +61,7 @@ public class NeoForgePlatformHelper implements IPlatformHelper {
     @Override
     public boolean isDevelopmentEnvironment() {
 
-        return !FMLLoader.isProduction();
+        return !FMLLoader.getCurrent().isProduction();
     }
 
     @Override
@@ -72,6 +69,7 @@ public class NeoForgePlatformHelper implements IPlatformHelper {
         ConfigLoaderImpl.registerConfig(cfg);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T extends PacketBase, B extends FriendlyByteBuf> void registerServerboundPacket(CustomPacketPayload.Type<T> type, Class<T> clazz, StreamCodec<B, T> codec, BiConsumer<T, Player> handler, Object... args) {
         PayloadRegistrar registrar = (PayloadRegistrar) args[0];
@@ -85,6 +83,7 @@ public class NeoForgePlatformHelper implements IPlatformHelper {
         registrar.playToServer(type, (StreamCodec<RegistryFriendlyByteBuf, T>)codec, serverHandler);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T extends PacketBase, B extends FriendlyByteBuf> void registerClientboundPacket(CustomPacketPayload.Type<T> type, Class<T> clazz, StreamCodec<B, T> codec, BiConsumer<T, Player> handler, Object... args)
     {
