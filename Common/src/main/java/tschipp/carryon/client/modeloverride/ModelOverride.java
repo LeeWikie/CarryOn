@@ -23,7 +23,6 @@ package tschipp.carryon.client.modeloverride;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.datafixers.util.Either;
-import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import net.minecraft.commands.arguments.blocks.BlockStateParser;
 import net.minecraft.commands.arguments.blocks.BlockStateParser.BlockResult;
@@ -40,22 +39,13 @@ import tschipp.carryon.common.scripting.Matchables.NBTCondition;
 import javax.annotation.Nullable;
 import java.util.Map;
 
-public class ModelOverride
-{
-	//public static Codec<ModelOverride> CODEC = Codec.STRING.comapFlatMap(ModelOverride::of, override -> override.raw);
-
-	private String raw;
+public class ModelOverride {
 	private BlockResult parsedBlock;
-	private Type type;
-	private Either<ItemResult, BlockResult> parsedRHS;
 	private Either<ItemStack, BlockState> renderObject;
 
 	private ModelOverride(String raw, BlockResult parsedBlock, Type type, Either<ItemResult, BlockResult> parsedRHS)
 	{
-		this.raw = raw;
 		this.parsedBlock = parsedBlock;
-		this.type = type;
-		this.parsedRHS = parsedRHS;
 
 		parsedRHS.ifLeft(res -> {
 			ItemStack stack = new ItemStack(res.item());

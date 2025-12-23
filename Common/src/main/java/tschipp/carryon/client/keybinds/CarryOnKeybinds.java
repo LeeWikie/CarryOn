@@ -22,11 +22,13 @@ package tschipp.carryon.client.keybinds;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
+import net.minecraft.resources.ResourceLocation;
 import tschipp.carryon.Constants;
 import tschipp.carryon.networking.serverbound.ServerboundCarryKeyPressedPacket;
 import tschipp.carryon.platform.Services;
 
 import java.util.function.Consumer;
+import net.minecraft.client.KeyMapping.Category;
 
 public class CarryOnKeybinds
 {
@@ -34,10 +36,13 @@ public class CarryOnKeybinds
 
 	public static void registerKeybinds(Consumer<KeyMapping> registrar)
 	{
+		Category category =  Category.register(ResourceLocation.withDefaultNamespace("key.carry.category"));
+
+
 		if(Services.PLATFORM.isModLoaded("amecsapi"))
-			carryKey = new ConflictFreeKeyMapping("key.carry.desc", InputConstants.KEY_LSHIFT, "key.carry.category");
+			carryKey = new KeyMapping("key.carry.desc", InputConstants.KEY_LSHIFT, category);
 		else
-			carryKey = new ConflictFreeKeyMapping("key.carry.desc", Services.PLATFORM.getPlatformName().equals("Forge") ? InputConstants.KEY_LSHIFT : InputConstants.UNKNOWN.getValue(), "key.carry.category");
+			carryKey = new KeyMapping("key.carry.desc", Services.PLATFORM.getPlatformName().equals("Forge") ? InputConstants.KEY_LSHIFT : InputConstants.UNKNOWN.getValue(), category);
 
 		registrar.accept(carryKey);
 	}

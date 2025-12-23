@@ -23,20 +23,13 @@ package tschipp.carryon;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import tschipp.carryon.client.keybinds.CarryOnKeybinds;
 import tschipp.carryon.events.ClientEvents;
 import tschipp.carryon.networking.PacketBase;
 
 import java.util.function.BiConsumer;
-import java.util.function.Function;
 
 public class CarryOnFabricClientMod implements ClientModInitializer
 {

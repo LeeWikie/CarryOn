@@ -20,7 +20,6 @@
 
 package tschipp.carryon.compat;
 
-import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
@@ -39,6 +38,7 @@ public class ArchitecturyCompat {
     private static Method PLACE_BLOCK;
     private static Method IS_FALSE;
 
+    @SuppressWarnings("unchecked")
     private static void setup( ) {
         try {
             Class BlockEvent = Class.forName("dev.architectury.event.events.common.BlockEvent");

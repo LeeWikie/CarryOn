@@ -26,10 +26,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -108,8 +105,6 @@ public class CarryOnCommon
 
 	public static void onCarryTick(ServerPlayer player)
 	{
-		//TODO: Remove
-		System.out.println(player.getGameProfile());
 	    CarryOnData carry = CarryOnDataManager.getCarryData(player);
 	    if(carry.isCarrying())
 	    {
@@ -117,7 +112,7 @@ public class CarryOnCommon
 	        {
 	            String cmd = carry.getActiveScript().get().scriptEffects().commandLoop();
 	            if(!cmd.isEmpty())
-	                player.level().getServer().getCommands().performPrefixedCommand(player.level().getServer().createCommandSourceStack(), "/execute as " + player.getGameProfile() + " run " + cmd);
+	                player.level().getServer().getCommands().performPrefixedCommand(player.level().getServer().createCommandSourceStack(), "/execute as " + player.getGameProfile().name() + " run " + cmd);
 	        }
 
 		    Inventory inv = player.getInventory();

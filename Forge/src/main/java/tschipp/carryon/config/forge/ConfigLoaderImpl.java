@@ -22,21 +22,13 @@ package tschipp.carryon.config.forge;
 
 import com.electronwill.nightconfig.core.AbstractConfig;
 import com.electronwill.nightconfig.core.UnmodifiableConfig;
-import net.minecraft.client.Minecraft;
-import net.minecraft.server.MinecraftServer;
-import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.common.util.LogicalSidedProvider;
 import net.minecraftforge.eventbus.api.listener.SubscribeEvent;
-import net.minecraftforge.fml.LogicalSide;
-import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.IConfigSpec;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.config.ModConfigEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.fml.loading.FMLServiceProvider;
-import net.minecraftforge.server.ServerLifecycleHooks;
 import tschipp.carryon.Constants;
 import tschipp.carryon.config.*;
 
@@ -119,6 +111,7 @@ public class ConfigLoaderImpl {
         builder.pop();
     }
 
+    @SuppressWarnings("unchecked")
     private static void buildProperty(ForgeConfigSpec.Builder builder, PropertyData data) throws IllegalAccessException {
         AnnotationData annotationData = data.getData();
         builder.comment(annotationData.description());

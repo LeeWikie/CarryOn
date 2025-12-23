@@ -20,7 +20,6 @@
 
 package tschipp.carryon.mixin;
 
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
@@ -35,6 +34,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+
 import tschipp.carryon.Constants;
 import tschipp.carryon.common.carry.CarryOnData;
 import tschipp.carryon.common.carry.CarryOnData.CarryType;
@@ -48,13 +50,14 @@ public abstract class EntityMixin
 	@Shadow
 	public boolean hasPassenger(Entity pEntity) {throw new IllegalStateException("EntityMixin application failed");}
 
-	@Shadow public abstract void onPassengerTurned(Entity $$0);
 
-	@ModifyExpressionValue(method = "startRiding(Lnet/minecraft/world/entity/Entity;Z)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/EntityType;canSerialize()Z"))
+	@ModifyExpressionValue(method = "startRiding(Lnet/minecraft/world/entity/Entity;ZZ)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/EntityType;canSerialize()Z"))
 	private boolean onStartRidingCheck(boolean original, Entity entity, boolean force) {
 		if (force && entity instanceof Player) return true;
 		return original;
 	}
+
+	@Shadow public abstract void onPassengerTurned(Entity $$0);
 
 	@Inject(method = "positionRider(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/entity/Entity$MoveFunction;)V", at = @At("HEAD"), cancellable = true)
 	private void onPositionPassenger(Entity entity, MoveFunction move, CallbackInfo ci)
@@ -92,7 +95,7 @@ public abstract class EntityMixin
 	@Inject(method = "onPassengerTurned(Lnet/minecraft/world/entity/Entity;)V", at = @At("HEAD"))
 	private void onPassengerTurned(Entity toUpdate, CallbackInfo ci)
 	{
-		if((Object)this instanceof Player thisPlayer && toUpdate instanceof Player otherPlayer)
+		if((Object)this instanceof Player thisPlayer && toUpdate instanceof Player)
 		{
 			CarryOnData carry = CarryOnDataManager.getCarryData(thisPlayer);
 			if(carry.isCarrying(CarryType.PLAYER)) {
