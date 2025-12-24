@@ -34,6 +34,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.level.storage.ValueInput;
@@ -74,91 +75,60 @@ public class CarryRenderHelper
 		return Axis.YP.rotationDegrees(getExactBodyRotationDegrees(entity, partialticks));
 	}
 
-	public static void applyGeneralTransformations(Player player, float partialticks, PoseStack matrix)
+	public static void applyGeneralTransformations(Player player, PoseStack matrix)
 	{
-		int perspective = CarryRenderHelper.getPerspective();
-		Quaternionf playerrot = CarryRenderHelper.getExactBodyRotation(player, partialticks);
-		Vec3 playerpos = CarryRenderHelper.getExactPos(player, partialticks);
-		Vec3 cameraPos = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
-		Vec3 offset = playerpos.subtract(cameraPos);
 		Pose pose = player.getPose();
-
-		matrix.pushPose();
-		matrix.translate(offset.x, offset.y, offset.z);
-
-		if (perspective == 2)
-			playerrot.mul(Axis.YP.rotationDegrees(180));
-		matrix.mulPose(playerrot);
 
 		matrix.pushPose();
 		matrix.scale(0.6f, 0.6f, 0.6f);
 
-		if (perspective == 2)
-			matrix.translate(0, 0, -1.35);
+		matrix.translate(0, 0, -1.35);
 
 		if (doSneakCheck(player))
 		{
 			matrix.translate(0, -0.4, 0);
 		}
 
-		if (pose == Pose.SWIMMING)
+		if (pose == Pose.SWIMMING || pose == Pose.FALL_FLYING)
 		{
-			float f = player.getSwimAmount(partialticks);
-			float f3 = player.isInWater() ? -90.0F - player.xRotO : -90.0F;
-			float f4 = Mth.lerp(f, 0.0F, f3);
-			if (perspective == 2)
-			{
-				matrix.translate(0, 0, 1.35);
-				matrix.mulPose(Axis.XP.rotationDegrees(f4));
-			}
-			else
-				matrix.mulPose(Axis.XN.rotationDegrees(f4));
-
-			matrix.translate(0, -1.5, -1.848);
-			if (perspective == 2)
-				matrix.translate(0, 0, 2.38);
+			matrix.translate(0, 0, 2.5);
+			matrix.mulPose(Axis.XP.rotationDegrees(90));
 		}
 
-		if (pose == Pose.FALL_FLYING)
-		{
-			float f1 = player.getFallFlyingTicks() + partialticks;
-			float f2 = Mth.clamp(f1 * f1 / 100.0F, 0.0F, 1.0F);
-			if (!player.isAutoSpinAttack())
-			{
-				if (perspective == 2)
-					matrix.translate(0, 0, 1.35);
-
-				if (perspective == 2)
-					matrix.mulPose(Axis.XP.rotationDegrees(f2 * (-90.0F - player.xRotO)));
-				else
-					matrix.mulPose(Axis.XN.rotationDegrees(f2 * (-90.0F - player.xRotO)));
-			}
-
-			Vec3 viewVector = player.getViewVector(partialticks);
-			Vec3 deltaMovement = player.getDeltaMovement();
-			double d0 = deltaMovement.horizontalDistanceSqr();
-			double d1 = deltaMovement.horizontalDistanceSqr();
-			if (d0 > 0.0D && d1 > 0.0D)
-			{
-				double d2 = (deltaMovement.x * viewVector.x + deltaMovement.z * viewVector.z) / (Math.sqrt(d0) * Math.sqrt(d1));
-				double d3 = deltaMovement.x * viewVector.z - deltaMovement.z * viewVector.x;
-
-				matrix.mulPose(Axis.YP.rotation((float) (Math.signum(d3) * Math.acos(d2))));
-			}
-
-			if (perspective != 2)
-				matrix.translate(0, 0, -1.35);
-			matrix.translate(0, -0.2, 0);
-		}
-
-		matrix.translate(0, 1.6, 0.65);
+		matrix.translate(0, -0.5, 0.65);
 	}
 
-	public static void applyBlockTransformations(Player player, float partialticks, PoseStack matrix, Block block)
-	{
-		//int perspective = CarryRenderHelper.getPerspective();
+	public static PoseStack setupBlockTransformations(Player player, PoseStack matrix, CarryOnData carry, boolean firstPerson) {
+		if (firstPerson) {
+			matrix.scale(2.5f, 2.5f, 2.5f);
+			matrix.translate(0, -0.5, -1);
 
-		applyGeneralTransformations(player, partialticks, matrix);
+			if (Constants.CLIENT_CONFIG.facePlayer != CarryRenderHelper.isChest(carry.getBlock().getBlock())) {
+				matrix.mulPose(Axis.YP.rotationDegrees(180));
+				matrix.mulPose(Axis.XN.rotationDegrees(8));
+			} else {
+				matrix.mulPose(Axis.XP.rotationDegrees(8));
+			}
+			carry.getActiveScript().ifPresent(script -> CarryRenderHelper.performScriptTransformation(matrix, script));
+
+			return matrix;
+		} else {
+			CarryRenderHelper.applyBlockTransformations(player, matrix, carry.getBlock().getBlock());
+			carry.getActiveScript().ifPresent(script -> CarryRenderHelper.performScriptTransformation(matrix, script));
+
+			PoseStack.Pose p = matrix.last();
+			PoseStack copy = new PoseStack();
+			copy.mulPose(p.pose());
+			matrix.popPose();
+
+			return copy;
+		}
+	}
+
+	public static void applyBlockTransformations(Player player, PoseStack matrix, Block block)
+	{
+		matrix.mulPose(Axis.ZN.rotationDegrees(180));
+		applyGeneralTransformations(player, matrix);
 
 		if (Constants.CLIENT_CONFIG.facePlayer != CarryRenderHelper.isChest(block))
 		{
@@ -167,59 +137,67 @@ public class CarryRenderHelper
 			//	matrix.translate(0, 0, -0.4);
 			matrix.mulPose(Axis.YP.rotationDegrees(180));
 		}
-//		if(perspective == 1)
-//		{
-//			matrix.pushPose();
-//			//matrix.mulPose(Axis.YP.rotationDegrees(180));
-//			matrix.popPose();
-//		}
-
-		//else if ((ModList.get().isLoaded("realrender") || ModList.get().isLoaded("rfpr")) && perspective == 0)
-		//	matrix.translate(0, 0, 0.4);
-		//matrix.mulPose(Axis.YP.rotationDegrees(180));
-
-
 
 		float height = getRenderHeight(player);
 		float offset = (height - 1f) / 1.2f;
 		matrix.translate(0, -offset, 0);
 	}
 
-	public static void applyEntityTransformations(Player player, float partialticks, PoseStack matrix, Entity entity)
+	public static void setupEntityTransformations(Player player, PoseStack matrix, CarryOnData carry, boolean firstPerson) {
+
+		Entity entity = carry.getEntity(player.level());
+
+		float height = entity.getBbHeight();
+		float width = entity.getBbWidth();
+
+		if(firstPerson) {
+			matrix.mulPose(Axis.YP.rotationDegrees(180));
+
+			matrix.scale(0.8f, 0.8f, 0.8f);
+			matrix.translate(0.0, -height - .2, width * 1.3 + 0.1);
+
+			carry.getActiveScript().ifPresent(script -> CarryRenderHelper.performScriptTransformation(matrix, script));
+
+			if(Constants.CLIENT_CONFIG.rotateEntitiesSideways)
+				matrix.mulPose(Axis.YP.rotationDegrees(90));
+		}
+		else {
+			applyEntityTransformations(player, matrix, entity);
+
+			carry.getActiveScript().ifPresent(script -> CarryRenderHelper.performScriptTransformation(matrix, script));
+		}
+	}
+
+	public static void applyEntityTransformations(Player player, PoseStack matrix, Entity entity)
 	{
-		int perspective = CarryRenderHelper.getPerspective();
 		Pose pose = player.getPose();
 
-		applyGeneralTransformations(player, partialticks, matrix);
+		applyGeneralTransformations(player, matrix);
 
-		if (perspective == 2)
-			matrix.translate(0, -1.6, 0.65);
-		else
-			matrix.translate(0, -1.6, -0.65);
+		matrix.mulPose(Axis.XP.rotationDegrees(180));
+
+		matrix.translate(0, -3.1, -0.65);
 		matrix.scale(1.666f, 1.666f, 1.666f);
 
 		float height = entity.getBbHeight();
 		float width = entity.getBbWidth();
-		float multiplier = height * width;
+		float multiplier = Math.min(9.9f, height * width) ;
 		entity.yo = 0.0f;
 		entity.yRotO = 0.0f;
 		entity.setYHeadRot(0.0f);
 		entity.xo = 0.0f;
 		entity.xRotO = 0.0f;
 
-		if (perspective == 2)
-			matrix.mulPose(Axis.YP.rotationDegrees(180));
-
 		matrix.scale((10 - multiplier) * 0.08f, (10 - multiplier) * 0.08f, (10 - multiplier) * 0.08f);
 		matrix.translate(0.0, height / 2 + -(height / 4) + 1, width - 0.1 < 0.7 ? width - 0.1 + (0.7 - (width - 0.1)) : width - 0.1);
 
+		if(doSneakCheck(player))
+			matrix.translate(0, -0.4, 0);
+
 		if (pose == Pose.SWIMMING || pose == Pose.FALL_FLYING)
 		{
-			matrix.mulPose(Axis.XN.rotationDegrees(90));
-			matrix.translate(0, -0.2 * height, 0);
-
-			if (pose == Pose.FALL_FLYING)
-				matrix.translate(0, 0, 0.2);
+			matrix.mulPose(Axis.XN.rotationDegrees(180));
+			matrix.translate(0, 0.2 * height - 2, -0.5);
 		}
 
 		if(Constants.CLIENT_CONFIG.rotateEntitiesSideways)
@@ -463,7 +441,7 @@ public class CarryRenderHelper
 
 	public static boolean isChest(Block block)
 	{
-		return block == Blocks.CHEST || block == Blocks.ENDER_CHEST || block == Blocks.TRAPPED_CHEST;
+		return block == Blocks.CHEST || block == Blocks.ENDER_CHEST || block == Blocks.TRAPPED_CHEST || block instanceof ChestBlock;
 	}
 
 }

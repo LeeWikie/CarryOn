@@ -26,6 +26,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -57,9 +58,9 @@ public class CarriedObjectRender
 		CarryOnData carry = CarryOnDataManager.getCarryData(player);
 		try {
 			if (carry.isCarrying(CarryType.BLOCK))
-				drawBlock(player,  matrix, light, CarryRenderHelper.getRenderState(player), nodeCollector, firstPerson);
+				drawBlock(player,  matrix, light, CarryRenderHelper.getRenderState(player), nodeCollector, firstPerson, partialTicks);
 			else if (carry.isCarrying(CarryType.ENTITY))
-				drawEntity(player, matrix, light, partialTicks,nodeCollector, firstPerson);
+				drawEntity(player, matrix, light, partialTicks, nodeCollector, firstPerson);
 		}
 		catch (Exception e)
 		{
@@ -79,37 +80,20 @@ public class CarriedObjectRender
 		return carry.isCarrying();
 	}
 
-	private static void drawBlock(Player player, PoseStack matrix, int light, BlockState state,SubmitNodeCollector nodeCollector, boolean firstPerson)
+	private static void drawBlock(Player player, PoseStack matrix, int light, BlockState state, SubmitNodeCollector nodeCollector, boolean firstPerson, float partialTicks)
 	{
-		matrix.pushPose();
-		if (firstPerson){
-			matrix.scale(2.5f, 2.5f, 2.5f);
-			matrix.translate(0, -0.5, -1);
-		}else{
-			matrix.scale(0.6f, 0.6f, 0.6f);
-			matrix.translate(0, 0.5, -0.8);
-			matrix.mulPose(Axis.ZN.rotationDegrees(180));
-
-		}
-
 		CarryOnData carry = CarryOnDataManager.getCarryData(player);
 		ItemStackRenderState renderState = new ItemStackRenderState();
 		var layer = renderState.newLayer();
 		layer.setRenderType(RenderType.glint());
 
-		if (Constants.CLIENT_CONFIG.facePlayer != CarryRenderHelper.isChest(state.getBlock())) {
-			matrix.mulPose(Axis.YP.rotationDegrees(180));
-			matrix.mulPose(Axis.XN.rotationDegrees(8));
-		} else {
-			matrix.mulPose(Axis.XP.rotationDegrees(8));
-		}
+		matrix.pushPose();
 
-		if(carry.getActiveScript().isPresent())
-			CarryRenderHelper.performScriptTransformation(matrix, carry.getActiveScript().get());
+		PoseStack renderPose = CarryRenderHelper.setupBlockTransformations(player, matrix, carry, firstPerson);
 
 		ItemStack renderStack = CarryRenderHelper.getRenderItemStack(player);
 		Minecraft.getInstance().getItemModelResolver().updateForTopItem(renderState, renderStack, ItemDisplayContext.NONE, player.level(), null, 0);
-		renderState.submit(matrix, nodeCollector, light,  OverlayTexture.NO_OVERLAY, 0);
+		renderState.submit(renderPose, nodeCollector, light,  OverlayTexture.NO_OVERLAY, 0);
 		matrix.popPose();
 	}
 
@@ -119,50 +103,36 @@ public class CarriedObjectRender
 		Entity entity = CarryRenderHelper.getRenderEntity(player);
 		CarryOnData carry = CarryOnDataManager.getCarryData(player);
 
-		if (entity != null)
-		{
-			Vec3 playerpos = CarryRenderHelper.getExactPos(player, partialTicks);
+		if (entity == null)
+			return;
 
-			entity.setPos(playerpos.x, playerpos.y, playerpos.z);
-			entity.xRotO = 0.0f;
-			entity.yRotO = 0.0f;
-			entity.setYHeadRot(0.0f);
+        Vec3 playerpos = CarryRenderHelper.getExactPos(player, partialTicks);
 
-			float height = entity.getBbHeight();
-			float width = entity.getBbWidth();
-		    matrix.pushPose();
-		    matrix.mulPose(Axis.YP.rotationDegrees(180));
-			if (firstPerson){
-				matrix.scale(0.8f, 0.8f, 0.8f);
-				matrix.translate(0.0, -height - .2, width * 1.3 + 0.1);
-			}else{
-				float multiplier = Math.min(9.9f, height * width) ;
-				matrix.scale((10 - multiplier) * 0.08f, (10 - multiplier) * 0.08f, (10 - multiplier) * 0.08f);
-				matrix.translate(0.0, height / 2 + -(height / 4) + 0.5f, width - 0.1 < 0.7 ? width - 0.1 + (0.7 - (width - 0.1)) : width - 0.1);
-				matrix.mulPose(Axis.ZN.rotationDegrees(180));
-			}
+        entity.setPos(playerpos.x, playerpos.y, playerpos.z);
+        entity.xRotO = 0.0f;
+        entity.yRotO = 0.0f;
+        entity.setYHeadRot(0.0f);
 
-			Optional<CarryOnScript> res = carry.getActiveScript();
-			if(res.isPresent())
-			{
-				CarryOnScript script = res.get();
-				CarryRenderHelper.performScriptTransformation(matrix, script);
-			}
+        matrix.pushPose();
 
-			if(Constants.CLIENT_CONFIG.rotateEntitiesSideways)
-				matrix.mulPose(Axis.YP.rotationDegrees(90));
+		CarryRenderHelper.setupEntityTransformations(player, matrix, carry, firstPerson);
 
-			if (entity instanceof LivingEntity)
-				((LivingEntity) entity).hurtTime = 0;
+        if (entity instanceof LivingEntity)
+            ((LivingEntity) entity).hurtTime = 0;
 
-			try {
-		       manager.submit(manager.extractEntity(entity, 0), new CameraRenderState(), 0, 0, 0, matrix, nodeCollector);
-			}
-			catch (Exception e)
-			{
-			}
+        try {
+            EntityRenderState renderState = manager.extractEntity(entity, 0);
+            renderState.shadowPieces.clear();
+			renderState.lightCoords = light;
+			manager.submit(renderState, new CameraRenderState(), 0, 0, 0, matrix, nodeCollector);
+        }
+        catch (Exception ignored)
+        {
+        }
+
+        matrix.popPose();
+		if(!firstPerson)
 			matrix.popPose();
-		}
-	}
+    }
 }
 

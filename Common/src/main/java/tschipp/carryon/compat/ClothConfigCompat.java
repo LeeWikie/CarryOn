@@ -20,7 +20,7 @@ public record ClothConfigCompat(BuiltConfig client, BuiltConfig common, Runnable
     public static Screen getConfigScreen(BuiltConfig client, BuiltConfig common, Screen parentScreen, Runnable onSave) {
         ConfigBuilder builder = ConfigBuilder.create()
                 .setParentScreen(parentScreen)
-                .setTitle(Component.translatable("key.carry.category"));
+                .setTitle(Component.translatable("key.category.carryon.key.carry.category"));
 
         buildConfigType(client, builder, "Client Config");
         buildConfigType(common, builder, "Common Config");

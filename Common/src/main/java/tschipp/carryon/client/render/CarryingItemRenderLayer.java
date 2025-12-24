@@ -2,6 +2,7 @@ package tschipp.carryon.client.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
@@ -16,7 +17,7 @@ public class CarryingItemRenderLayer<M extends PlayerModel> extends RenderLayer<
     public void submit(PoseStack poseStack, SubmitNodeCollector nodeCollector, int packedLight,
         AvatarRenderState renderState, float yRot, float xRot) {
         if (renderState instanceof ICarryOnRenderState carryOnRenderState){
-            CarriedObjectRender.draw(carryOnRenderState.getPlayer(), poseStack, packedLight, 0, nodeCollector,false);
+            CarriedObjectRender.draw(carryOnRenderState.getPlayer(), poseStack, packedLight, Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(true), nodeCollector,false);
         }
     }
 }

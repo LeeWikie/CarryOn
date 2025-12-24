@@ -36,13 +36,9 @@ public class CarryOnKeybinds
 
 	public static void registerKeybinds(Consumer<KeyMapping> registrar)
 	{
-		Category category =  Category.register(ResourceLocation.withDefaultNamespace("key.carry.category"));
+		Category category =  Category.register(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID,"key.carry.category"));
 
-
-		if(Services.PLATFORM.isModLoaded("amecsapi"))
-			carryKey = new KeyMapping("key.carry.desc", InputConstants.KEY_LSHIFT, category);
-		else
-			carryKey = new KeyMapping("key.carry.desc", Services.PLATFORM.getPlatformName().equals("Forge") ? InputConstants.KEY_LSHIFT : InputConstants.UNKNOWN.getValue(), category);
+		carryKey = new KeyMapping("key.carry.desc", InputConstants.KEY_LSHIFT, category);
 
 		registrar.accept(carryKey);
 	}
