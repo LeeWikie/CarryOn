@@ -55,7 +55,7 @@ public class CommonEvents {
 
         UseBlockCallback.EVENT.register((player, world, hand, hitResult) -> {
 
-            if(world.isClientSide)
+            if(world.isClientSide())
                 return InteractionResult.PASS;
 
             BlockPos pos = hitResult.getBlockPos();
@@ -96,7 +96,7 @@ public class CommonEvents {
 
         UseEntityCallback.EVENT.register((player, level, hand, entity, hitResult) -> {
 
-            if(level.isClientSide)
+            if(level.isClientSide())
                 return InteractionResult.PASS;
 
             CarryOnData carry = CarryOnDataManager.getCarryData(player);

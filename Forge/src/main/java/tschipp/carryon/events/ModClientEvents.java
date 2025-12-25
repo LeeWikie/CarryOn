@@ -21,17 +21,13 @@
 package tschipp.carryon.events;
 
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.ConfigScreenHandler;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.eventbus.api.listener.SubscribeEvent;
-import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import tschipp.carryon.Constants;
 import tschipp.carryon.client.keybinds.CarryOnKeybinds;
-import tschipp.carryon.compat.ClothConfigCompatForge;
 import tschipp.carryon.config.BuiltConfig;
 import tschipp.carryon.config.forge.ConfigLoaderImpl;
 import tschipp.carryon.platform.Services;

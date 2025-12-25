@@ -50,7 +50,6 @@ import tschipp.carryon.common.pickupcondition.PickupConditionHandler;
 import tschipp.carryon.common.scripting.CarryOnScript;
 import tschipp.carryon.common.scripting.ScriptManager;
 import tschipp.carryon.networking.clientbound.ClientboundStartRidingOtherPlayerPacket;
-import tschipp.carryon.networking.clientbound.ClientboundStartRidingPacket;
 import tschipp.carryon.platform.Services;
 
 import javax.annotation.Nullable;

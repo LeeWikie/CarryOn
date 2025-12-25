@@ -21,7 +21,6 @@
 package tschipp.carryon.platform;
 
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
@@ -31,14 +30,12 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.event.network.CustomPayloadEvent;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.loading.FMLLoader;
-import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.PacketDistributor;
 import tschipp.carryon.CarryOnCommonClient;
 import tschipp.carryon.CarryOnForge;
 import tschipp.carryon.Constants;
 import tschipp.carryon.carry.CarryOnDataCapability;
 import tschipp.carryon.carry.CarryOnDataCapabilityProvider;
-import tschipp.carryon.carry.ICarryOnDataCapability;
 import tschipp.carryon.common.carry.CarryOnData;
 import tschipp.carryon.config.BuiltConfig;
 import tschipp.carryon.config.forge.ConfigLoaderImpl;
@@ -47,7 +44,6 @@ import tschipp.carryon.networking.PacketBase;
 import tschipp.carryon.platform.services.IPlatformHelper;
 
 import java.util.function.BiConsumer;
-import java.util.function.Function;
 
 public class ForgePlatformHelper implements IPlatformHelper {
 

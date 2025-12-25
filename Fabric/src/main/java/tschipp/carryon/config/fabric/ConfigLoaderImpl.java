@@ -23,8 +23,6 @@ package tschipp.carryon.config.fabric;
 import com.google.gson.*;
 import net.fabricmc.loader.api.FabricLoader;
 import org.apache.commons.io.FileUtils;
-import tschipp.carryon.Constants;
-import tschipp.carryon.common.config.CarryConfig;
 import tschipp.carryon.common.config.ListHandler;
 import tschipp.carryon.config.*;
 
@@ -32,7 +30,10 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ConfigLoaderImpl {
 

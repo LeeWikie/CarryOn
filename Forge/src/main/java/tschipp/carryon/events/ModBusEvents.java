@@ -19,15 +19,14 @@
  */
 
 package tschipp.carryon.events;
+
 import net.minecraftforge.eventbus.api.listener.Priority;
 import net.minecraftforge.eventbus.api.listener.SubscribeEvent;
 import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.fml.InterModComms.IMCMessage;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModProcessEvent;
 import tschipp.carryon.Constants;
-import tschipp.carryon.client.modeloverride.ModelOverrideHandler;
 import tschipp.carryon.common.config.ListHandler;
 
 import java.util.stream.Stream;

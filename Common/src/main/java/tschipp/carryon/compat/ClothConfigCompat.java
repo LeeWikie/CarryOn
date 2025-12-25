@@ -4,13 +4,11 @@ import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
 import me.shedaniel.clothconfig2.impl.builders.SubCategoryBuilder;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import tschipp.carryon.config.AnnotationData;
 import tschipp.carryon.config.BuiltCategory;
 import tschipp.carryon.config.BuiltConfig;
-import tschipp.carryon.config.ConfigLoader;
 
 import javax.annotation.Nullable;
 import java.util.List;

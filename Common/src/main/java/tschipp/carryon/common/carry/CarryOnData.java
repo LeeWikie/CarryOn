@@ -22,7 +22,6 @@ package tschipp.carryon.common.carry;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -50,7 +49,6 @@ import tschipp.carryon.Constants;
 import tschipp.carryon.common.scripting.CarryOnScript;
 
 import javax.annotation.Nullable;
-import java.util.Objects;
 import java.util.Optional;
 
 public class CarryOnData {

@@ -9,10 +9,10 @@
     "PlayerMixin"
   ],
   "client": [
+    "EntityRendererMixin",
     "HumanoidModelMixin",
     "MinecraftMixin",
-    "PlayerRenderStateMixin",
-    "EntityRendererMixin"
+    "PlayerRenderStateMixin"
   ],
   "server": [
   ],
