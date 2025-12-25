@@ -22,6 +22,7 @@ package tschipp.carryon.events;
 
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
+import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.CommonLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -133,13 +134,9 @@ public class CommonEvents {
                 CarryOnCommon.onCarryTick(player);
         });
 
-        ServerLivingEntityEvents.AFTER_DEATH.register((entity, damageSource)->{
-            if (!(entity instanceof ServerPlayer)) return;
-            var player = (ServerPlayer) entity;
-            var carry = CarryOnDataManager.getCarryData(player);
-            if (carry.isCarrying(CarryType.PLAYER) || !player.level().getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY)) PlacementHandler.placeCarried(player);
-        });
-
+        ServerPlayerEvents.COPY_FROM.register(((oldPlayer, newPlayer, alive) -> {
+            PlacementHandler.placeCarriedOnDeath(oldPlayer, newPlayer, !alive);
+        }));
 
         PlayerBlockBreakEvents.BEFORE.register(((world, player, pos, state, blockEntity) -> {
             if(!CarryOnCommon.onTryBreakBlock(player))

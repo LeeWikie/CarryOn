@@ -22,6 +22,7 @@ package tschipp.carryon.common.carry;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.TickTask;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -288,7 +289,7 @@ public class PlacementHandler
 	public static void placeCarriedOnDeath(ServerPlayer oldPlayer, ServerPlayer newPlayer, boolean died)
 	{
 		CarryOnData carry = CarryOnDataManager.getCarryData(oldPlayer);
-		if (((ServerLevel) oldPlayer.level()).getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY) || !died) {
+		if (oldPlayer.level().getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY) || !died) {
 			if (!carry.isCarrying(CarryType.PLAYER)) {
 				CarryOnDataManager.setCarryData(newPlayer, carry);
 				newPlayer.getInventory().setSelectedSlot(oldPlayer.getInventory().getSelectedSlot());

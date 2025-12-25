@@ -24,7 +24,7 @@ public class CarryOnDataSyncHandler implements AttachmentSyncHandler<CarryOnData
         // the isAlive check avoids us syncing attachment data about dead players. Which causes a disconnect
         // player.tickCount <= 0 avoids us syncing attachment data about players the instant they spawn. 
         // Which also causes a disconnect as the player entity may not be synced yet.
-        if (to.connection == null || !player.isAlive() || player.tickCount <= 0)
+        if (to.connection == null || !player.isAlive() || player.tickCount <= 0 || player.isRemoved())
             return false;
         return AttachmentSyncHandler.super.sendToPlayer(holder, to);
     }

@@ -108,6 +108,10 @@ public class CarryOnCommon
 	    CarryOnData carry = CarryOnDataManager.getCarryData(player);
 	    if(carry.isCarrying())
 	    {
+			// Dumb Fix to sync Carry Data after a respawn with KeepInventory, because we can't sync in the first tick.
+			if(player.tickCount == 1)
+				CarryOnDataManager.setCarryData(player, carry);
+
 	        if(carry.getActiveScript().isPresent())
 	        {
 	            String cmd = carry.getActiveScript().get().scriptEffects().commandLoop();
