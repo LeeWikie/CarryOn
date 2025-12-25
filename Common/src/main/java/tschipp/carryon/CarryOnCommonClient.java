@@ -47,14 +47,15 @@ public class CarryOnCommonClient
 	}
 
 
-	public static void onCarryClientTick()
-	{
+	public static void onCarryClientTick() {
 		Player player = Minecraft.getInstance().player;
-		if(player != null) {
+		if (player != null) {
 			CarryOnData carry = CarryOnDataManager.getCarryData(player);
-			if(carry.isCarrying())
-			{
-				player.getInventory().setSelectedSlot(carry.getSelected());
+			if (carry.isCarrying()) {
+				int wantedSlot = carry.getSelected();
+				if (player.getInventory().getSelectedSlot() != wantedSlot) {
+					player.getInventory().setSelectedSlot(wantedSlot);
+				}
 			}
 		}
 	}
