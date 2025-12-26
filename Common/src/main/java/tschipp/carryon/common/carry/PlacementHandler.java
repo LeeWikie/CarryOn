@@ -92,6 +92,9 @@ public class PlacementHandler
 		if (!doPlace)
 			return false;
 
+		if(level.isOutsideBuildHeight(pos))
+			return false;
+
 		if (carry.getActiveScript().isPresent()) {
 			ScriptEffects effects = carry.getActiveScript().get().scriptEffects();
 			String cmd = effects.commandPlace();
