@@ -40,8 +40,11 @@ import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
+import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.storage.TagValueOutput;
 import net.minecraft.world.phys.Vec3;
 import tschipp.carryon.CarryOnCommon;
@@ -106,6 +109,10 @@ public class PickupHandler {
         }
 
         if(!ListHandler.isPermitted(state.getBlock()))
+            return false;
+
+        // Reject pickup of Double blocks, if they use the vanilla property
+        if(hasPropertyType(state, DoorBlock.HALF))
             return false;
 
         if(state.getDestroySpeed(level, pos) == -1 && !player.isCreative() && !Constants.COMMON_CONFIG.settings.pickupUnbreakableBlocks)
@@ -207,7 +214,7 @@ public class PickupHandler {
                 return false;
         }
 
-        boolean doPickup = pickupCallback == null ? true : pickupCallback.apply(entity);
+        boolean doPickup = pickupCallback == null || pickupCallback.apply(entity);
         if(!doPickup)
             return false;
 
@@ -273,6 +280,14 @@ public class PickupHandler {
         if (!player.isCreative() || Constants.COMMON_CONFIG.settings.slownessInCreative)
             player.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 100000000, CarryOnCommon.potionLevel(carry, player.level()), false, false));
         return true;
+    }
+
+    private static <T extends Comparable<T>> boolean hasPropertyType(BlockState state, Property<T> prop) {
+        for (var p : state.getProperties()) {
+            if(p.getValueClass().equals(prop.getValueClass()))
+                return true;
+        }
+        return false;
     }
 
 }

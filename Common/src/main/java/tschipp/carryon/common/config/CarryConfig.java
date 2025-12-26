@@ -285,7 +285,7 @@ public class CarryConfig
 					"modern_industrialization:fluid_pipe",
 					"modern_industrialization:*_fluid_pipe",
 					"yigd:*", "domum_ornamentum:*", "connectiblechains:*",
-					"cobblemon:*", "snowrealmagic:*", "forbidden_arcanus:black_hole", "domum_ornamentum:*", "sgjourney:*", "copycats:*", "expandedstorage:*"
+					"cobblemon:*", "snowrealmagic:*", "forbidden_arcanus:black_hole", "domum_ornamentum:*", "sgjourney:*", "copycats:*", "expandedstorage:*", "replication:*"
 			};
 
 			@Property(
@@ -302,7 +302,7 @@ public class CarryConfig
 					"animania:hamster", "animania:ferret*", "animania:hedgehog*", "animania:cart",
 					"animania:wagon", "mynko:*", "pixelmon:*", "mocreatures:*", "quark:totem", "vehicle:*",
 					"securitycraft:*", "taterzens:npc", "easy_npc:*", "bodiesbodies:dead_body", "littletiles:*",
-					"connectiblechains:*", "cobblemon:*", "create:*", "swem:*"
+					"connectiblechains:*", "cobblemon:*", "create:*", "swem:*", "toms_mobs:*"
 			};
 
 			@Property(
@@ -311,7 +311,8 @@ public class CarryConfig
 					validationRegex = "(#?[a-zA-Z0-9_*]+:[a-zA-Z0-9_*]*(?:\\*|[a-zA-Z0-9_]*)(?:\\*|[a-zA-Z0-9_]*)?)"
 			)
 			public String[] forbiddenStacking = {
-					"minecraft:horse"
+					"minecraft:horse",
+					"minecraft:ender_dragon"
 			};
 		}
 
