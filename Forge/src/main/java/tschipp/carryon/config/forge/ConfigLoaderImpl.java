@@ -30,7 +30,10 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.config.ModConfigEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import tschipp.carryon.Constants;
-import tschipp.carryon.config.*;
+import tschipp.carryon.config.AnnotationData;
+import tschipp.carryon.config.BuiltCategory;
+import tschipp.carryon.config.BuiltConfig;
+import tschipp.carryon.config.PropertyData;
 
 import java.util.*;
 

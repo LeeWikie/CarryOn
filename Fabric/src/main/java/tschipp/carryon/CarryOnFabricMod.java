@@ -24,17 +24,18 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import tschipp.carryon.common.carry.CarryOnData;
 import tschipp.carryon.config.fabric.ConfigLoaderImpl;
 import tschipp.carryon.events.CommonEvents;
+
 import java.io.IOException;
 
 public class CarryOnFabricMod implements ModInitializer {
 
     public static final AttachmentType<CarryOnData> CARRY_ON_DATA_ATTACHMENT_TYPE = AttachmentRegistry.create(
-            ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "carry_on_data"),
+            Identifier.fromNamespaceAndPath(Constants.MOD_ID, "carry_on_data"),
             builder -> builder
                     .initializer(() -> new CarryOnData(new CompoundTag()))
                     .persistent(CarryOnData.CODEC)

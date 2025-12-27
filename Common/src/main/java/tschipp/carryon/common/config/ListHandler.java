@@ -22,7 +22,7 @@ package tschipp.carryon.common.config;
 
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -119,8 +119,8 @@ public class ListHandler {
         ALLOWED_TILES_TAGS.clear();
         PROPERTY_EXCEPTION_CLASSES.clear();
 
-        Map<ResourceLocation, TagKey<Block>> blocktags = BuiltInRegistries.BLOCK.listTagIds().collect(Collectors.toMap(t -> t.location(), t -> t));
-        Map<ResourceLocation, TagKey<EntityType<?>>> entitytags = BuiltInRegistries.ENTITY_TYPE.listTagIds().collect(Collectors.toMap(t -> t.location(), t -> t));
+        Map<Identifier, TagKey<Block>> blocktags = BuiltInRegistries.BLOCK.listTagIds().collect(Collectors.toMap(t -> t.location(), t -> t));
+        Map<Identifier, TagKey<EntityType<?>>> entitytags = BuiltInRegistries.ENTITY_TYPE.listTagIds().collect(Collectors.toMap(t -> t.location(), t -> t));
 
         List<String> forbidden = new ArrayList<>(List.of(Constants.COMMON_CONFIG.blacklist.forbiddenTiles));
         forbidden.add("#carryon:block_blacklist");
@@ -152,7 +152,7 @@ public class ListHandler {
                 continue;
             String name = propString.substring(0, propString.indexOf("["));
             String props = propString.substring(propString.indexOf("[") + 1, propString.indexOf("]"));
-            Block blk = BuiltInRegistries.BLOCK.get(ResourceLocation.parse(name)).get().value();
+            Block blk = BuiltInRegistries.BLOCK.get(Identifier.parse(name)).get().value();
             for(String propName : props.split(",")) {
                 for (Property<?> prop : blk.defaultBlockState().getProperties()) {
                     if (prop.getName().equals(propName))
@@ -162,16 +162,16 @@ public class ListHandler {
         }
     }
 
-    private static <T> void addTag(String tag, Map<ResourceLocation, TagKey<T>> tagMap, List<TagKey<T>> tags) {
+    private static <T> void addTag(String tag, Map<Identifier, TagKey<T>> tagMap, List<TagKey<T>> tags) {
         String sub = tag.substring(1);
-        TagKey<T> t = tagMap.get(ResourceLocation.parse(sub));
+        TagKey<T> t = tagMap.get(Identifier.parse(sub));
         if (t != null)
             tags.add(t);
     }
 
-    private static <T> void addWithWildcards(List<String> entries, Set<String> toAddTo, Registry<T> registry, Map<ResourceLocation, TagKey<T>> tags, List<TagKey<T>> toAddTags) {
+    private static <T> void addWithWildcards(List<String> entries, Set<String> toAddTo, Registry<T> registry, Map<Identifier, TagKey<T>> tags, List<TagKey<T>> toAddTags) {
 
-        ResourceLocation[] keys = registry.keySet().toArray(new ResourceLocation[0]);
+        Identifier[] keys = registry.keySet().toArray(new Identifier[0]);
         for (int i = 0; i < entries.size(); i++)
         {
             String curr = entries.get(i);
@@ -181,7 +181,7 @@ public class ListHandler {
                 {
                     String[] filter = curr.replace("*", ",").split(",");
 
-                    for (ResourceLocation key : keys)
+                    for (Identifier key : keys)
                     {
 
                         if (containsAll(key.toString(), filter))

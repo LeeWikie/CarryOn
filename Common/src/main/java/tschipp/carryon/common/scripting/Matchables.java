@@ -26,7 +26,7 @@ import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.ServerAdvancementManager;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -35,7 +35,10 @@ import net.minecraft.world.scores.Objective;
 import net.minecraft.world.scores.Scoreboard;
 import tschipp.carryon.platform.Services;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 
 public final class Matchables
 {
@@ -125,7 +128,7 @@ public final class Matchables
 		public boolean matches(ServerPlayer player)
 		{
 			ServerAdvancementManager manager = player.level().getServer().getAdvancements();
-			AdvancementHolder adv = manager.get(ResourceLocation.parse(advancement.isEmpty() ? "" : advancement));
+			AdvancementHolder adv = manager.get(Identifier.parse(advancement.isEmpty() ? "" : advancement));
 
 			boolean achievement = adv == null ? true : player.getAdvancements().getOrStartProgress(adv).isDone();
 			return achievement;

@@ -25,7 +25,7 @@ import com.mojang.serialization.DataResult;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.FileToIdConverter;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
@@ -45,7 +45,7 @@ public class ScriptReloadListener extends SimpleJsonResourceReloadListener<Carry
 	}
 
 	@Override
-	protected void apply(Map<ResourceLocation, CarryOnScript> scripts, @NotNull ResourceManager resourceManager, @NotNull ProfilerFiller profilerFiller)
+	protected void apply(Map<Identifier, CarryOnScript> scripts, @NotNull ResourceManager resourceManager, @NotNull ProfilerFiller profilerFiller)
 	{
 		ScriptManager.SCRIPTS.clear();
 

@@ -29,7 +29,10 @@ import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.config.ModConfigEvent;
 import net.neoforged.neoforge.common.ModConfigSpec;
 import tschipp.carryon.Constants;
-import tschipp.carryon.config.*;
+import tschipp.carryon.config.AnnotationData;
+import tschipp.carryon.config.BuiltCategory;
+import tschipp.carryon.config.BuiltConfig;
+import tschipp.carryon.config.PropertyData;
 
 import java.util.*;
 

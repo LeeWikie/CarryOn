@@ -20,7 +20,7 @@
 
 package tschipp.carryon;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraftforge.eventbus.api.listener.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
@@ -52,7 +52,7 @@ public class CarryOnForge {
     @SubscribeEvent
     public static void setup(final FMLCommonSetupEvent event)
     {
-        network = ChannelBuilder.named(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "carryonpackets")).simpleChannel();
+        network = ChannelBuilder.named(Identifier.fromNamespaceAndPath(Constants.MOD_ID, "carryonpackets")).simpleChannel();
 
         CarryOnCommon.registerServerPackets();
         CarryOnCommon.registerClientPackets();

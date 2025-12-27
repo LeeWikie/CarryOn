@@ -21,7 +21,6 @@
 package tschipp.carryon.events;
 
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
-import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.CommonLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -34,7 +33,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.level.GameRules;
 import tschipp.carryon.CarryOnCommon;
 import tschipp.carryon.common.carry.CarryOnData;
 import tschipp.carryon.common.carry.CarryOnData.CarryType;

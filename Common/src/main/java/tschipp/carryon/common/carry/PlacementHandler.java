@@ -22,8 +22,6 @@ package tschipp.carryon.common.carry;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.server.TickTask;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -31,16 +29,16 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.animal.horse.Horse;
+import net.minecraft.world.entity.animal.equine.Horse;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -292,7 +290,7 @@ public class PlacementHandler
 	public static void placeCarriedOnDeath(ServerPlayer oldPlayer, ServerPlayer newPlayer, boolean died)
 	{
 		CarryOnData carry = CarryOnDataManager.getCarryData(oldPlayer);
-		if (oldPlayer.level().getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY) || !died) {
+		if (oldPlayer.level().getGameRules().get(GameRules.KEEP_INVENTORY) || !died) {
 			if (!carry.isCarrying(CarryType.PLAYER)) {
 				CarryOnDataManager.setCarryData(newPlayer, carry);
 				newPlayer.getInventory().setSelectedSlot(oldPlayer.getInventory().getSelectedSlot());

@@ -23,7 +23,7 @@ package tschipp.carryon.platform.services;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -63,11 +63,11 @@ public interface IPlatformHelper {
 
     <T extends PacketBase, B extends FriendlyByteBuf> void  registerClientboundPacket(CustomPacketPayload.Type<T> type, Class<T> clazz, StreamCodec<B, T> codec, BiConsumer<T, Player> handler, Object... args);
 
-    void sendPacketToServer(ResourceLocation id, PacketBase packet);
+    void sendPacketToServer(Identifier id, PacketBase packet);
 
-    void sendPacketToPlayer(ResourceLocation id, PacketBase packet, ServerPlayer player);
+    void sendPacketToPlayer(Identifier id, PacketBase packet, ServerPlayer player);
 
-    default void sendPacketToAllPlayers(ResourceLocation id, PacketBase packet, ServerLevel level) {
+    default void sendPacketToAllPlayers(Identifier id, PacketBase packet, ServerLevel level) {
         for(ServerPlayer p : level.players())
             sendPacketToPlayer(id, packet, p);
     }

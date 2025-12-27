@@ -2,7 +2,6 @@ package tschipp.carryon.mixin;
 
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import net.minecraft.world.entity.player.Player;
-
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import tschipp.carryon.client.render.ICarryOnRenderState;

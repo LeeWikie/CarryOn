@@ -20,14 +20,13 @@
 
 package tschipp.carryon.client.render;
 
-import com.mojang.blaze3d.vertex.*;
-import com.mojang.math.Axis;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.world.entity.Entity;
@@ -38,15 +37,11 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import tschipp.carryon.Constants;
 import tschipp.carryon.common.carry.CarryOnData;
 import tschipp.carryon.common.carry.CarryOnData.CarryType;
 import tschipp.carryon.common.carry.CarryOnDataManager;
-import tschipp.carryon.common.scripting.CarryOnScript;
 import tschipp.carryon.common.scripting.CarryOnScript.ScriptRender;
 import tschipp.carryon.platform.Services;
-
-import java.util.*;
 
 public class CarriedObjectRender
 {
@@ -85,7 +80,7 @@ public class CarriedObjectRender
 		CarryOnData carry = CarryOnDataManager.getCarryData(player);
 		ItemStackRenderState renderState = new ItemStackRenderState();
 		var layer = renderState.newLayer();
-		layer.setRenderType(RenderType.glint());
+		layer.setRenderType(RenderTypes.glint());
 
 		matrix.pushPose();
 

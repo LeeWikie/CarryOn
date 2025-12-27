@@ -9,11 +9,11 @@
     "PlayerMixin"
   ],
   "client": [
+    "AvatarRendererMixin",
+    "EntityRendererMixin",
     "HumanoidModelMixin",
     "MinecraftMixin",
-    "PlayerRenderStateMixin",
-    "EntityRendererMixin",
-    "AvatarRendererMixin"
+    "PlayerRenderStateMixin"
   ],
   "server": [
   ],

@@ -28,6 +28,8 @@ import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.permissions.Permission;
+import net.minecraft.server.permissions.PermissionLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.block.state.BlockState;
 import tschipp.carryon.Constants;
@@ -54,11 +56,11 @@ public class CommandCarryOn
 
 				.then(Commands.literal("clear").executes(cmd -> handleClear(cmd.getSource(), Collections.singleton(cmd.getSource().getPlayerOrException()))))
 
-				.then(Commands.literal("clear").then(Commands.argument("target", EntityArgument.players()).requires(src -> src.hasPermission(2)).executes(cmd -> handleClear(cmd.getSource(), EntityArgument.getPlayers(cmd, "target")))))
+				.then(Commands.literal("clear").then(Commands.argument("target", EntityArgument.players()).requires(src -> src.permissions().hasPermission(new Permission.HasCommandLevel(PermissionLevel.GAMEMASTERS))).executes(cmd -> handleClear(cmd.getSource(), EntityArgument.getPlayers(cmd, "target")))))
 
-				.then(Commands.literal("place").requires(src -> src.hasPermission(2)).executes(cmd -> handlePlace(cmd.getSource(), Collections.singleton(cmd.getSource().getPlayerOrException()))))
+				.then(Commands.literal("place").requires(src -> src.permissions().hasPermission(new Permission.HasCommandLevel(PermissionLevel.GAMEMASTERS))).executes(cmd -> handlePlace(cmd.getSource(), Collections.singleton(cmd.getSource().getPlayerOrException()))))
 
-				.then(Commands.literal("place").then(Commands.argument("target", EntityArgument.players()).requires(src -> src.hasPermission(2)).executes(cmd -> handlePlace(cmd.getSource(), EntityArgument.getPlayers(cmd, "target")))))
+				.then(Commands.literal("place").then(Commands.argument("target", EntityArgument.players()).requires(src -> src.permissions().hasPermission(new Permission.HasCommandLevel(PermissionLevel.GAMEMASTERS))).executes(cmd -> handlePlace(cmd.getSource(), EntityArgument.getPlayers(cmd, "target")))))
 
 				;
 

@@ -20,6 +20,7 @@
 
 package tschipp.carryon.mixin;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
@@ -34,9 +35,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-
 import tschipp.carryon.Constants;
 import tschipp.carryon.common.carry.CarryOnData;
 import tschipp.carryon.common.carry.CarryOnData.CarryType;

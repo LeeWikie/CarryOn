@@ -21,7 +21,7 @@
 package tschipp.carryon.events;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
@@ -94,7 +94,7 @@ public class CommonEvents
 			} else {
 				PlacementHandler.tryPlaceEntity((ServerPlayer) player, pos, event.getFace(), (pPos, toPlace) -> {
 					if (toPlace instanceof Mob mob) {
-						FinalizeSpawn checkSpawn = new FinalizeSpawn(mob, (ServerLevelAccessor) level, pPos.x, pPos.y, pPos.z, level.getCurrentDifficultyAt(new BlockPos((int) pPos.x, (int) pPos.y, (int) pPos.z)), EntitySpawnReason.EVENT, null, null, null);
+						FinalizeSpawn checkSpawn = new FinalizeSpawn(mob, (ServerLevelAccessor) level, pPos.x, pPos.y, pPos.z, ((ServerLevelAccessor) level).getCurrentDifficultyAt(new BlockPos((int) pPos.x, (int) pPos.y, (int) pPos.z)), EntitySpawnReason.EVENT, null, null, null);
 						return !FinalizeSpawn.BUS.post(checkSpawn);
 					}
 					return true;
@@ -224,7 +224,7 @@ public class CommonEvents
 	@SubscribeEvent
 	public static void onAttachCapabilities(AttachCapabilitiesEvent.Entities event) {
 		if (event.getObject() instanceof Player) {
-			event.addCapability(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "carry_on_data"), new CarryOnDataCapabilityProvider());
+			event.addCapability(Identifier.fromNamespaceAndPath(Constants.MOD_ID, "carry_on_data"), new CarryOnDataCapabilityProvider());
 		}
 	}
 

@@ -20,7 +20,7 @@
 
 package tschipp.carryon;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tschipp.carryon.common.config.CarryConfig;
@@ -34,10 +34,10 @@ public class Constants {
 	public static final CarryConfig.Common COMMON_CONFIG = new CarryConfig.Common();
 	public static final CarryConfig.Client CLIENT_CONFIG = new CarryConfig.Client();
 
-	public static final ResourceLocation PACKET_ID_KEY_PRESSED =  ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "key_pressed");
-	public static final ResourceLocation PACKET_ID_START_RIDING =  ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "start_riding");
-	public static final ResourceLocation PACKET_ID_SYNC_SCRIPTS =  ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "sync_scripts");
-	public static final ResourceLocation PACKET_ID_START_RIDING_OTHER =  ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "start_riding_other");
-	public static final ResourceLocation PACKET_ID_SYNC_CARRY_ON_DATA =  ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "sync_carry_data");
+	public static final Identifier PACKET_ID_KEY_PRESSED =  Identifier.fromNamespaceAndPath(Constants.MOD_ID, "key_pressed");
+	public static final Identifier PACKET_ID_START_RIDING =  Identifier.fromNamespaceAndPath(Constants.MOD_ID, "start_riding");
+	public static final Identifier PACKET_ID_SYNC_SCRIPTS =  Identifier.fromNamespaceAndPath(Constants.MOD_ID, "sync_scripts");
+	public static final Identifier PACKET_ID_START_RIDING_OTHER =  Identifier.fromNamespaceAndPath(Constants.MOD_ID, "start_riding_other");
+	public static final Identifier PACKET_ID_SYNC_CARRY_ON_DATA =  Identifier.fromNamespaceAndPath(Constants.MOD_ID, "sync_carry_data");
 
 }

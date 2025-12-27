@@ -23,9 +23,8 @@ package tschipp.carryon.platform;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
-
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.fml.ModList;
@@ -100,12 +99,12 @@ public class NeoForgePlatformHelper implements IPlatformHelper {
 
 
     @Override
-    public void sendPacketToServer(ResourceLocation id, PacketBase packet) {
+    public void sendPacketToServer(Identifier id, PacketBase packet) {
         CarryOnNeoForgeClient.sendPacketToServer(packet);
     }
 
     @Override
-    public void sendPacketToPlayer(ResourceLocation id, PacketBase packet, ServerPlayer player) {
+    public void sendPacketToPlayer(Identifier id, PacketBase packet, ServerPlayer player) {
         PacketDistributor.sendToPlayer(player, packet);
     }
 

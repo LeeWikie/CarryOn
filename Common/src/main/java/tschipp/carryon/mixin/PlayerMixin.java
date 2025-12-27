@@ -32,8 +32,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import tschipp.carryon.common.carry.CarryOnData;
-import tschipp.carryon.common.carry.CarryOnDataManager;
 import tschipp.carryon.common.carry.CarryOnData.CarryType;
+import tschipp.carryon.common.carry.CarryOnDataManager;
 
 import java.util.Optional;
 

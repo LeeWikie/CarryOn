@@ -21,7 +21,7 @@
 package tschipp.carryon.events;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.TriState;
 import net.minecraft.world.InteractionResult;
@@ -36,7 +36,10 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.common.util.BlockSnapshot;
-import net.neoforged.neoforge.event.*;
+import net.neoforged.neoforge.event.AddServerReloadListenersEvent;
+import net.neoforged.neoforge.event.OnDatapackSyncEvent;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import net.neoforged.neoforge.event.TagsUpdatedEvent;
 import net.neoforged.neoforge.event.entity.living.MobSpawnEvent;
 import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
@@ -148,7 +151,7 @@ public class CommonEvents
 	@SubscribeEvent
 	public static void onDatapackRegister(AddServerReloadListenersEvent event)
 	{
-		event.addListener(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "scripts"), new ScriptReloadListener());
+		event.addListener(Identifier.fromNamespaceAndPath(Constants.MOD_ID, "scripts"), new ScriptReloadListener());
 	}
 
 	@SubscribeEvent

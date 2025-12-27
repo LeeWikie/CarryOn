@@ -22,13 +22,13 @@ package tschipp.carryon.client.keybinds;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.KeyMapping.Category;
+import net.minecraft.resources.Identifier;
 import tschipp.carryon.Constants;
 import tschipp.carryon.networking.serverbound.ServerboundCarryKeyPressedPacket;
 import tschipp.carryon.platform.Services;
 
 import java.util.function.Consumer;
-import net.minecraft.client.KeyMapping.Category;
 
 public class CarryOnKeybinds
 {
@@ -36,7 +36,7 @@ public class CarryOnKeybinds
 
 	public static void registerKeybinds(Consumer<KeyMapping> registrar)
 	{
-		Category category =  Category.register(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID,"key.carry.category"));
+		Category category =  Category.register(Identifier.fromNamespaceAndPath(Constants.MOD_ID,"key.carry.category"));
 
 		carryKey = new KeyMapping("key.carry.desc", InputConstants.KEY_LSHIFT, category);
 
