@@ -72,7 +72,7 @@ public class ScriptReloadListener extends SimpleJsonResourceReloadListener
 			e.printStackTrace();
 		}
 
-		Collections.sort(ScriptManager.SCRIPTS, (s1, s2) -> Long.compare(s2.priority(), s1.priority()));
+		ScriptManager.SCRIPTS.sort((s1, s2) -> Long.compare(s2.priority(), s1.priority()));
 	}
 
 	public static void syncScriptsWithClient(ServerPlayer player)
