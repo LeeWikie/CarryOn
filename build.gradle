@@ -10,7 +10,18 @@ subprojects {
     java.toolchain.languageVersion = JavaLanguageVersion.of(21)
     java.withSourcesJar()
     java.withJavadocJar()
-        
+
+    configurations.all {
+        resolutionStrategy {
+            // Force the version of ASM that NeoForge wants (9.8 in your error log)
+            force 'org.ow2.asm:asm-analysis:9.8'
+            force 'org.ow2.asm:asm:9.8'
+            force 'org.ow2.asm:asm-tree:9.8'
+            force 'org.ow2.asm:asm-commons:9.8'
+            force 'org.ow2.asm:asm-util:9.8'
+        }
+    }
+
     jar {
         from(rootProject.file("LICENSE")) {
             rename { "${it}_${mod_id}" }
