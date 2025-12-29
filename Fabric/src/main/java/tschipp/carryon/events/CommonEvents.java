@@ -21,6 +21,7 @@
 package tschipp.carryon.events;
 
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.CommonLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -158,7 +159,19 @@ public class CommonEvents {
             CarryOnCommon.onRiderDisconnected(handler.getPlayer());
         });
 
-        //TODO: drop carried when attacked
+        ServerLivingEntityEvents.ALLOW_DEATH.register((entity, damageSource, damageAmount) -> {
+            if(entity instanceof ServerPlayer sp) {
+                CarryOnCommon.onRiderDisconnected(sp);
+            }
+            return true;
+        });
+
+        ServerLivingEntityEvents.ALLOW_DAMAGE.register((entity, source, amount) -> {
+            if(entity instanceof ServerPlayer sp) {
+                CarryOnCommon.onPlayerAttacked(sp);
+            }
+            return true;
+        });
     }
 
 }

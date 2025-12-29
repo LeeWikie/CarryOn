@@ -36,6 +36,7 @@ import net.minecraftforge.event.*;
 import net.minecraftforge.event.TickEvent.ServerTickEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.MobSpawnEvent.FinalizeSpawn;
 import net.minecraftforge.event.entity.player.AttackEntityEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -239,6 +240,13 @@ public class CommonEvents
 	public static void onJoinWorld(EntityJoinLevelEvent event) {
 		if (event.getEntity() instanceof ServerPlayer sp) {
 			Services.PLATFORM.sendPacketToPlayer(Constants.PACKET_ID_SYNC_CARRY_ON_DATA, new ClientboundSyncCarryDataPacket(sp.getId(), CarryOnDataManager.getCarryData(sp)), sp);
+		}
+	}
+
+	@SubscribeEvent
+	public static void onPlayerDie(LivingDeathEvent event) {
+		if(event.getEntity() instanceof ServerPlayer sp) {
+			CarryOnCommon.onRiderDisconnected(sp);
 		}
 	}
 

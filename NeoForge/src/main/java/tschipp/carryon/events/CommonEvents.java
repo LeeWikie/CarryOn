@@ -40,6 +40,7 @@ import net.neoforged.neoforge.event.AddServerReloadListenersEvent;
 import net.neoforged.neoforge.event.OnDatapackSyncEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.TagsUpdatedEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.living.MobSpawnEvent;
 import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
@@ -218,6 +219,13 @@ public class CommonEvents
 	public static void onPlayerLoggedOut(PlayerEvent.PlayerLoggedOutEvent event) {
 		if(event.getEntity() instanceof ServerPlayer player)
 			CarryOnCommon.onRiderDisconnected(player);
+	}
+
+	@SubscribeEvent
+	public static void onPlayerDie(LivingDeathEvent event) {
+		if(event.getEntity() instanceof ServerPlayer sp) {
+			CarryOnCommon.onRiderDisconnected(sp);
+		}
 	}
 
 }
