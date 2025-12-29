@@ -50,11 +50,12 @@ public abstract class EntityMixin
 
 	@Shadow public abstract void onPassengerTurned(Entity $$0);
 
+	/*
 	@ModifyExpressionValue(method = "startRiding(Lnet/minecraft/world/entity/Entity;Z)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/EntityType;canSerialize()Z"))
 	private boolean onStartRidingCheck(boolean original, Entity entity, boolean force) {
 		if (force && entity instanceof Player) return true;
 		return original;
-	}
+	}*/
 
 	@Inject(method = "positionRider(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/entity/Entity$MoveFunction;)V", at = @At("HEAD"), cancellable = true)
 	private void onPositionPassenger(Entity entity, MoveFunction move, CallbackInfo ci)

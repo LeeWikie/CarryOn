@@ -21,19 +21,14 @@
 package tschipp.carryon;
 
 import net.minecraft.nbt.CompoundTag;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.attachment.AttachmentType;
-import net.neoforged.neoforge.client.gui.ConfigurationScreen;
-import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
-import tschipp.carryon.carry.CarryOnDataSyncHandler;
 import tschipp.carryon.common.carry.CarryOnData;
 import tschipp.carryon.config.neoforge.ConfigLoaderImpl;
 
@@ -47,8 +42,9 @@ public class CarryOnNeoForge {
     public static final Supplier<AttachmentType<CarryOnData>> CARRY_ON_DATA_ATTACHMENT = ATTACHMENT_TYPES.register(
             "carry_on_data",
             () -> AttachmentType.builder(() -> new CarryOnData(new CompoundTag()))
-                    .sync(new CarryOnDataSyncHandler())
-                    .serialize(CarryOnData.CODEC.fieldOf(CarryOnData.SERIALIZATION_KEY))
+                    //.sync(new CarryOnDataSyncHandler())
+                    //.serialize(CarryOnData.CODEC.fieldOf(CarryOnData.SERIALIZATION_KEY))
+                    .serialize(CarryOnData.CODEC)
                     .build()
     );
 

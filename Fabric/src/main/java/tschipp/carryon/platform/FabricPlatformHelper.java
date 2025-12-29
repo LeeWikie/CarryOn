@@ -20,31 +20,28 @@
 
 package tschipp.carryon.platform;
 
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking.PlayPayloadHandler;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.codec.StreamDecoder;
-import net.minecraft.network.codec.StreamMemberEncoder;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import tschipp.carryon.CarryOnFabricClientMod;
 import tschipp.carryon.CarryOnFabricMod;
+import tschipp.carryon.Constants;
 import tschipp.carryon.common.carry.CarryOnData;
 import tschipp.carryon.config.BuiltConfig;
 import tschipp.carryon.config.fabric.ConfigLoaderImpl;
 import tschipp.carryon.networking.PacketBase;
+import tschipp.carryon.networking.clientbound.ClientboundSyncCarryDataPacket;
 import tschipp.carryon.platform.services.IPlatformHelper;
 
 import java.util.function.BiConsumer;
-import java.util.function.Function;
 
 public class FabricPlatformHelper implements IPlatformHelper {
 
@@ -114,5 +111,8 @@ public class FabricPlatformHelper implements IPlatformHelper {
     @Override
     public void setCarryData(Player player, CarryOnData data) {
         player.setAttached(CarryOnFabricMod.CARRY_ON_DATA_ATTACHMENT_TYPE, data);
+        if(!player.level().isClientSide) {
+            sendPacketToAllPlayers(Constants.PACKET_ID_SYNC_CARRY_ON_DATA, new ClientboundSyncCarryDataPacket(player.getId(), data), (ServerLevel) player.level());
+        }
     }
 }

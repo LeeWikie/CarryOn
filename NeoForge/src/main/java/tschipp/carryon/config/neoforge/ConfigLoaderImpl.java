@@ -22,22 +22,17 @@ package tschipp.carryon.config.neoforge;
 
 import com.electronwill.nightconfig.core.AbstractConfig;
 import com.electronwill.nightconfig.core.UnmodifiableConfig;
-import net.minecraft.client.Minecraft;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
-import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.common.Mod;
-import net.neoforged.fml.config.IConfigSpec;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.config.ModConfigEvent;
 import net.neoforged.neoforge.common.ModConfigSpec;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import tschipp.carryon.Constants;
-import tschipp.carryon.config.*;
+import tschipp.carryon.config.AnnotationData;
+import tschipp.carryon.config.BuiltCategory;
+import tschipp.carryon.config.BuiltConfig;
+import tschipp.carryon.config.PropertyData;
 
 import java.util.*;
 

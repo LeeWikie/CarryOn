@@ -24,10 +24,8 @@ import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.InterModComms;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.InterModProcessEvent;
 import tschipp.carryon.Constants;
-import tschipp.carryon.client.modeloverride.ModelOverrideHandler;
 import tschipp.carryon.common.config.ListHandler;
 
 import java.util.stream.Stream;

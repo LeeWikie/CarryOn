@@ -36,6 +36,7 @@ import net.minecraftforge.event.*;
 import net.minecraftforge.event.TickEvent.ServerTickEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.MobSpawnEvent.FinalizeSpawn;
 import net.minecraftforge.event.entity.player.AttackEntityEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -60,7 +61,7 @@ import tschipp.carryon.common.carry.PickupHandler;
 import tschipp.carryon.common.carry.PlacementHandler;
 import tschipp.carryon.common.scripting.ScriptReloadListener;
 import tschipp.carryon.config.ConfigLoader;
-import tschipp.carryon.networking.ClientboundSyncCarryDataPacket;
+import tschipp.carryon.networking.clientbound.ClientboundSyncCarryDataPacket;
 import tschipp.carryon.platform.Services;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE, modid = Constants.MOD_ID)
@@ -252,6 +253,13 @@ public class CommonEvents
 	public static void onJoinWorld(EntityJoinLevelEvent event) {
 		if (event.getEntity() instanceof ServerPlayer sp) {
 			Services.PLATFORM.sendPacketToPlayer(Constants.PACKET_ID_SYNC_CARRY_ON_DATA, new ClientboundSyncCarryDataPacket(sp.getId(), CarryOnDataManager.getCarryData(sp)), sp);
+		}
+	}
+
+	@SubscribeEvent
+	public static void onPlayerDie(LivingDeathEvent event) {
+		if(event.getEntity() instanceof ServerPlayer sp) {
+			CarryOnCommon.onRiderDisconnected(sp);
 		}
 	}
 

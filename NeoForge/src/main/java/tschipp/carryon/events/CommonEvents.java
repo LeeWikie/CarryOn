@@ -29,15 +29,18 @@ import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
-import net.neoforged.bus.api.Event;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.common.util.BlockSnapshot;
 import net.neoforged.neoforge.common.util.TriState;
-import net.neoforged.neoforge.event.*;
+import net.neoforged.neoforge.event.AddReloadListenerEvent;
+import net.neoforged.neoforge.event.OnDatapackSyncEvent;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import net.neoforged.neoforge.event.TagsUpdatedEvent;
+import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.living.MobSpawnEvent;
 import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
@@ -53,6 +56,8 @@ import tschipp.carryon.common.carry.PickupHandler;
 import tschipp.carryon.common.carry.PlacementHandler;
 import tschipp.carryon.common.scripting.ScriptReloadListener;
 import tschipp.carryon.config.ConfigLoader;
+import tschipp.carryon.networking.clientbound.ClientboundSyncCarryDataPacket;
+import tschipp.carryon.platform.Services;
 
 @EventBusSubscriber(bus = EventBusSubscriber.Bus.GAME, modid = Constants.MOD_ID)
 public class CommonEvents
@@ -216,6 +221,27 @@ public class CommonEvents
 	public static void onPlayerLoggedOut(PlayerEvent.PlayerLoggedOutEvent event) {
 		if(event.getEntity() instanceof ServerPlayer player)
 			CarryOnCommon.onRiderDisconnected(player);
+	}
+
+	@SubscribeEvent
+	public static void onStartTracking(PlayerEvent.StartTracking event) {
+		if(event.getEntity() instanceof ServerPlayer sp && event.getTarget() instanceof ServerPlayer target) {
+			Services.PLATFORM.sendPacketToPlayer(Constants.PACKET_ID_SYNC_CARRY_ON_DATA, new ClientboundSyncCarryDataPacket(sp.getId(), CarryOnDataManager.getCarryData(sp)), target);
+		}
+	}
+
+	@SubscribeEvent
+	public static void onJoinWorld(EntityJoinLevelEvent event) {
+		if (event.getEntity() instanceof ServerPlayer sp) {
+			Services.PLATFORM.sendPacketToPlayer(Constants.PACKET_ID_SYNC_CARRY_ON_DATA, new ClientboundSyncCarryDataPacket(sp.getId(), CarryOnDataManager.getCarryData(sp)), sp);
+		}
+	}
+
+	@SubscribeEvent
+	public static void onPlayerDie(LivingDeathEvent event) {
+		if(event.getEntity() instanceof ServerPlayer sp) {
+			CarryOnCommon.onRiderDisconnected(sp);
+		}
 	}
 
 }

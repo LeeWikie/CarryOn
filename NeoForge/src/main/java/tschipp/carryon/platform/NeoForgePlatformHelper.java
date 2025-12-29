@@ -20,15 +20,12 @@
 
 package tschipp.carryon.platform;
 
-import net.minecraft.nbt.CompoundTag;
-import io.netty.buffer.ByteBuf;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.codec.StreamDecoder;
-import net.minecraft.network.codec.StreamMemberEncoder;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.fml.ModList;
@@ -39,16 +36,15 @@ import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import tschipp.carryon.CarryOnCommonClient;
 import tschipp.carryon.CarryOnNeoForge;
 import tschipp.carryon.CarryOnNeoForgeClient;
-import tschipp.carryon.common.carry.CarryOnData;
+import tschipp.carryon.Constants;
 import tschipp.carryon.common.carry.CarryOnData;
 import tschipp.carryon.config.BuiltConfig;
 import tschipp.carryon.config.neoforge.ConfigLoaderImpl;
 import tschipp.carryon.networking.PacketBase;
-import tschipp.carryon.networking.serverbound.ServerboundCarryKeyPressedPacket;
+import tschipp.carryon.networking.clientbound.ClientboundSyncCarryDataPacket;
 import tschipp.carryon.platform.services.IPlatformHelper;
 
 import java.util.function.BiConsumer;
-import java.util.function.Function;
 
 public class NeoForgePlatformHelper implements IPlatformHelper {
 
@@ -121,5 +117,8 @@ public class NeoForgePlatformHelper implements IPlatformHelper {
     @Override
     public void setCarryData(Player player, CarryOnData data) {
         player.setData(CarryOnNeoForge.CARRY_ON_DATA_ATTACHMENT, data);
+        if(!player.level().isClientSide) {
+            sendPacketToAllPlayers(Constants.PACKET_ID_SYNC_CARRY_ON_DATA, new ClientboundSyncCarryDataPacket(player.getId(), data), (ServerLevel) player.level());
+        }
     }
 }

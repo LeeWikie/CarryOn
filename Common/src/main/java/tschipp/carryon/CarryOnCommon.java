@@ -26,7 +26,6 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -42,6 +41,7 @@ import tschipp.carryon.common.command.CommandCarryOn;
 import tschipp.carryon.config.ConfigLoader;
 import tschipp.carryon.networking.clientbound.ClientboundStartRidingOtherPlayerPacket;
 import tschipp.carryon.networking.clientbound.ClientboundStartRidingPacket;
+import tschipp.carryon.networking.clientbound.ClientboundSyncCarryDataPacket;
 import tschipp.carryon.networking.clientbound.ClientboundSyncScriptsPacket;
 import tschipp.carryon.networking.serverbound.ServerboundCarryKeyPressedPacket;
 import tschipp.carryon.platform.Services;
@@ -92,6 +92,14 @@ public class CarryOnCommon
 				ClientboundStartRidingOtherPlayerPacket::handle,
 				args
 		);
+
+		Services.PLATFORM.registerClientboundPacket(
+				ClientboundSyncCarryDataPacket.TYPE,
+				ClientboundSyncCarryDataPacket.class,
+				ClientboundSyncCarryDataPacket.CODEC,
+				ClientboundSyncCarryDataPacket::handle,
+				args
+		);
 	}
 
 	public static void registerConfig()
@@ -111,6 +119,10 @@ public class CarryOnCommon
 	    CarryOnData carry = CarryOnDataManager.getCarryData(player);
 	    if(carry.isCarrying())
 	    {
+			//Dirty Hack to sync carry data 1 tick after respawning
+			if(player.tickCount == 1)
+				CarryOnDataManager.setCarryData(player, carry);
+
 	        if(carry.getActiveScript().isPresent())
 	        {
 	            String cmd = carry.getActiveScript().get().scriptEffects().commandLoop();

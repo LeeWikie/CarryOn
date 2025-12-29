@@ -23,17 +23,11 @@ package tschipp.carryon.mixin;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
-import net.minecraft.network.syncher.EntityDataAccessor;
-import net.minecraft.network.syncher.EntityDataSerializers;
-import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -52,7 +46,7 @@ public abstract class PlayerMixin extends LivingEntity  {
     @Inject(method = "readAdditionalSaveData(Lnet/minecraft/nbt/CompoundTag;)V", at = @At("RETURN"))
     private void onReadAdditionalSaveData(CompoundTag tag, CallbackInfo info)
     {
-        Optional<CarryOnData> res = CarryOnData.CODEC.parse(NbtOps.INSTANCE, tag).result();
+        Optional<CarryOnData> res = CarryOnData.CODEC.parse(NbtOps.INSTANCE, tag.get(CarryOnData.SERIALIZATION_KEY)).result();
         res.ifPresent(data -> CarryOnDataManager.setCarryData((Player)((Object)this), data));
     }
 

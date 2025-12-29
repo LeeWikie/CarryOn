@@ -25,7 +25,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Inventory;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import tschipp.carryon.common.carry.CarryOnDataManager;
 
 @Mixin(Minecraft.class)

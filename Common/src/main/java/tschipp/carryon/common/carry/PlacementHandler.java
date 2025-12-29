@@ -26,6 +26,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.animal.horse.Horse;
@@ -111,6 +112,8 @@ public class PlacementHandler
 		player.playSound(state.getSoundType().getPlaceSound(), 1.0f, 0.5f);
 		level.playSound(null, pos, state.getSoundType().getPlaceSound(), SoundSource.BLOCKS, 1.0f, 0.5f);
 		player.swing(InteractionHand.MAIN_HAND, true);
+		if (!player.isCreative() || Constants.COMMON_CONFIG.settings.slownessInCreative)
+			player.removeEffect(MobEffects.MOVEMENT_SLOWDOWN);
 		return true;
 	}
 
@@ -180,6 +183,8 @@ public class PlacementHandler
 			CarryOnDataManager.setCarryData(player, carry);
             otherPlayer.teleportTo(placementPos.x, placementPos.y, placementPos.z);
 			player.swing(InteractionHand.MAIN_HAND, true);
+			if (!player.isCreative() || Constants.COMMON_CONFIG.settings.slownessInCreative)
+				player.removeEffect(MobEffects.MOVEMENT_SLOWDOWN);
 			return true;
 		}
 
@@ -204,6 +209,8 @@ public class PlacementHandler
 		player.swing(InteractionHand.MAIN_HAND, true);
 		carry.clear();
 		CarryOnDataManager.setCarryData(player, carry);
+		if (!player.isCreative() || Constants.COMMON_CONFIG.settings.slownessInCreative)
+			player.removeEffect(MobEffects.MOVEMENT_SLOWDOWN);
 		return true;
 	}
 

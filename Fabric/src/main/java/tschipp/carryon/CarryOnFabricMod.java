@@ -22,7 +22,6 @@ package tschipp.carryon;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
-import net.fabricmc.fabric.api.attachment.v1.AttachmentSyncPredicate;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
@@ -34,7 +33,7 @@ import java.io.IOException;
 
 public class CarryOnFabricMod implements ModInitializer {
 
-    public static final AttachmentType<CarryOnData> CARRY_ON_DATA_ATTACHMENT_TYPE = AttachmentRegistry.create(
+   /* public static final AttachmentType<CarryOnData> CARRY_ON_DATA_ATTACHMENT_TYPE = AttachmentRegistry.create(
             ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "carry_on_data"),
             builder -> builder
                     .initializer(() -> new CarryOnData(new CompoundTag()))
@@ -42,7 +41,12 @@ public class CarryOnFabricMod implements ModInitializer {
                     .syncWith(CarryOnData.STREAM_CODEC, (t, p) -> p.connection != null)
                     .copyOnDeath()
 
-    );
+    ); */
+
+    public static final AttachmentType<CarryOnData> CARRY_ON_DATA_ATTACHMENT_TYPE = AttachmentRegistry.<CarryOnData>builder()
+            .initializer(() -> new CarryOnData(new CompoundTag()))
+            .persistent(CarryOnData.CODEC)
+            .buildAndRegister(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "carry_on_data"));
 
     @Override
     public void onInitialize() {

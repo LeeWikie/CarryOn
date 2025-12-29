@@ -1,4 +1,4 @@
-package tschipp.carryon.networking;
+package tschipp.carryon.networking.clientbound;
 
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -9,7 +9,7 @@ import net.minecraft.world.entity.player.Player;
 import tschipp.carryon.Constants;
 import tschipp.carryon.common.carry.CarryOnData;
 import tschipp.carryon.common.carry.CarryOnDataManager;
-import tschipp.carryon.networking.clientbound.ClientboundStartRidingPacket;
+import tschipp.carryon.networking.PacketBase;
 
 public record ClientboundSyncCarryDataPacket(int iden, CarryOnData data) implements PacketBase {
 
@@ -25,6 +25,7 @@ public record ClientboundSyncCarryDataPacket(int iden, CarryOnData data) impleme
     public void handle(Player player) {
         Entity e = player.level().getEntity(this.iden);
         if(e instanceof Player p) {
+            p.getInventory().selected = data.getSelected();
             CarryOnDataManager.setCarryData(p, data);
         }
     }

@@ -21,11 +21,13 @@
 package tschipp.carryon.events;
 
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.CommonLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.*;
+import net.fabricmc.fabric.api.networking.v1.EntityTrackingEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.core.BlockPos;
@@ -34,6 +36,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.world.InteractionResult;
 import tschipp.carryon.CarryOnCommon;
+import tschipp.carryon.Constants;
 import tschipp.carryon.common.carry.CarryOnData;
 import tschipp.carryon.common.carry.CarryOnData.CarryType;
 import tschipp.carryon.common.carry.CarryOnDataManager;
@@ -42,6 +45,8 @@ import tschipp.carryon.common.carry.PlacementHandler;
 import tschipp.carryon.common.scripting.ScriptReloadListener;
 import tschipp.carryon.compat.ArchitecturyCompat;
 import tschipp.carryon.config.ConfigLoader;
+import tschipp.carryon.networking.clientbound.ClientboundSyncCarryDataPacket;
+import tschipp.carryon.platform.Services;
 import tschipp.carryon.scripting.IdentifiableScriptReloadListener;
 
 public class CommonEvents {
@@ -160,7 +165,31 @@ public class CommonEvents {
             CarryOnCommon.onRiderDisconnected(handler.getPlayer());
         });
 
-        //TODO: drop carried when attacked
+        EntityTrackingEvents.START_TRACKING.register(((trackedEntity, player) -> {
+            if(trackedEntity instanceof ServerPlayer sp) {
+                Services.PLATFORM.sendPacketToPlayer(Constants.PACKET_ID_SYNC_CARRY_ON_DATA, new ClientboundSyncCarryDataPacket(sp.getId(), CarryOnDataManager.getCarryData(sp)), player);
+            }
+        }));
+
+        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
+            if(handler.getPlayer() instanceof  ServerPlayer sp) {
+                Services.PLATFORM.sendPacketToPlayer(Constants.PACKET_ID_SYNC_CARRY_ON_DATA, new ClientboundSyncCarryDataPacket(sp.getId(), CarryOnDataManager.getCarryData(sp)), sp);
+            }
+        });
+
+        ServerLivingEntityEvents.ALLOW_DEATH.register((entity, damageSource, damageAmount) -> {
+            if(entity instanceof ServerPlayer sp) {
+                CarryOnCommon.onRiderDisconnected(sp);
+            }
+            return true;
+        });
+
+        ServerLivingEntityEvents.ALLOW_DAMAGE.register((entity, source, amount) -> {
+            if(entity instanceof ServerPlayer sp) {
+                CarryOnCommon.onPlayerAttacked(sp);
+            }
+            return true;
+        });
     }
 
 }
