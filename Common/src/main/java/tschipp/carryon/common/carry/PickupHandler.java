@@ -102,6 +102,9 @@ public class PickupHandler {
             nbt = output.buildResult();
         }
 
+        Optional<CarryOnScript> result =  ScriptManager.inspectBlock(state, level, pos, nbt);
+        boolean overrideChecks = result.map(CarryOnScript::overrideChecks).orElse(false);
+
         if(!ListHandler.isPermitted(state.getBlock()))
             return false;
 
@@ -109,10 +112,10 @@ public class PickupHandler {
         if(hasPropertyType(state, DoorBlock.HALF))
             return false;
 
-        if(state.getDestroySpeed(level, pos) == -1 && !player.isCreative() && !Constants.COMMON_CONFIG.settings.pickupUnbreakableBlocks)
+        if(!overrideChecks && (state.getDestroySpeed(level, pos) == -1 && !player.isCreative() && !Constants.COMMON_CONFIG.settings.pickupUnbreakableBlocks))
             return false;
 
-        if(blockEntity == null && !Constants.COMMON_CONFIG.settings.pickupAllBlocks)
+        if(!overrideChecks && (blockEntity == null && !Constants.COMMON_CONFIG.settings.pickupAllBlocks))
             return false;
 
         //Check if TE is locked
@@ -133,7 +136,6 @@ public class PickupHandler {
         if(!doPickup)
             return false;
 
-        Optional<CarryOnScript> result =  ScriptManager.inspectBlock(state, level, pos, nbt);
         if(result.isPresent())
         {
             CarryOnScript script = result.get();
@@ -184,17 +186,20 @@ public class PickupHandler {
             }
         }
 
+        Optional<CarryOnScript> result =  ScriptManager.inspectEntity(entity);
+        boolean overrideChecks = result.map(CarryOnScript::overrideChecks).orElse(false);
+
         if(!ListHandler.isPermitted(entity))
         {
             //We can pick up baby animals even if the grown up animal is blacklisted.
-            if(!(entity instanceof AgeableMob ageableMob && Constants.COMMON_CONFIG.settings.allowBabies && (ageableMob.getAge() < 0 || ageableMob.isBaby())))
+            if(!overrideChecks && (!(entity instanceof AgeableMob ageableMob && Constants.COMMON_CONFIG.settings.allowBabies && (ageableMob.getAge() < 0 || ageableMob.isBaby()))))
                 return false;
         }
 
         //Non-Creative only guards
         if(!player.isCreative())
         {
-            if(!Constants.COMMON_CONFIG.settings.pickupHostileMobs && entity.getType().getCategory() == MobCategory.MONSTER)
+            if(!overrideChecks && (!Constants.COMMON_CONFIG.settings.pickupHostileMobs && entity.getType().getCategory() == MobCategory.MONSTER))
                 return false;
 
             if(Constants.COMMON_CONFIG.settings.maxEntityHeight < entity.getBbHeight() || Constants.COMMON_CONFIG.settings.maxEntityWidth < entity.getBbWidth())
@@ -214,7 +219,6 @@ public class PickupHandler {
 
         CarryOnData carry = CarryOnDataManager.getCarryData(player);
 
-        Optional<CarryOnScript> result =  ScriptManager.inspectEntity(entity);
         if(result.isPresent())
         {
             CarryOnScript script = result.get();

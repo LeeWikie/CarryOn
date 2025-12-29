@@ -39,12 +39,13 @@ public record CarryOnScript(
 		ScriptObject scriptObject,
 		ScriptConditions scriptConditions,
 		ScriptRender scriptRender,
-		ScriptEffects scriptEffects)
+		ScriptEffects scriptEffects,
+		boolean overrideChecks)
 {
 
 	public boolean isValid()
 	{
-		return (isBlock() ^ isEntity()) && (scriptConditions != ScriptConditions.EMPTY || scriptRender != ScriptRender.EMPTY || scriptEffects != ScriptEffects.EMPTY);
+		return (isBlock() ^ isEntity()) && (scriptConditions != ScriptConditions.EMPTY || scriptRender != ScriptRender.EMPTY || scriptEffects != ScriptEffects.EMPTY || overrideChecks);
 	}
 
 	public boolean isBlock()
@@ -63,7 +64,8 @@ public record CarryOnScript(
 					ScriptObject.CODEC.fieldOf("object").forGetter(CarryOnScript::scriptObject),
 					ScriptConditions.CODEC.optionalFieldOf("conditions", ScriptConditions.EMPTY).forGetter(CarryOnScript::scriptConditions),
 					ScriptRender.CODEC.optionalFieldOf("render", ScriptRender.EMPTY).forGetter(CarryOnScript::scriptRender),
-					ScriptEffects.CODEC.optionalFieldOf("effects", ScriptEffects.EMPTY).forGetter(CarryOnScript::scriptEffects)
+					ScriptEffects.CODEC.optionalFieldOf("effects", ScriptEffects.EMPTY).forGetter(CarryOnScript::scriptEffects),
+					Codec.BOOL.optionalFieldOf("override_checks", false).forGetter(CarryOnScript::overrideChecks)
 			).apply(instance, CarryOnScript::new)
 	);
 
