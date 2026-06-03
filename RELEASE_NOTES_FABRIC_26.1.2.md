@@ -2,6 +2,12 @@
 
 This is an unofficial community build of Carry On for Minecraft 26.1.2 on Fabric.
 
+## Community.2 Hotfix
+
+- Increased the Fabric attachment sync payload allowance for carried data to reduce disconnects when carried blocks or entities contain large NBT.
+- Prevented failed `activeScript` serialization from aborting attachment sync; the failed script field is logged and omitted from the sync payload instead.
+- Hotfix jar SHA-256: `1ba56b29597d5b0b10f96027fe0d59da00b0e6c0245de49c92b795576f2537f9`.
+
 ## Artifact
 
 - Runtime jar: `carryon-fabric-26.1.2-2.9.1.jar`

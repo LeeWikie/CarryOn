@@ -9,6 +9,7 @@ This fork publishes an unofficial Fabric build for Minecraft 26.1.2 while the up
 - Fabric API: `0.150.0+26.1.2`
 - Java: `25`
 - Runtime jar: see this fork's GitHub Releases for `carryon-fabric-26.1.2-2.9.1.jar`
+- Latest release: [`fabric-26.1.2-community.2`](https://github.com/LeeWikie/CarryOn/releases/tag/fabric-26.1.2-community.2)
 
 Build command used for this fork:
 
@@ -27,6 +28,7 @@ Known differences from upstream:
 - This is a Fabric-only community build for 26.1.2; Forge and NeoForge source directories are preserved but not part of this release.
 - The optional ModMenu / Cloth Config GUI integration is disabled in this build because the available coordinates do not compile cleanly against the non-obfuscated 26.1.2 Fabric classpath.
 - Minecraft 26.1+ uses Fabric's non-obfuscated build flow; `:Fabric:jar` / `:Fabric:build` are the release gates, not `remapJar`.
+- `fabric-26.1.2-community.2` includes an attachment sync hotfix for large carried NBT / script serialization edge cases that could disconnect clients with `fabric:attachment_sync_v1` encode errors.
 
 This fork is not an official upstream release. Original project, authorship, and license remain with Carry On and its maintainers.
 

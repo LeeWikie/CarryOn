@@ -34,6 +34,8 @@ import java.io.IOException;
 
 public class CarryOnFabricMod implements ModInitializer {
 
+    private static final int MAX_CARRY_SYNC_SIZE = 4 * 1024 * 1024;
+
     public static final AttachmentType<CarryOnData> CARRY_ON_DATA_ATTACHMENT_TYPE = AttachmentRegistry.create(
             Identifier.fromNamespaceAndPath(Constants.MOD_ID, "carry_on_data"),
             builder -> builder
@@ -46,7 +48,7 @@ public class CarryOnFabricMod implements ModInitializer {
                         // carryingPlayer.tickCount > 0 avoids us syncing attachment data about players the instant they spawn.
                         // Which also causes a disconnect as the player entity may not be synced yet.
                         return carryingPlayer.isAlive() && !player.isRemoved() && carryingPlayer.tickCount > 0;
-                    })
+                    }, MAX_CARRY_SYNC_SIZE)
 
 
 

@@ -126,9 +126,21 @@ public class CarryOnData {
         nbt.putBoolean("keyPressed", keyPressed);
         if(activeScript != null)
         {
-            DataResult<Tag> res = CarryOnScript.CODEC.encodeStart(NbtOps.INSTANCE, activeScript);
-            Tag tag = res.getOrThrow((s) -> {throw new RuntimeException("Failed to encode activeScript during CarryOnData serialization: " + s);});
-            nbt.put("activeScript", tag);
+            try
+            {
+                DataResult<Tag> res = CarryOnScript.CODEC.encodeStart(NbtOps.INSTANCE, activeScript);
+                Tag tag = res.getOrThrow((s) -> {throw new RuntimeException("Failed to encode activeScript during CarryOnData serialization: " + s);});
+                nbt.put("activeScript", tag);
+            }
+            catch(RuntimeException e)
+            {
+                Constants.LOG.error("Failed to encode activeScript during CarryOnData serialization", e);
+                nbt.remove("activeScript");
+            }
+        }
+        else
+        {
+            nbt.remove("activeScript");
         }
         nbt.putInt("selected", this.selectedSlot);
         return nbt;
