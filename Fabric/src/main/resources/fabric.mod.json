@@ -23,9 +23,6 @@
       ],
       "client": [
         "tschipp.carryon.CarryOnFabricClientMod"
-      ],
-      "modmenu" : [
-        "tschipp.carryon.compat.ModMenuCompat"
       ]
     },
     "mixins": [
@@ -35,9 +32,8 @@
   
     "depends": {
       "fabricloader": ">=${fabric_loader_version}",
-      "fabric-api": "*",
+      "fabric-api": ">=${fabric_version}",
       "minecraft": "${minecraft_version_range_fabric}",
       "java": ">=${java_version}"
     }
   }
-  
