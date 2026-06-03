@@ -61,14 +61,23 @@ public class PlacementHandler
 	public static boolean tryPlaceBlock(ServerPlayer player, BlockPos pos, Direction facing, @Nullable BiFunction<BlockPos, BlockState, Boolean> placementCallback)
 	{
 		CarryOnData carry = CarryOnDataManager.getCarryData(player);
-		if (!carry.isCarrying(CarryOnData.CarryType.BLOCK))
+		if (carry == null || !carry.isCarrying(CarryOnData.CarryType.BLOCK))
 			return false;
 
 		if (player.tickCount == carry.getTick())
 			return false;
 
+		if (carry.getContentNbt() == null) {
+			clearCarryAndSlowness(player, carry);
+			return false;
+		}
+
 		Level level = player.level();
 		BlockState state = carry.getBlock();
+		if (state.isAir()) {
+			clearCarryAndSlowness(player, carry);
+			return false;
+		}
 
 		BlockPlaceContext context = new BlockPlaceContext(player, InteractionHand.MAIN_HAND, ItemStack.EMPTY, BlockHitResult.miss(player.position(), facing, pos));
 
@@ -155,7 +164,7 @@ public class PlacementHandler
 	{
 		CarryOnData carry = CarryOnDataManager.getCarryData(player);
 
-		if (!carry.isCarrying(CarryType.ENTITY) && !carry.isCarrying(CarryType.PLAYER))
+		if (carry == null || (!carry.isCarrying(CarryType.ENTITY) && !carry.isCarrying(CarryType.PLAYER)))
 			return false;
 
 		if (player.tickCount == carry.getTick())
@@ -178,6 +187,11 @@ public class PlacementHandler
 
 		if (carry.isCarrying(CarryType.PLAYER)) {
 			Entity otherPlayer = carry.getCarryingPlayer(level);
+			if (otherPlayer == null) {
+				player.ejectPassengers();
+				clearCarryAndSlowness(player, carry);
+				return false;
+			}
 			player.ejectPassengers();
 			Services.PLATFORM.sendPacketToAllPlayers(Constants.PACKET_ID_START_RIDING_OTHER, new ClientboundStartRidingOtherPlayerPacket(player.getId(), otherPlayer.getId(), false), player.level());
 			carry.clear();
@@ -189,6 +203,10 @@ public class PlacementHandler
 		}
 
 		Entity entity = carry.getEntity(level);
+		if (entity == null || !carry.isCarrying(CarryType.ENTITY)) {
+			clearCarryAndSlowness(player, carry);
+			return false;
+		}
 		entity.setPos(placementPos);
 
 		boolean doPlace = placementCallback == null || placementCallback.apply(placementPos, entity);
@@ -219,13 +237,18 @@ public class PlacementHandler
 			return;
 
 		CarryOnData carry = CarryOnDataManager.getCarryData(player);
-		if (!carry.isCarrying(CarryType.ENTITY) && !carry.isCarrying(CarryType.PLAYER))
+		if (carry == null || (!carry.isCarrying(CarryType.ENTITY) && !carry.isCarrying(CarryType.PLAYER)))
 			return;
 
 		Level level = player.level();
 		Entity entityHeld;
-		if (carry.isCarrying(CarryType.ENTITY))
+		if (carry.isCarrying(CarryType.ENTITY)) {
 			entityHeld = carry.getEntity(level);
+			if (entityHeld == null || !carry.isCarrying(CarryType.ENTITY)) {
+				clearCarryAndSlowness(player, carry);
+				return;
+			}
+		}
 		else
 			entityHeld = player.getFirstPassenger();
 
@@ -289,10 +312,20 @@ public class PlacementHandler
 
 	public static void placeCarriedOnDeath(ServerPlayer oldPlayer, ServerPlayer newPlayer, boolean died)
 	{
+		if (oldPlayer == null || newPlayer == null)
+			return;
+
 		CarryOnData carry = CarryOnDataManager.getCarryData(oldPlayer);
+		if (carry == null || !carry.isCarrying())
+			return;
+		if ((carry.isCarrying(CarryType.BLOCK) || carry.isCarrying(CarryType.ENTITY)) && carry.getContentNbt() == null) {
+			clearCarryAndSlowness(oldPlayer, carry);
+			return;
+		}
+
 		if (oldPlayer.level().getGameRules().get(GameRules.KEEP_INVENTORY) || !died) {
 			if (!carry.isCarrying(CarryType.PLAYER)) {
-				CarryOnDataManager.setCarryData(newPlayer, carry);
+				CarryOnDataManager.setCarryData(newPlayer, carry.clone());
 				newPlayer.getInventory().setSelectedSlot(oldPlayer.getInventory().getSelectedSlot());
 				return;
 			}
@@ -303,14 +336,33 @@ public class PlacementHandler
 
 	public static void placeCarried(ServerPlayer player)
 	{
+		if (player == null)
+			return;
+
 		CarryOnData carry = CarryOnDataManager.getCarryData(player);
+		if (carry == null || !carry.isCarrying())
+			return;
+
 		if (carry.isCarrying(CarryType.ENTITY)) {
 			Entity entity = carry.getEntity(player.level());
+			if (entity == null || !carry.isCarrying(CarryType.ENTITY)) {
+				clearCarryAndSlowness(player, carry);
+				return;
+			}
 			entity.setPos(player.position());
 			player.level().addFreshEntity(entity);
 		} else if (carry.isCarrying(CarryType.BLOCK)) {
+			if (carry.getContentNbt() == null) {
+				clearCarryAndSlowness(player, carry);
+				return;
+			}
+
 			BlockPlaceContext context = new BlockPlaceContext(player, InteractionHand.MAIN_HAND, ItemStack.EMPTY, BlockHitResult.miss(Vec3.atCenterOf(player.blockPosition()), Direction.DOWN, player.blockPosition()));
 			BlockState state = getPlacementState(carry.getBlock(), player, context, player.blockPosition());
+			if (state.isAir()) {
+				clearCarryAndSlowness(player, carry);
+				return;
+			}
 			BlockPos pos = getDeathPlacementPos(state, player);
 			BlockEntity blockEntity = carry.getBlockEntity(pos, player.level().registryAccess());
 			player.level().setBlock(pos, state, 3);
@@ -319,6 +371,11 @@ public class PlacementHandler
 		} else if (carry.isCarrying(CarryType.PLAYER)) {
 			player.ejectPassengers();
 		}
+		clearCarryAndSlowness(player, carry);
+	}
+
+	private static void clearCarryAndSlowness(ServerPlayer player, CarryOnData carry)
+	{
 		carry.clear();
 		CarryOnDataManager.setCarryData(player, carry);
 		player.removeEffect(MobEffects.SLOWNESS);

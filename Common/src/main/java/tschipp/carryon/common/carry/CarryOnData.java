@@ -87,7 +87,7 @@ public class CarryOnData {
     public CarryOnData(CompoundTag data)
     {
         if(data.contains("type"))
-            this.type = CarryType.valueOf(data.getStringOr("type", "INVALID"));
+            this.type = readType(data.getStringOr("type", "INVALID"));
         else
             this.type = CarryType.INVALID;
 
@@ -105,6 +105,16 @@ public class CarryOnData {
 
     }
 
+    private static CarryType readType(String typeName)
+    {
+        try {
+            return CarryType.valueOf(typeName);
+        } catch (IllegalArgumentException | NullPointerException e) {
+            Constants.LOG.error("Invalid CarryOnData type: " + typeName);
+            return CarryType.INVALID;
+        }
+    }
+
     public CarryType getType()
     {
         return this.type;
@@ -112,7 +122,7 @@ public class CarryOnData {
 
     public CompoundTag getNbt()
     {
-        nbt.putString("type", type.toString());
+        nbt.putString("type", (type == null ? CarryType.INVALID : type).toString());
         nbt.putBoolean("keyPressed", keyPressed);
         if(activeScript != null)
         {
@@ -124,6 +134,7 @@ public class CarryOnData {
         return nbt;
     }
 
+    @Nullable
     public CompoundTag getContentNbt()
     {
         if(type == CarryType.BLOCK && nbt.contains("block"))
@@ -186,14 +197,29 @@ public class CarryOnData {
         if(this.type != CarryType.ENTITY)
             throw new IllegalStateException("Called getEntity on data that contained " + this.type);
 
-        ValueInput in = TagValueInput.create(problemReporter, level.registryAccess(), nbt.getCompoundOrEmpty("entity"));
-        var optionalEntity = EntityType.create(in, level, EntitySpawnReason.BUCKET);
-        if(optionalEntity.isPresent())
-            return optionalEntity.get();
+        if(level == null || !nbt.contains("entity"))
+            return clearInvalidEntity(level, "Missing entity data");
 
-        Constants.LOG.error("Called EntityType#create even though no entity data was present. Data: " + nbt.toString());
+        try {
+            ValueInput in = TagValueInput.create(problemReporter, level.registryAccess(), nbt.getCompoundOrEmpty("entity"));
+            var optionalEntity = EntityType.create(in, level, EntitySpawnReason.BUCKET);
+            if(optionalEntity.isPresent())
+                return optionalEntity.get();
+        } catch (RuntimeException e) {
+            Constants.LOG.error("Failed to create carried entity from data: " + nbt.toString(), e);
+            this.clear();
+            return level == null ? null : new AreaEffectCloud(level, 0, 0, 0);
+        }
+
+        return clearInvalidEntity(level, "Failed to create carried entity");
+    }
+
+    @Nullable
+    private Entity clearInvalidEntity(Level level, String reason)
+    {
+        Constants.LOG.error(reason + ". Data: " + nbt.toString());
         this.clear();
-        return new AreaEffectCloud(level, 0, 0, 0);
+        return level == null ? null : new AreaEffectCloud(level, 0, 0, 0);
     }
 
     public Optional<CarryOnScript> getActiveScript()
@@ -218,20 +244,35 @@ public class CarryOnData {
     {
         if(this.type != CarryType.PLAYER)
             throw new IllegalStateException("Called getCarryingPlayer on data that contained " + this.type);
-        if(!nbt.contains("player"))
+        if(level == null || level.getServer() == null || !nbt.contains("player")) {
+            this.clear();
             return null;
-        UUID uuid = UUID.fromString(nbt.getString("player").get());
-        return level.getServer().getPlayerList().getPlayer(uuid);
+        }
+
+        String playerId = nbt.getStringOr("player", "");
+        if(playerId.isEmpty()) {
+            this.clear();
+            return null;
+        }
+
+        try {
+            UUID uuid = UUID.fromString(playerId);
+            return level.getServer().getPlayerList().getPlayer(uuid);
+        } catch (IllegalArgumentException e) {
+            Constants.LOG.error("Invalid carried player UUID: " + playerId);
+            this.clear();
+            return null;
+        }
     }
 
     public boolean isCarrying()
     {
-        return this.type != CarryType.INVALID;
+        return this.type != null && this.type != CarryType.INVALID;
     }
 
     public boolean isCarrying(CarryType type)
     {
-        return this.type == type;
+        return this.type != null && this.type == type;
     }
 
     public boolean isKeyPressed() {return this.keyPressed;}

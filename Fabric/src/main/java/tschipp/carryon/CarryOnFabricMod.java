@@ -39,21 +39,22 @@ public class CarryOnFabricMod implements ModInitializer {
             builder -> builder
                     .initializer(() -> new CarryOnData(new CompoundTag()))
                     .persistent(CarryOnData.CODEC)
-                    .syncWith(CarryOnData.STREAM_CODEC, (t, p) ->{ 
-                        ServerPlayer player = (ServerPlayer) t;
+                    .syncWith(CarryOnData.STREAM_CODEC, (target, player) ->{
+                        if (!(target instanceof ServerPlayer carryingPlayer) || player == null || player.connection == null)
+                            return false;
                         // the isAlive check avoids us syncing attachment data about dead players. Which causes a disconnect
-                        // player.tickCount > 0 avoids us syncing attachment data about players the instant they spawn. 
+                        // carryingPlayer.tickCount > 0 avoids us syncing attachment data about players the instant they spawn.
                         // Which also causes a disconnect as the player entity may not be synced yet.
-                        return p.connection != null && player.isAlive() && !p.isRemoved() && player.tickCount > 0;
+                        return carryingPlayer.isAlive() && !player.isRemoved() && carryingPlayer.tickCount > 0;
                     })
 
-         
+
 
     );
 
     @Override
     public void onInitialize() {
-        
+
         // This method is invoked by the Fabric mod loader when it is ready
         // to load your mod. You can access Fabric and Common code in this
         // project.

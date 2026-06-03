@@ -26,6 +26,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Inventory;
@@ -178,11 +179,15 @@ public class CarryOnCommon
 
 	public static int potionLevel(CarryOnData carry, Level level)
 	{
+		if(carry == null || level == null || !carry.isCarrying())
+			return 0;
 		if(carry.isCarrying(CarryType.PLAYER))
 			return 1;
 		if(carry.isCarrying(CarryType.ENTITY))
 		{
 			Entity entity = carry.getEntity(level);
+			if(entity == null || !carry.isCarrying(CarryType.ENTITY))
+				return 0;
 			int i = (int) (entity.getBbHeight() * entity.getBbWidth());
 			if (i > 4)
 				i = 4;
@@ -192,7 +197,16 @@ public class CarryOnCommon
 		}
 		if(carry.isCarrying(CarryType.BLOCK))
 		{
-			String nbt = carry.getNbt().toString();
+			CompoundTag contentNbt = carry.getContentNbt();
+			if(contentNbt == null)
+				return 0;
+			String nbt;
+			try {
+				nbt = carry.getNbt().toString();
+			} catch (RuntimeException e) {
+				Constants.LOG.error("Failed to calculate carried block slowness from NBT", e);
+				return 0;
+			}
 			int i = nbt.length() / 500;
 
 			if (i > 4)

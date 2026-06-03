@@ -121,7 +121,7 @@ public class PickupHandler {
         //Check if TE is locked
         if(blockEntity != null)
         {
-            if(nbt.contains("Lock") && !nbt.getString("Lock").equals(""))
+            if(nbt.contains("Lock") && !nbt.getStringOr("Lock", "").isEmpty())
                 return false;
         }
 
