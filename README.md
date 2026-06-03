@@ -1,5 +1,35 @@
 # Carry On [![](http://cf.way2muchnoise.eu/carry-on.svg)](https://minecraft.curseforge.com/projects/carry-on) [![](http://cf.way2muchnoise.eu/versions/carry-on.svg)](https://minecraft.curseforge.com/projects/carry-on)
 
+## Unofficial Fabric 26.1.2 Community Build
+
+This fork publishes an unofficial Fabric build for Minecraft 26.1.2 while the upstream project catches up. It is intended for players and pack authors who need a working Fabric 26.1.x build now.
+
+- Target: Minecraft `26.1.2`
+- Loader: Fabric Loader `0.19.2`
+- Fabric API: `0.150.0+26.1.2`
+- Java: `25`
+- Runtime jar: see this fork's GitHub Releases for `carryon-fabric-26.1.2-2.9.1.jar`
+
+Build command used for this fork:
+
+```bash
+JAVA_HOME=/usr/lib/jvm/java-25-openjdk ./gradlew -PincludeForge=false -PincludeNeoForge=false :Fabric:build
+```
+
+Smoke testing completed for this community build:
+
+- Dedicated server startup: passed
+- Client startup under Xvfb: passed
+- Interactive in-world carry/drop gameplay: not covered by automated testing in this environment
+
+Known differences from upstream:
+
+- This is a Fabric-only community build for 26.1.2; Forge and NeoForge source directories are preserved but not part of this release.
+- The optional ModMenu / Cloth Config GUI integration is disabled in this build because the available coordinates do not compile cleanly against the non-obfuscated 26.1.2 Fabric classpath.
+- Minecraft 26.1+ uses Fabric's non-obfuscated build flow; `:Fabric:jar` / `:Fabric:build` are the release gates, not `remapJar`.
+
+This fork is not an official upstream release. Original project, authorship, and license remain with Carry On and its maintainers.
+
 To use CarryOn in your projects, include this in your build.gradle:
 ```
 repositories {
