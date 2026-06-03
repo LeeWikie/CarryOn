@@ -4,10 +4,11 @@
 
 This fork publishes an unofficial Fabric build for Minecraft 26.1.2 while the upstream project catches up. It is intended for players and pack authors who need a working Fabric 26.1.x build now.
 
-- **Release:** [fabric-26.1.2-community.1](https://github.com/LeeWikie/CarryOn/releases/tag/fabric-26.1.2-community.1)
+- **Release:** [fabric-26.1.2-community.2](https://github.com/LeeWikie/CarryOn/releases/tag/fabric-26.1.2-community.2)
 - **Runtime jar:** `carryon-fabric-26.1.2-2.9.1.jar`
 - **Target:** Minecraft `26.1.2`, Fabric Loader `0.19.2`, Fabric API `0.150.0+26.1.2`, Java `25`
 - **Branch:** [`fabric-26x-port`](https://github.com/LeeWikie/CarryOn/tree/fabric-26x-port)
+- **Hotfix:** `community.2` fixes `fabric:attachment_sync_v1` encode disconnects for large carried NBT / script serialization edge cases.
 
 This is not an official upstream release. Original project, authorship, and license remain with Carry On and its maintainers.
 
