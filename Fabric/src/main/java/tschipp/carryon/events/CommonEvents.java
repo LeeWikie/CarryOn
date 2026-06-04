@@ -27,6 +27,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.CommonLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.*;
+import net.fabricmc.fabric.api.networking.v1.EntityTrackingEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.core.BlockPos;
@@ -35,6 +36,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.world.InteractionResult;
 import tschipp.carryon.CarryOnCommon;
+import tschipp.carryon.Constants;
 import tschipp.carryon.common.carry.CarryOnData;
 import tschipp.carryon.common.carry.CarryOnData.CarryType;
 import tschipp.carryon.common.carry.CarryOnDataManager;
@@ -43,6 +45,8 @@ import tschipp.carryon.common.carry.PlacementHandler;
 import tschipp.carryon.common.scripting.ScriptReloadListener;
 import tschipp.carryon.compat.ArchitecturyCompat;
 import tschipp.carryon.config.ConfigLoader;
+import tschipp.carryon.networking.ClientboundSyncCarryDataPacket;
+import tschipp.carryon.platform.Services;
 import tschipp.carryon.scripting.IdentifiableScriptReloadListener;
 
 public class CommonEvents {
@@ -157,6 +161,17 @@ public class CommonEvents {
 
         ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> {
             CarryOnCommon.onRiderDisconnected(handler.getPlayer());
+        });
+
+        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
+            ServerPlayer player = handler.getPlayer();
+            Services.PLATFORM.sendPacketToPlayer(Constants.PACKET_ID_SYNC_CARRY_ON_DATA, new ClientboundSyncCarryDataPacket(player.getId(), CarryOnDataManager.getCarryData(player)), player);
+        });
+
+        EntityTrackingEvents.START_TRACKING.register((entity, trackingPlayer) -> {
+            if(entity instanceof ServerPlayer trackedPlayer) {
+                Services.PLATFORM.sendPacketToPlayer(Constants.PACKET_ID_SYNC_CARRY_ON_DATA, new ClientboundSyncCarryDataPacket(trackedPlayer.getId(), CarryOnDataManager.getCarryData(trackedPlayer)), trackingPlayer);
+            }
         });
 
         ServerLivingEntityEvents.ALLOW_DEATH.register((entity, damageSource, damageAmount) -> {
