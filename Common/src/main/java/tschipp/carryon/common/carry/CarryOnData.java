@@ -86,22 +86,22 @@ public class CarryOnData {
 
     public CarryOnData(CompoundTag data)
     {
-        if(data.contains("type"))
-            this.type = readType(data.getStringOr("type", "INVALID"));
+        this.nbt = data.copy();
+
+        if(this.nbt.contains("type"))
+            this.type = readType(this.nbt.getStringOr("type", "INVALID"));
         else
             this.type = CarryType.INVALID;
 
-        this.nbt = data;
+        this.keyPressed = this.nbt.getBooleanOr("keyPressed", false);
 
-        this.keyPressed = data.getBooleanOr("keyPressed", false);
-
-        if(data.contains("activeScript"))
+        if(this.nbt.contains("activeScript"))
         {
-            DataResult<CarryOnScript> res = CarryOnScript.CODEC.parse(NbtOps.INSTANCE, data.get("activeScript"));
+            DataResult<CarryOnScript> res = CarryOnScript.CODEC.parse(NbtOps.INSTANCE, this.nbt.get("activeScript"));
             this.activeScript = res.getOrThrow((s) -> {throw new RuntimeException("Failed to decode activeScript during CarryOnData serialization: " + s);});
         }
 
-        this.selectedSlot = data.getIntOr("selected", 0);
+        this.selectedSlot = this.nbt.getIntOr("selected", 0);
 
     }
 
@@ -120,7 +120,7 @@ public class CarryOnData {
         return this.type;
     }
 
-    public CompoundTag getNbt()
+    public synchronized CompoundTag getNbt()
     {
         nbt.putString("type", (type == null ? CarryType.INVALID : type).toString());
         nbt.putBoolean("keyPressed", keyPressed);
@@ -143,20 +143,20 @@ public class CarryOnData {
             nbt.remove("activeScript");
         }
         nbt.putInt("selected", this.selectedSlot);
-        return nbt;
+        return nbt.copy();
     }
 
     @Nullable
-    public CompoundTag getContentNbt()
+    public synchronized CompoundTag getContentNbt()
     {
         if(type == CarryType.BLOCK && nbt.contains("block"))
-            return nbt.getCompoundOrEmpty("block");
+            return nbt.getCompoundOrEmpty("block").copy();
         else if(type == CarryType.ENTITY && nbt.contains("entity"))
-            return nbt.getCompoundOrEmpty("entity");
+            return nbt.getCompoundOrEmpty("entity").copy();
         return null;
     }
 
-    public void setBlock(BlockState state, @Nullable BlockEntity tile, ServerPlayer player, BlockPos pos)
+    public synchronized void setBlock(BlockState state, @Nullable BlockEntity tile, ServerPlayer player, BlockPos pos)
     {
         this.type = CarryType.BLOCK;
 
@@ -175,7 +175,7 @@ public class CarryOnData {
         }
     }
 
-    public BlockState getBlock()
+    public synchronized BlockState getBlock()
     {
         if(this.type != CarryType.BLOCK)
             throw new IllegalStateException("Called getBlock on data that contained " + this.type);
@@ -184,7 +184,7 @@ public class CarryOnData {
     }
 
     @Nullable
-    public BlockEntity getBlockEntity(BlockPos pos, HolderLookup.Provider lookup)
+    public synchronized BlockEntity getBlockEntity(BlockPos pos, HolderLookup.Provider lookup)
     {
         if(this.type != CarryType.BLOCK)
             throw new IllegalStateException("Called getBlockEntity on data that contained " + this.type);
@@ -195,7 +195,7 @@ public class CarryOnData {
         return BlockEntity.loadStatic(pos, this.getBlock(), nbt.getCompoundOrEmpty("tile"), lookup);
     }
 
-    public void setEntity(Entity entity)
+    public synchronized void setEntity(Entity entity)
     {
         this.type = CarryType.ENTITY;
         TagValueOutput output = TagValueOutput.createWithContext(new ProblemReporter.ScopedCollector(Constants.LOG), entity.registryAccess());
@@ -204,7 +204,7 @@ public class CarryOnData {
         nbt.put("entity", entityData);
     }
 
-    public Entity getEntity(Level level)
+    public synchronized Entity getEntity(Level level)
     {
         if(this.type != CarryType.ENTITY)
             throw new IllegalStateException("Called getEntity on data that contained " + this.type);
@@ -227,32 +227,32 @@ public class CarryOnData {
     }
 
     @Nullable
-    private Entity clearInvalidEntity(Level level, String reason)
+    private synchronized Entity clearInvalidEntity(Level level, String reason)
     {
         Constants.LOG.error(reason + ". Data: " + nbt.toString());
         this.clear();
         return level == null ? null : new AreaEffectCloud(level, 0, 0, 0);
     }
 
-    public Optional<CarryOnScript> getActiveScript()
+    public synchronized Optional<CarryOnScript> getActiveScript()
     {
         if(activeScript == null)
             return Optional.empty();
         return Optional.of(activeScript);
     }
 
-    public void setActiveScript(CarryOnScript script)
+    public synchronized void setActiveScript(CarryOnScript script)
     {
         this.activeScript = script;
     }
 
-    public void setCarryingPlayer(Player player) 
+    public synchronized void setCarryingPlayer(Player player)
     {
         this.type = CarryType.PLAYER;
         nbt.putString("player",  player.getStringUUID().toString());
     }
 
-    public Player getCarryingPlayer(Level level) 
+    public synchronized Player getCarryingPlayer(Level level)
     {
         if(this.type != CarryType.PLAYER)
             throw new IllegalStateException("Called getCarryingPlayer on data that contained " + this.type);
@@ -289,36 +289,36 @@ public class CarryOnData {
 
     public boolean isKeyPressed() {return this.keyPressed;}
 
-    public void setKeyPressed(boolean val) {
+    public synchronized void setKeyPressed(boolean val) {
         this.keyPressed = val;
         this.nbt.putBoolean("keyPressed", val);
     }
 
-    public void setSelected(int selectedSlot) {
+    public synchronized void setSelected(int selectedSlot) {
         this.selectedSlot = selectedSlot;
     }
 
-    public int getSelected() {
+    public synchronized int getSelected() {
         return this.selectedSlot;
     }
 
-    public void clear()
+    public synchronized void clear()
     {
         this.type = CarryType.INVALID;
         this.nbt = new CompoundTag();
         this.activeScript = null;
     }
 
-    public CarryOnData clone() {
-        return new CarryOnData(nbt.copy());
+    public synchronized CarryOnData clone() {
+        return new CarryOnData(getNbt());
     }
 
-    public int getTick()
+    public synchronized int getTick()
     {
         return this.nbt.getIntOr("tick", -1);
     }
 
-    public void setTick(int tick) {
+    public synchronized void setTick(int tick) {
         this.nbt.putInt("tick", tick);
     }
 
