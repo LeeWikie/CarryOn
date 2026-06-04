@@ -28,13 +28,16 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import tschipp.carryon.CarryOnFabricClientMod;
 import tschipp.carryon.CarryOnFabricMod;
+import tschipp.carryon.Constants;
 import tschipp.carryon.common.carry.CarryOnData;
 import tschipp.carryon.config.BuiltConfig;
 import tschipp.carryon.config.fabric.ConfigLoaderImpl;
+import tschipp.carryon.networking.ClientboundSyncCarryDataPacket;
 import tschipp.carryon.networking.PacketBase;
 import tschipp.carryon.platform.services.IPlatformHelper;
 
@@ -109,6 +112,10 @@ public class FabricPlatformHelper implements IPlatformHelper {
 
     @Override
     public void setCarryData(Player player, CarryOnData data) {
-        player.setAttached(CarryOnFabricMod.CARRY_ON_DATA_ATTACHMENT_TYPE, data);
+        CarryOnData snapshot = data.clone();
+        player.setAttached(CarryOnFabricMod.CARRY_ON_DATA_ATTACHMENT_TYPE, snapshot);
+        if(player.level() instanceof ServerLevel level) {
+            sendPacketToAllPlayers(Constants.PACKET_ID_SYNC_CARRY_ON_DATA, new ClientboundSyncCarryDataPacket(player.getId(), snapshot.clone()), level);
+        }
     }
 }

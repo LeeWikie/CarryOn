@@ -25,33 +25,21 @@ import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.Identifier;
-import net.minecraft.server.level.ServerPlayer;
 import tschipp.carryon.common.carry.CarryOnData;
 import tschipp.carryon.config.fabric.ConfigLoaderImpl;
 import tschipp.carryon.events.CommonEvents;
+import tschipp.carryon.networking.ClientboundSyncCarryDataPacket;
+import tschipp.carryon.platform.Services;
 
 import java.io.IOException;
 
 public class CarryOnFabricMod implements ModInitializer {
-
-    private static final int MAX_CARRY_SYNC_SIZE = 4 * 1024 * 1024;
 
     public static final AttachmentType<CarryOnData> CARRY_ON_DATA_ATTACHMENT_TYPE = AttachmentRegistry.create(
             Identifier.fromNamespaceAndPath(Constants.MOD_ID, "carry_on_data"),
             builder -> builder
                     .initializer(() -> new CarryOnData(new CompoundTag()))
                     .persistent(CarryOnData.CODEC)
-                    .syncWith(CarryOnData.STREAM_CODEC, (target, player) ->{
-                        if (!(target instanceof ServerPlayer carryingPlayer) || player == null || player.connection == null)
-                            return false;
-                        // the isAlive check avoids us syncing attachment data about dead players. Which causes a disconnect
-                        // carryingPlayer.tickCount > 0 avoids us syncing attachment data about players the instant they spawn.
-                        // Which also causes a disconnect as the player entity may not be synced yet.
-                        return carryingPlayer.isAlive() && !player.isRemoved() && carryingPlayer.tickCount > 0;
-                    }, MAX_CARRY_SYNC_SIZE)
-
-
-
     );
 
     @Override
@@ -72,6 +60,13 @@ public class CarryOnFabricMod implements ModInitializer {
         CommonEvents.registerEvents();
         CarryOnCommon.registerServerPackets();
         CarryOnCommon.registerClientPackets(false);
+        Services.PLATFORM.registerClientboundPacket(
+                ClientboundSyncCarryDataPacket.TYPE,
+                ClientboundSyncCarryDataPacket.class,
+                ClientboundSyncCarryDataPacket.CODEC,
+                ClientboundSyncCarryDataPacket::handle,
+                false
+        );
 
     }
 }

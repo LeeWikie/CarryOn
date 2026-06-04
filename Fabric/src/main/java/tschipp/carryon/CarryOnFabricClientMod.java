@@ -27,7 +27,9 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.entity.player.Player;
 import tschipp.carryon.client.keybinds.CarryOnKeybinds;
 import tschipp.carryon.events.ClientEvents;
+import tschipp.carryon.networking.ClientboundSyncCarryDataPacket;
 import tschipp.carryon.networking.PacketBase;
+import tschipp.carryon.platform.Services;
 
 import java.util.function.BiConsumer;
 
@@ -39,6 +41,13 @@ public class CarryOnFabricClientMod implements ClientModInitializer
 		CarryOnKeybinds.registerKeybinds(KeyMappingHelper::registerKeyMapping);
 		ClientEvents.registerEvents();
 		CarryOnCommon.registerClientPackets(true);
+		Services.PLATFORM.registerClientboundPacket(
+				ClientboundSyncCarryDataPacket.TYPE,
+				ClientboundSyncCarryDataPacket.class,
+				ClientboundSyncCarryDataPacket.CODEC,
+				ClientboundSyncCarryDataPacket::handle,
+				true
+		);
 	}
 
 	public static void sendPacketToServer(PacketBase packet)
