@@ -9,7 +9,7 @@ This fork publishes an unofficial Fabric build for Minecraft 26.1.2 while the up
 - Fabric API: `0.150.0+26.1.2`
 - Java: `25`
 - Runtime jar: see this fork's GitHub Releases for `carryon-fabric-26.1.2-2.9.1.jar`
-- Latest release: [`fabric-26.1.2-community.2`](https://github.com/LeeWikie/CarryOn/releases/tag/fabric-26.1.2-community.2)
+- Latest release: [`fabric-26.1.2-community.3`](https://github.com/LeeWikie/CarryOn/releases/tag/fabric-26.1.2-community.3)
 
 Build command used for this fork:
 
@@ -17,18 +17,18 @@ Build command used for this fork:
 JAVA_HOME=/usr/lib/jvm/java-25-openjdk ./gradlew -PincludeForge=false -PincludeNeoForge=false :Fabric:build
 ```
 
-Smoke testing completed for this community build:
+Verification for community.3:
 
-- Dedicated server startup: passed
-- Client startup under Xvfb: passed
-- Interactive in-world carry/drop gameplay: not covered by automated testing in this environment
+- `:Fabric:build` passed for community.3.
+- `git diff --check` passed for community.3.
+- Dedicated server startup, client startup, and interactive in-world/LAN carry/drop gameplay were not rerun for community.3 in this environment.
 
 Known differences from upstream:
 
 - This is a Fabric-only community build for 26.1.2; Forge and NeoForge source directories are preserved but not part of this release.
 - The optional ModMenu / Cloth Config GUI integration is disabled in this build because the available coordinates do not compile cleanly against the non-obfuscated 26.1.2 Fabric classpath.
 - Minecraft 26.1+ uses Fabric's non-obfuscated build flow; `:Fabric:jar` / `:Fabric:build` are the release gates, not `remapJar`.
-- `fabric-26.1.2-community.2` includes an attachment sync hotfix for large carried NBT / script serialization edge cases that could disconnect clients with `fabric:attachment_sync_v1` encode errors.
+- `fabric-26.1.2-community.3` disables Fabric attachment auto-sync for CarryOnData; carry-data sync now uses explicit snapshot packets. This avoids `fabric:attachment_sync_v1` encode crashes that could disconnect integrated/LAN sessions before save. community.2 only guarded serialization and did not remove the crash path; community.3 supersedes it for this issue.
 
 This fork is not an official upstream release. Original project, authorship, and license remain with Carry On and its maintainers.
 
